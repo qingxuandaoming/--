@@ -1,0 +1,115 @@
+/* 增加页面整体层次感 - 秋季暖色调 */
+body {
+    background-color: #FFF8E1; /* 温暖的米黄色背景 */
+    line-height: 1.6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #5D4037; /* 深棕色文字，增强秋季感 */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto; /* 确保页面居中显示 */
+    padding: 20px;
+}
+
+/* 增强按钮效果 - 秋季暖色调 */
+.cta-button, .btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #FF9800, #F57C00); /* 橙色渐变 */
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.cta-button:hover, .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255, 152, 0, 0.4); /* 橙色阴影 */
+    background: linear-gradient(135deg, #FFB74D, #FF9800); /* 更亮的橙色渐变 */
+}
+
+/* 难度标签样式 */
+.difficulty {
+    display: inline-block;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.difficulty.easy {
+    background: #8BC34A; /* 秋季绿色 */
+    color: white;
+}
+
+.difficulty.moderate {
+    background: #FF9800; /* 橙色 */
+    color: white;
+}
+
+.difficulty.challenging {
+    background: #D84315; /* 深橙红色 */
+    color: white;
+}
+
+/* 改善页脚样式 */
+footer {
+    background: #795548; /* 棕色背景 */
+    color: #FFF8E1; /* 淡黄色文字 */
+    padding: 50px 0;
+    margin-top: 50px;
+}
+
+.footer-section {
+    margin-bottom: 25px;
+}
+
+.footer-section h4 {
+    margin-bottom: 18px;
+    color: #FFB74D; /* 淡橙色标题 */
+    font-size: 20px;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 10px;
+    transition: transform 0.3s ease;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 25px;
+    border-top: 1px solid #8D6E63; /* 淡棕色边框 */
+    margin-top: 30px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* 媒体查询 */
+@media (max-width: 768px) {
+    .help-search input {
+        width: 85%;
+        padding: 10px 15px 10px 40px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .help-search i {
+        left: 12px;
+        font-size: 16px;
+    }
+}
