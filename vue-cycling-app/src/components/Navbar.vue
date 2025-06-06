@@ -5,6 +5,8 @@
         <router-link to="/">灵境骑行</router-link>
       </div>
       <nav class="nav-links">
+        <router-link to="/">首页</router-link>
+        <router-link to="/route-planning" class="highlight">路线规划</router-link>
         <router-link to="/login">登录</router-link>
         <router-link to="/register">注册</router-link>
         <router-link to="/feedback">建议</router-link>

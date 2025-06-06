@@ -1,0 +1,116 @@
+# 灵境行者路径规划服务配置
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  application:
+    name: cycling-route-backend
+  
+  # 数据库配置 - 暂时禁用
+  # datasource:
+  #   url: jdbc:mysql://localhost:3306/ljxz?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+  #   username: root
+  #   password: 123456
+  #   driver-class-name: com.mysql.cj.jdbc.Driver
+  #   hikari:
+  #     maximum-pool-size: 20
+  #     minimum-idle: 5
+  #     connection-timeout: 30000
+  #     idle-timeout: 600000
+  #     max-lifetime: 1800000
+  
+  # JPA配置 - 暂时禁用
+  # jpa:
+  #   hibernate:
+  #     ddl-auto: update
+  #   show-sql: false
+  #   properties:
+  #     hibernate:
+  #       dialect: org.hibernate.dialect.MySQL8Dialect
+  #       format_sql: true
+  #   open-in-view: false
+  
+  # Jackson配置
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+
+# MyBatis配置 - 暂时禁用
+# mybatis:
+#   mapper-locations: classpath:mapper/*.xml
+#   type-aliases-package: com.ljxz.cycling.entity
+#   configuration:
+#     map-underscore-to-camel-case: true
+#     cache-enabled: true
+#     lazy-loading-enabled: true
+#     multiple-result-sets-enabled: true
+#     use-column-label: true
+#     use-generated-keys: true
+#     auto-mapping-behavior: partial
+#     default-executor-type: reuse
+#     default-statement-timeout: 25000
+
+# 高德地图API配置
+amap:
+  # Web服务API Key
+  web-api-key: 4b19117847fdee44a92d547edb7ab8c1
+  # Web端JS API Key
+  js-api-key: cc888f3fbd2b5c82cb3b842d8277c241
+  # 安全密钥
+  security-key: 045a4882fc3282b9bf01d689b11a06d7
+  # API基础URL
+  base-url: https://restapi.amap.com/v3
+  # 请求超时时间(毫秒)
+  timeout: 10000
+  # 重试次数
+  retry-count: 3
+
+# 路径规划配置
+route:
+  # 默认城市
+  default-city: 石家庄
+  # 最大路径点数
+  max-waypoints: 16
+  # 缓存过期时间(分钟)
+  cache-expire-minutes: 30
+  # 支持的交通方式
+  transport-modes:
+    - driving    # 驾车
+    - walking    # 步行
+    - transit    # 公交
+    - riding     # 骑行
+
+# 日志配置
+logging:
+  level:
+    com.ljxz.cycling: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/cycling-route.log
+    max-size: 10MB
+    max-history: 30
+
+# 管理端点配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true

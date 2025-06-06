@@ -103,6 +103,83 @@ class ApiService {
     search: (query) => api.get(`/routes/search?q=${encodeURIComponent(query)}`)
   };
 
+  // 路线规划相关API (Java后端)
+  static routePlanning = {
+    // 完整路线规划
+    planRoute: (routeData) => {
+      const javaApi = axios.create({
+        baseURL: 'http://localhost:8080/api',
+        timeout: 30000,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return javaApi.post('/route/plan', routeData);
+    },
+    
+    // 快速路线规划
+    quickPlan: (origin, destination, transportMode, city = '石家庄') => {
+      const javaApi = axios.create({
+        baseURL: 'http://localhost:8080/api',
+        timeout: 30000
+      });
+      const params = new URLSearchParams({
+        origin,
+        destination,
+        transportMode,
+        city
+      });
+      return javaApi.get(`/route/quick-plan?${params}`);
+    },
+    
+    // 地理编码（地址转坐标）
+    geocode: (address, city = '石家庄') => {
+      const javaApi = axios.create({
+        baseURL: 'http://localhost:8080/api',
+        timeout: 10000
+      });
+      const params = new URLSearchParams({ address, city });
+      return javaApi.get(`/route/geocode?${params}`);
+    },
+    
+    // 逆地理编码（坐标转地址）
+    reverseGeocode: (longitude, latitude) => {
+      const javaApi = axios.create({
+        baseURL: 'http://localhost:8080/api',
+        timeout: 10000
+      });
+      const params = new URLSearchParams({ longitude, latitude });
+      return javaApi.get(`/route/reverse-geocode?${params}`);
+    },
+    
+    // 获取支持的交通方式
+    getTransportModes: () => {
+      const javaApi = axios.create({
+        baseURL: 'http://localhost:8080/api',
+        timeout: 5000
+      });
+      return javaApi.get('/route/transport-modes');
+    },
+    
+    // 获取路线策略
+    getStrategies: () => {
+      const javaApi = axios.create({
+        baseURL: 'http://localhost:8080/api',
+        timeout: 5000
+      });
+      return javaApi.get('/route/strategies');
+    },
+    
+    // 健康检查
+    healthCheck: () => {
+      const javaApi = axios.create({
+        baseURL: 'http://localhost:8080/api',
+        timeout: 5000
+      });
+      return javaApi.get('/route/health');
+    }
+  };
+
   // 骑行记录相关API
   static records = {
     // 获取用户的骑行记录

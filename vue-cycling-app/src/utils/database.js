@@ -1,98 +1,102 @@
-import mysql from 'mysql2/promise';
-import dbConfig from '../config/database.js';
+import axios from 'axios';
 
-// 创建连接池
-const pool = mysql.createPool({
-  host: dbConfig.host,
-  user: dbConfig.user,
-  password: dbConfig.password,
-  port: dbConfig.port,
-  database: dbConfig.database,
-  waitForConnections: true,
-  connectionLimit: dbConfig.connectionLimit,
-  queueLimit: 0,
-  acquireTimeout: dbConfig.acquireTimeout,
-  timeout: dbConfig.timeout,
-  reconnect: dbConfig.reconnect
+// API基础URL配置
+const API_BASE_URL = 'http://localhost:8080/api'; // Java后端
+const PYTHON_API_BASE_URL = 'http://localhost:5000/api'; // Python后端
+
+// 创建axios实例
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
-// 数据库操作类
+const pythonApiClient = axios.create({
+  baseURL: PYTHON_API_BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// API数据库操作类
 class Database {
-  // 执行查询
-  static async query(sql, params = []) {
+  // 执行查询 - 通过API调用后端
+  static async query(endpoint, params = {}) {
     try {
-      const [rows] = await pool.execute(sql, params);
-      return rows;
+      const response = await apiClient.get(endpoint, { params });
+      return response.data;
     } catch (error) {
-      console.error('数据库查询错误:', error);
+      console.error('API查询错误:', error);
       throw error;
     }
   }
 
-  // 执行插入操作
-  static async insert(table, data) {
+  // 执行插入操作 - 通过API调用后端
+  static async insert(endpoint, data) {
     try {
-      const keys = Object.keys(data);
-      const values = Object.values(data);
-      const placeholders = keys.map(() => '?').join(', ');
-      const sql = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders})`;
-      
-      const [result] = await pool.execute(sql, values);
-      return result;
+      const response = await apiClient.post(endpoint, data);
+      return response.data;
     } catch (error) {
-      console.error('数据库插入错误:', error);
+      console.error('API插入错误:', error);
       throw error;
     }
   }
 
-  // 执行更新操作
-  static async update(table, data, where, whereParams = []) {
+  // 执行更新操作 - 通过API调用后端
+  static async update(endpoint, data) {
     try {
-      const keys = Object.keys(data);
-      const values = Object.values(data);
-      const setClause = keys.map(key => `${key} = ?`).join(', ');
-      const sql = `UPDATE ${table} SET ${setClause} WHERE ${where}`;
-      
-      const [result] = await pool.execute(sql, [...values, ...whereParams]);
-      return result;
+      const response = await apiClient.put(endpoint, data);
+      return response.data;
     } catch (error) {
-      console.error('数据库更新错误:', error);
+      console.error('API更新错误:', error);
       throw error;
     }
   }
 
-  // 执行删除操作
-  static async delete(table, where, whereParams = []) {
+  // 执行删除操作 - 通过API调用后端
+  static async delete(endpoint, params = {}) {
     try {
-      const sql = `DELETE FROM ${table} WHERE ${where}`;
-      const [result] = await pool.execute(sql, whereParams);
-      return result;
+      const response = await apiClient.delete(endpoint, { params });
+      return response.data;
     } catch (error) {
-      console.error('数据库删除错误:', error);
+      console.error('API删除错误:', error);
       throw error;
     }
   }
 
-  // 测试数据库连接
+  // 测试后端连接
   static async testConnection() {
     try {
-      const connection = await pool.getConnection();
-      console.log('数据库连接成功!');
-      connection.release();
-      return true;
+      const response = await apiClient.get('/health');
+      console.log('后端服务连接成功!');
+      return response.data;
     } catch (error) {
-      console.error('数据库连接失败:', error);
+      console.error('后端服务连接失败:', error);
       return false;
     }
   }
 
-  // 关闭连接池
-  static async close() {
+  // Python后端API调用
+  static async pythonQuery(endpoint, params = {}) {
     try {
-      await pool.end();
-      console.log('数据库连接池已关闭');
+      const response = await pythonApiClient.get(endpoint, { params });
+      return response.data;
     } catch (error) {
-      console.error('关闭数据库连接池错误:', error);
+      console.error('Python API查询错误:', error);
+      throw error;
+    }
+  }
+
+  static async pythonPost(endpoint, data) {
+    try {
+      const response = await pythonApiClient.post(endpoint, data);
+      return response.data;
+    } catch (error) {
+      console.error('Python API请求错误:', error);
+      throw error;
     }
   }
 }

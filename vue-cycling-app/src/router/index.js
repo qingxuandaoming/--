@@ -32,6 +32,11 @@ const router = createRouter({
       path: '/vr',
       name: 'VR',
       component: () => import('../views/VR.vue')
+    },
+    {
+      path: '/route-planning',
+      name: 'RoutePlanning',
+      component: () => import('../views/RoutePlanning.vue')
     }
   ]
 })
