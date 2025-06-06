@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # MySQL数据库
+  mysql:
+    image: mysql:8.0
+    container_name: ljxz_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: ljxz
+      MYSQL_USER: ljxz_user
+      MYSQL_PASSWORD: ljxz_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./database/equipment_tables.sql:/docker-entrypoint-initdb.d/02-equipment.sql
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - ljxz_network
+
+  # Redis缓存（可选）
+  redis:
+    image: redis:7-alpine
+    container_name: ljxz_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ljxz_network
+
+  # Python后端服务
+  python-backend:
+    build: .
+    container_name: ljxz_python_backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      # 数据库配置
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ljxz_user
+      DB_PASSWORD: ljxz_pass
+      DB_NAME: ljxz
+      
+      # Flask配置
+      FLASK_ENV: production
+      FLASK_DEBUG: false
+      SECRET_KEY: your-secret-key-here
+      
+      # Redis配置（可选）
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+      
+      # 爬虫配置
+      CRAWLER_DELAY: 2
+      CRAWLER_TIMEOUT: 30
+      CRAWLER_MAX_RETRIES: 3
+      CRAWLER_USER_AGENTS: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      
+      # 日志配置
+      LOG_LEVEL: INFO
+      LOG_FILE: /app/logs/app.log
+      
+      # Chrome配置（Docker环境）
+      CHROME_BINARY_PATH: /usr/bin/google-chrome
+      CHROMEDRIVER_PATH: /usr/local/bin/chromedriver
+    volumes:
+      - ./logs:/app/logs
+      - /dev/shm:/dev/shm  # Chrome需要共享内存
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - ljxz_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  ljxz_network:
+    driver: bridge
