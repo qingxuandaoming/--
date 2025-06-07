@@ -2,6 +2,7 @@
     "cSpell.words": [
         "databind",
         "fasterxml",
+        "geocodes",
         "httpclient",
         "httpcomponents",
         "jdbc",
@@ -9,9 +10,11 @@
         "jsonwebtoken",
         "ljxz",
         "mybatis",
+        "pois",
         "projectlombok",
         "springframework",
         "wechat",
-        "weibo"
+        "weibo",
+        "weixin"
     ]
 }

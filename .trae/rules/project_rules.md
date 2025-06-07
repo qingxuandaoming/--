@@ -22,3 +22,7 @@ key：cc888f3fbd2b5c82cb3b842d8277c241
 web服务
 key名称：mcp
 key：4b19117847fdee44a92d547edb7ab8c1
+
+12.前端、Python后端、Java后端都有markdown文件，请你每次对功能、路由、API有改变时，都修改markdown文件，更新描述。
+13.markdown文档有错误，请即使修改。你存在对项目不了解时也应读取markdown文档。
+14.项目开始时间是2025年，现在是2025年。

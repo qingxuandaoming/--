@@ -1,41 +1,72 @@
-# 数据库设置指南
+# 灵境行者数据库设置指南
 
-本项目使用MySQL作为数据库，以下是完整的设置和使用指南。
+本指南将帮助您设置灵境行者项目所需的MySQL数据库，包括Java后端和Python后端的数据库配置。
 
-## 📋 前提条件
+## 📋 前置要求
 
-1. 确保已安装MySQL服务器（版本5.7或更高）
-2. MySQL服务正在运行
-3. 具有数据库创建权限的用户账户
+- **MySQL**: 8.0 或更高版本
+- **数据库管理工具**: MySQL Workbench、phpMyAdmin 或命令行工具
+- **权限**: 数据库创建和管理权限
+- **字符集**: 支持UTF-8编码
 
 ## 🔧 数据库配置
 
-### 1. 数据库连接信息
+### 默认连接配置
 
-项目默认配置如下（可在 `src/config/database.js` 中修改）：
+项目使用以下默认数据库连接配置：
 
-```javascript
-{
-  host: 'localhost',
-  user: 'root',
-  password: '123456',
-  port: 3306,
-  database: 'ljxz'
+```yaml
+# Java后端配置 (application.yml)
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/ljxz?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+```
+
+```python
+# Python后端配置
+DATABASE_CONFIG = {
+    'host': 'localhost',
+    'port': 3306,
+    'user': 'root',
+    'password': 'root',
+    'database': 'ljxz',
+    'charset': 'utf8mb4'
 }
 ```
 
-### 2. 修改数据库配置
+### 修改数据库配置
 
-如需修改数据库连接信息，请编辑 `src/config/database.js` 文件：
+#### Java后端配置
+修改 `java-backend/src/main/resources/application.yml`：
 
-```javascript
-const dbConfig = {
-  host: 'your_host',        // 数据库主机地址
-  user: 'your_username',    // 数据库用户名
-  password: 'your_password', // 数据库密码
-  port: 3306,               // 数据库端口
-  database: 'your_database_name' // 数据库名称
-};
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://your-host:your-port/your-database?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: your-username
+    password: your-password
+```
+
+#### Python后端配置
+修改 `python-backend/config.py`：
+
+```python
+DATABASE_URL = 'mysql+pymysql://username:password@host:port/database'
+```
+
+#### 环境变量配置（推荐）
+为了安全性，建议使用环境变量：
+
+```bash
+# 设置环境变量
+export DB_HOST=localhost
+export DB_PORT=3306
+export DB_USER=root
+export DB_PASSWORD=your-password
+export DB_NAME=ljxz
 ```
 
 ## 🗄️ 数据库初始化
@@ -144,61 +175,210 @@ const loginResult = await ApiService.user.login({
 
 ## 🧪 测试数据库连接
 
-项目提供了数据库连接测试工具：
+### Java后端测试
 
-```javascript
-import { testDatabaseConnection, testDatabaseOperations } from '@/utils/dbTest.js';
+```bash
+# 启动Java应用后访问健康检查端点
+curl http://localhost:8080/actuator/health
 
-// 测试连接
-const isConnected = await testDatabaseConnection();
-
-// 测试操作
-const operationsWork = await testDatabaseOperations();
+# 测试数据库连接
+curl http://localhost:8080/api/test/db
 ```
 
-在开发模式下，测试会自动运行并在控制台显示结果。
+### Python后端测试
 
-## ⚠️ 注意事项
+```bash
+# 测试Python服务健康状态
+curl http://localhost:5000/api/health
 
-1. **安全性**：
-   - 生产环境中请使用强密码
-   - 不要在代码中硬编码敏感信息
-   - 考虑使用环境变量存储数据库配置
+# 测试数据库连接
+curl http://localhost:5000/api/test/db
+```
 
-2. **性能优化**：
-   - 项目使用连接池管理数据库连接
-   - 适当使用索引提高查询性能
-   - 定期清理不必要的数据
+### 前端测试
 
-3. **备份**：
-   - 定期备份数据库
-   - 在重要操作前创建数据快照
+```javascript
+// 在浏览器控制台中测试API连接
+fetch('/api/test/db')
+  .then(response => response.json())
+  .then(data => console.log('数据库连接状态:', data));
+```
 
-## 🔧 故障排除
+## 🔍 故障排除
 
-### 常见问题
+### 1. 连接失败问题
 
-1. **连接被拒绝**：
-   - 检查MySQL服务是否运行
-   - 验证连接参数是否正确
-   - 确认防火墙设置
+**症状**: `Connection refused` 或 `Access denied`
 
-2. **认证失败**：
-   - 检查用户名和密码
-   - 确认用户具有相应权限
+**解决方案**:
+```bash
+# 检查MySQL服务状态
+sudo systemctl status mysql
+# 或 Windows 下
+net start mysql80
 
-3. **数据库不存在**：
-   - 运行初始化脚本创建数据库
-   - 检查数据库名称是否正确
+# 检查端口是否开放
+netstat -an | grep 3306
 
-### 调试技巧
+# 测试连接
+mysql -h localhost -u root -p
+```
 
-- 查看浏览器控制台的错误信息
-- 检查MySQL错误日志
-- 使用数据库连接测试工具验证配置
+### 2. 字符编码问题
 
-## 📚 相关文档
+**症状**: 中文字符显示为乱码
 
+**解决方案**:
+```sql
+-- 检查数据库字符集
+SHOW VARIABLES LIKE 'character_set%';
+
+-- 修改数据库字符集
+ALTER DATABASE ljxz CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- 修改表字符集
+ALTER TABLE table_name CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### 3. 权限问题
+
+**症状**: `Access denied for user`
+
+**解决方案**:
+```sql
+-- 创建用户并授权
+CREATE USER 'ljxz_user'@'localhost' IDENTIFIED BY 'secure_password';
+GRANT ALL PRIVILEGES ON ljxz.* TO 'ljxz_user'@'localhost';
+FLUSH PRIVILEGES;
+
+-- 检查用户权限
+SHOW GRANTS FOR 'ljxz_user'@'localhost';
+```
+
+### 4. 时区问题
+
+**症状**: 时间数据不正确
+
+**解决方案**:
+```sql
+-- 设置时区
+SET GLOBAL time_zone = '+8:00';
+SET time_zone = '+8:00';
+
+-- 在连接URL中指定时区
+jdbc:mysql://localhost:3306/ljxz?serverTimezone=Asia/Shanghai
+```
+
+## 🚀 性能优化
+
+### 1. 索引优化
+
+```sql
+-- 为常用查询字段创建索引
+CREATE INDEX idx_user_email ON users(email);
+CREATE INDEX idx_route_difficulty ON cycling_routes(difficulty_level);
+CREATE INDEX idx_record_date ON cycling_records(created_at);
+```
+
+### 2. 连接池配置
+
+```yaml
+# Java后端连接池配置
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+```
+
+### 3. 查询优化
+
+```sql
+-- 使用EXPLAIN分析查询性能
+EXPLAIN SELECT * FROM cycling_routes WHERE difficulty_level = 'easy';
+
+-- 避免SELECT *，只查询需要的字段
+SELECT id, name, difficulty_level FROM cycling_routes WHERE difficulty_level = 'easy';
+```
+
+## 🔒 安全最佳实践
+
+### 1. 密码安全
+- 使用强密码
+- 定期更换数据库密码
+- 使用环境变量存储敏感信息
+
+### 2. 网络安全
+```sql
+-- 限制远程访问
+CREATE USER 'app_user'@'localhost' IDENTIFIED BY 'strong_password';
+-- 而不是 'app_user'@'%'
+```
+
+### 3. 备份策略
+```bash
+# 定期备份数据库
+mysqldump -u root -p ljxz > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# 自动备份脚本
+#!/bin/bash
+BACKUP_DIR="/path/to/backup"
+DATE=$(date +%Y%m%d_%H%M%S)
+mysqldump -u root -p ljxz > $BACKUP_DIR/ljxz_backup_$DATE.sql
+```
+
+## 📊 监控和维护
+
+### 1. 性能监控
+```sql
+-- 查看慢查询
+SHOW VARIABLES LIKE 'slow_query_log';
+SET GLOBAL slow_query_log = 'ON';
+SET GLOBAL long_query_time = 2;
+
+-- 查看连接状态
+SHOW PROCESSLIST;
+SHOW STATUS LIKE 'Threads_connected';
+```
+
+### 2. 存储空间监控
+```sql
+-- 查看数据库大小
+SELECT 
+    table_schema AS 'Database',
+    ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS 'Size (MB)'
+FROM information_schema.tables 
+WHERE table_schema = 'ljxz'
+GROUP BY table_schema;
+```
+
+## 📝 注意事项
+
+1. **生产环境配置**:
+   - 使用专用数据库用户，避免使用root
+   - 启用SSL连接
+   - 配置防火墙规则
+   - 定期备份数据
+
+2. **开发环境配置**:
+   - 可以使用Docker快速搭建
+   - 使用测试数据，避免影响生产数据
+   - 启用详细日志便于调试
+
+3. **数据迁移**:
+   - 在更新数据库结构前先备份
+   - 使用版本控制管理数据库变更
+   - 测试迁移脚本
+
+## 🔗 相关文档
+
+- [API接口文档](./API_ENDPOINTS.md)
+- [前端应用文档](./README.md)
+- [Java后端文档](../java-backend/README.md)
+- [Python后端文档](../python-backend/README.md)
 - [MySQL官方文档](https://dev.mysql.com/doc/)
-- [mysql2 NPM包文档](https://www.npmjs.com/package/mysql2)
-- [Vue.js官方文档](https://vuejs.org/)
+- [Spring Boot数据库配置](https://docs.spring.io/spring-boot/docs/current/reference/html/data.html)
+- [Flask-SQLAlchemy文档](https://flask-sqlalchemy.palletsprojects.com/)

@@ -7,40 +7,39 @@
       </div>
       
       <form @submit.prevent="handleSubmit">
-        <div class="form-group">
-          <label for="username">用户名</label>
-          <input type="text" id="username" v-model="username" placeholder="请输入用户名（3-20个字符）" required minlength="3" maxlength="20">
-        </div>
-        
-        <div class="form-group">
-          <label for="email">电子邮箱</label>
-          <input type="email" id="email" v-model="email" placeholder="请输入您的电子邮箱" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="password">密码</label>
-          <input type="password" id="password" v-model="password" @input="checkPasswordStrength" placeholder="请设置您的密码" required>
-          
-          <div class="password-requirements">
-            <p>密码要求：</p>
-            <ul>
-              <li :class="{ valid: hasMinLength }">至少8个字符</li>
-              <li :class="{ valid: hasNumber }">包含数字</li>
-              <li :class="{ valid: hasLetter }">包含字母</li>
-              <li :class="{ valid: hasSpecialChar }">包含特殊字符（推荐）</li>
-            </ul>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" v-model="username" placeholder="3-20个字符" required minlength="3" maxlength="20">
           </div>
           
-          <div class="password-strength">
-            <div class="password-strength-bar" :style="{ width: passwordStrength + '%', background: passwordStrengthColor }"></div>
+          <div class="form-group">
+            <label for="email">电子邮箱</label>
+            <input type="email" id="email" v-model="email" placeholder="请输入邮箱" required>
           </div>
-          
-          <div class="password-strength-text">密码强度：{{ passwordStrengthText }}</div>
         </div>
         
-        <div class="form-group">
-          <label for="confirmPassword">确认密码</label>
-          <input type="password" id="confirmPassword" v-model="confirmPassword" placeholder="请再次输入您的密码" required>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">
+              密码
+              <button type="button" class="password-help-btn" @click="showPasswordModal = true">
+                <i class="fas fa-question-circle"></i>
+              </button>
+            </label>
+            <input type="password" id="password" v-model="password" @input="checkPasswordStrength" placeholder="请设置密码" required>
+            
+            <div class="password-strength">
+              <div class="password-strength-bar" :style="{ width: passwordStrength + '%', background: passwordStrengthColor }"></div>
+            </div>
+            
+            <div class="password-strength-text">强度：{{ passwordStrengthText }}</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="confirmPassword">确认密码</label>
+            <input type="password" id="confirmPassword" v-model="confirmPassword" placeholder="再次输入密码" required>
+          </div>
         </div>
         
         <!-- 错误消息 -->
@@ -71,22 +70,44 @@
       <div class="auth-footer">
         已有账户？ <router-link to="/login">立即登录</router-link>
       </div>
-      
-      <div class="social-login">
-        <p>使用社交账号登录</p>
-        
-        <div class="social-icons">
-          <a href="#" class="social-icon wechat">
-            <i class="fab fa-weixin"></i>
-          </a>
-          
-          <a href="#" class="social-icon weibo">
-            <i class="fab fa-weibo"></i>
-          </a>
-          
-          <a href="#" class="social-icon qq">
-            <i class="fab fa-qq"></i>
-          </a>
+    </div>
+    
+    <!-- 密码要求弹窗 -->
+    <div v-if="showPasswordModal" class="modal-overlay" @click="showPasswordModal = false">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3>密码要求</h3>
+          <button class="close-btn" @click="showPasswordModal = false">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="password-requirements-modal">
+            <ul>
+              <li :class="{ valid: hasMinLength }">
+                <i class="fas" :class="hasMinLength ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                至少8个字符
+              </li>
+              <li :class="{ valid: hasNumber }">
+                <i class="fas" :class="hasNumber ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                包含数字
+              </li>
+              <li :class="{ valid: hasLetter }">
+                <i class="fas" :class="hasLetter ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                包含字母
+              </li>
+              <li :class="{ valid: hasSpecialChar }">
+                <i class="fas" :class="hasSpecialChar ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                包含特殊字符（推荐）
+              </li>
+            </ul>
+            <div class="password-tips">
+              <p><strong>提示：</strong></p>
+              <p>• 使用大小写字母、数字和特殊字符的组合</p>
+              <p>• 避免使用常见密码如"123456"、"password"等</p>
+              <p>• 不要使用个人信息作为密码</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -108,6 +129,7 @@ const passwordStrength = ref(0);
 const loading = ref(false);
 const errorMessage = ref('');
 const successMessage = ref('');
+const showPasswordModal = ref(false);
 
 // 密码要求检查
 const hasMinLength = computed(() => password.value.length >= 8);
@@ -204,37 +226,57 @@ const handleSubmit = async () => {
 
 <style scoped>
 .auth-container {
-  max-width: 500px;
-  margin: 60px auto;
+  max-width: 480px;
+  margin: 40px auto;
   background: white;
   border-radius: 12px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-  padding: 40px;
+  padding: 30px;
 }
 
 .auth-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 .auth-header h1 {
   color: #2c3e50;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  font-size: 1.8rem;
 }
 
 .auth-header p {
   color: #7f8c8d;
+  font-size: 0.9rem;
 }
 
 .form-group {
-  margin-bottom: 25px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 8px;
   color: #2c3e50;
   font-weight: 500;
+}
+
+.password-help-btn {
+  background: none;
+  border: none;
+  color: #FF9800;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 2px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.password-help-btn:hover {
+  color: #F57C00;
+  transform: scale(1.1);
 }
 
 .form-group input {
@@ -253,11 +295,13 @@ const handleSubmit = async () => {
 
 .form-row {
   display: flex;
-  gap: 15px;
+  gap: 20px;
+  margin-bottom: 18px;
 }
 
 .form-row .form-group {
   flex: 1;
+  margin-bottom: 0;
 }
 
 .password-strength {
@@ -274,55 +318,11 @@ const handleSubmit = async () => {
   transition: width 0.3s ease, background 0.3s ease;
 }
 
-.password-requirements {
-  margin-top: 10px;
-  padding: 12px;
-  background: #f8f9fa;
-  border-radius: 6px;
-  border-left: 3px solid #FF9800;
-}
 
-.password-requirements p {
-  margin: 0 0 8px 0;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #2c3e50;
-}
-
-.password-requirements ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.password-requirements li {
-  font-size: 0.85rem;
-  color: #7f8c8d;
-  margin-bottom: 4px;
-  padding-left: 20px;
-  position: relative;
-}
-
-.password-requirements li::before {
-  content: '✗';
-  position: absolute;
-  left: 0;
-  color: #e74c3c;
-  font-weight: bold;
-}
-
-.password-requirements li.valid {
-  color: #27ae60;
-}
-
-.password-requirements li.valid::before {
-  content: '✓';
-  color: #27ae60;
-}
 
 .password-strength-text {
-  font-size: 0.8rem;
-  margin-top: 5px;
+  font-size: 0.75rem;
+  margin-top: 4px;
   color: #7f8c8d;
   font-weight: 500;
 }
@@ -331,7 +331,7 @@ const handleSubmit = async () => {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  margin-top: 20px;
+  margin: 15px 0;
 }
 
 .terms-checkbox input {
@@ -339,7 +339,7 @@ const handleSubmit = async () => {
 }
 
 .terms-checkbox label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #7f8c8d;
   line-height: 1.4;
 }
@@ -355,8 +355,8 @@ const handleSubmit = async () => {
 
 .submit-btn {
   width: 100%;
-  padding: 14px;
-  margin-top: 20px;
+  padding: 12px;
+  margin-top: 15px;
   background: linear-gradient(135deg, #FF9800, #F57C00);
   color: white;
   border: none;
@@ -414,94 +414,144 @@ const handleSubmit = async () => {
   100% { transform: rotate(360deg); }
 }
 
-.terms-checkbox {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 25px;
-}
-
-.terms-checkbox input {
-  margin-top: 5px;
-}
-
-.terms-checkbox label {
-  font-size: 0.9rem;
-  color: #7f8c8d;
-  line-height: 1.4;
-}
-
-.terms-checkbox a {
-  color: #E65100;
-  text-decoration: none;
-}
-
-.terms-checkbox a:hover {
-  text-decoration: underline;
-}
-
-.social-login {
-  margin-top: 30px;
-  text-align: center;
-}
-
-.social-login p {
-  margin-bottom: 15px;
-  color: #7f8c8d;
-  position: relative;
-}
-
-.social-login p::before,
-.social-login p::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: 35%;
-  height: 1px;
-  background: #ddd;
-}
-
-.social-login p::before {
+/* 弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
   left: 0;
-}
-
-.social-login p::after {
-  right: 0;
-}
-
-.social-icons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-}
-
-.social-icon {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  background: #f8f9fa;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+  margin: 0;
   color: #2c3e50;
+  font-size: 1.2rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
   transition: all 0.3s ease;
 }
 
-.social-icon:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+.close-btn:hover {
+  color: #e74c3c;
+  background: #f8f9fa;
 }
 
-.social-icon.wechat {
-  color: #07C160;
+.modal-body {
+  padding: 20px 25px;
 }
 
-.social-icon.weibo {
-  color: #E6162D;
+.password-requirements-modal ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
 }
 
-.social-icon.qq {
-  color: #12B7F5;
+.password-requirements-modal li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  transition: color 0.3s ease;
 }
+
+.password-requirements-modal li.valid {
+  color: #27ae60;
+}
+
+.password-requirements-modal li i {
+  font-size: 1rem;
+  width: 16px;
+}
+
+.password-requirements-modal .fa-check-circle {
+  color: #27ae60;
+}
+
+.password-requirements-modal .fa-times-circle {
+  color: #e74c3c;
+}
+
+.password-tips {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 3px solid #FF9800;
+}
+
+.password-tips p {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  color: #2c3e50;
+  line-height: 1.4;
+}
+
+.password-tips p:last-child {
+  margin-bottom: 0;
+}
+
+.password-tips strong {
+  color: #FF9800;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .auth-container {
+    margin: 20px;
+    padding: 25px 20px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .form-row .form-group {
+    margin-bottom: 18px;
+  }
+  
+  .modal-content {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .modal-header,
+  .modal-body {
+    padding: 15px 20px;
+  }
+}
+
 </style>
