@@ -37,7 +37,7 @@
             </div>
             
             <div class="more-link-block footer-route-item">
-              <router-link to="/vr" class="cta-button">探索更多路线</router-link>
+              <router-link to="/route-planning" class="cta-button">探索更多路线</router-link>
               <div class="more-content">
                 <i class="fas fa-arrow-circle-right"></i>
                 <h4>探索更多路线</h4>

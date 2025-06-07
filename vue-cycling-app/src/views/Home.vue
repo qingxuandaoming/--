@@ -420,9 +420,330 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+
 const imageLoaded = (event) => {
   event.target.parentElement.classList.add('loaded');
 };
+
+const map = ref(null)
+const startPoint = ref('')
+const endPoint = ref('')
+const routePlanning = ref(null)
+
+// 动态加载高德地图API脚本
+const loadAMapScript = () => {
+  return new Promise((resolve, reject) => {
+    if (window.AMap) {
+      resolve(window.AMap)
+      return
+    }
+    
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.async = true
+    script.src = 'https://webapi.amap.com/maps?v=1.4.15&key=cc888f3fbd2b5c82cb3b842d8277c241&plugin=AMap.Riding,AMap.Geocoder,AMap.ToolBar,AMap.Scale&jscode=045a4882fc3282b9bf01d689b11a06d7'
+    script.onload = () => {
+      if (window.AMap) {
+        resolve(window.AMap)
+      } else {
+        reject(new Error('高德地图API加载失败'))
+      }
+    }
+    script.onerror = () => reject(new Error('高德地图API脚本加载失败'))
+    document.head.appendChild(script)
+  })
+}
+
+// 初始化高德地图
+const initAMap = async () => {
+  try {
+    // 配置高德地图安全密钥（必须在加载API之前设置）
+    window._AMapSecurityConfig = {
+      securityJSCode: '045a4882fc3282b9bf01d689b11a06d7'
+    }
+    
+    // 动态加载高德地图API
+    await loadAMapScript()
+    
+    // 等待DOM更新
+    await nextTick()
+    
+    // 检查容器是否存在
+    const container = document.getElementById('container')
+    if (!container) {
+      console.error('地图容器不存在')
+      return
+    }
+    
+    // 创建地图实例
+    map.value = new AMap.Map('container', {
+      zoom: 12,
+      center: [114.31667, 30.51667], // 石家庄坐标
+      resizeEnable: true,
+      viewMode: '2D',
+      mapStyle: 'amap://styles/normal'
+    })
+    
+    // 监听地图加载完成事件
+    map.value.on('complete', () => {
+      console.log('地图加载完成')
+      // 在地图中心添加一个标记
+      const marker = new AMap.Marker({
+        position: [114.31667, 30.51667],
+        title: '石家庄市中心'
+      })
+      map.value.add(marker)
+    })
+    
+    // 添加地图控件
+    AMap.plugin(['AMap.ToolBar', 'AMap.Scale'], function() {
+      // 工具条控件
+      map.value.addControl(new AMap.ToolBar({
+        position: 'RB'
+      }))
+      
+      // 比例尺控件
+      map.value.addControl(new AMap.Scale())
+    })
+    
+    // 初始化骑行路线规划服务
+    AMap.plugin('AMap.Riding', function() {
+      routePlanning.value = new AMap.Riding({
+        map: map.value,
+        panel: null,
+        policy: AMap.RidingPolicy.LEAST_TIME // 骑行策略参数
+      })
+    })
+    
+    console.log('高德地图初始化成功')
+  } catch (error) {
+    console.error('高德地图初始化失败:', error)
+  }
+}
+
+// 使用POI搜索API进行地址解析
+const geocodeAddress = async (address) => {
+  try {
+    // 安全密钥
+    const securityJsCode = '045a4882fc3282b9bf01d689b11a06d7'
+    
+    // 首先尝试POI搜索API，这对地标和模糊地址更友好
+    const poiUrl = `https://restapi.amap.com/v3/place/text?key=4b19117847fdee44a92d547edb7ab8c1&keywords=${encodeURIComponent(address)}&city=北京&offset=1&jscode=${securityJsCode}`
+    console.log('尝试POI搜索:', address)
+    console.log('POI搜索URL:', poiUrl)
+    
+    const poiResponse = await fetch(poiUrl)
+    const poiData = await poiResponse.json()
+    
+    console.log('POI搜索响应:', poiData)
+    
+    // 如果POI搜索成功
+    if (poiData.status === '1' && poiData.pois && poiData.pois.length > 0) {
+      const poi = poiData.pois[0]
+      const location = poi.location.split(',')
+      console.log(`POI搜索成功，找到: ${poi.name}，地址: ${poi.address}`)
+      return new AMap.LngLat(parseFloat(location[0]), parseFloat(location[1]))
+    }
+    
+    console.log('POI搜索未找到结果，尝试地理编码API')
+    
+    // 如果POI搜索失败，回退到地理编码API
+    const geoUrl = `https://restapi.amap.com/v3/geocode/geo?key=4b19117847fdee44a92d547edb7ab8c1&address=${encodeURIComponent(address)}&jscode=${securityJsCode}`
+    console.log('地理编码URL:', geoUrl)
+    
+    const geoResponse = await fetch(geoUrl)
+    const geoData = await geoResponse.json()
+    
+    console.log('地理编码响应:', geoData)
+    
+    if (geoData.status === '1' && geoData.geocodes && geoData.geocodes.length > 0) {
+      const location = geoData.geocodes[0].location.split(',')
+      console.log(`地理编码成功，地址: ${geoData.geocodes[0].formatted_address}`)
+      return new AMap.LngLat(parseFloat(location[0]), parseFloat(location[1]))
+    }
+    
+    // 两种方法都失败
+    const errorMsg = poiData.info || geoData.info || '未知错误'
+    throw new Error(`地址解析失败: ${errorMsg}`)
+    
+  } catch (error) {
+    console.error('地址解析异常:', error)
+    if (error.message.includes('地址解析失败:')) {
+      throw error
+    }
+    throw new Error('地址解析请求失败: ' + error.message)
+  }
+}
+
+// 使用Web服务API进行骑行路线规划
+const planBicyclingRoute = async (origin, destination) => {
+  try {
+    const securityJsCode = '045a4882fc3282b9bf01d689b11a06d7'
+    const apiKey = '4b19117847fdee44a92d547edb7ab8c1'
+    
+    // 使用高德地图Web服务API的骑行路线规划
+    const routeUrl = `https://restapi.amap.com/v4/direction/bicycling?key=${apiKey}&origin=${origin}&destination=${destination}&jscode=${securityJsCode}`
+    
+    console.log('骑行路线规划URL:', routeUrl)
+    
+    const response = await fetch(routeUrl)
+    const data = await response.json()
+    
+    console.log('骑行路线规划响应:', data)
+    
+    // 检查API响应格式：{data: {...}, errcode: 0, errmsg: 'OK'}
+    if (data.errcode === 0 && data.data && data.data.paths && data.data.paths.length > 0) {
+      const path = data.data.paths[0]
+      console.log('路线规划成功:', {
+        distance: path.distance + '米',
+        duration: Math.round(path.duration / 60) + '分钟',
+        steps: path.steps.length + '个步骤'
+      })
+      
+      // 在地图上绘制路线
+      drawRouteOnMap(path)
+      
+      alert(`路线规划成功！\n距离: ${(path.distance / 1000).toFixed(1)}公里\n预计时间: ${Math.round(path.duration / 60)}分钟`)
+      return data
+    } else {
+      throw new Error(data.errmsg || '路线规划失败')
+    }
+  } catch (error) {
+    console.error('骑行路线规划失败:', error)
+    throw error
+  }
+}
+
+// 在地图上绘制路线
+const drawRouteOnMap = (path) => {
+  if (!map.value) return
+  
+  try {
+    // 清除之前的路线
+    map.value.clearMap()
+    
+    // 解析路径坐标
+    const pathCoords = []
+    if (path.steps && path.steps.length > 0) {
+      path.steps.forEach(step => {
+        if (step.polyline) {
+          const coords = step.polyline.split(';')
+          coords.forEach(coord => {
+            const [lng, lat] = coord.split(',')
+            if (lng && lat) {
+              pathCoords.push([parseFloat(lng), parseFloat(lat)])
+            }
+          })
+        }
+      })
+    }
+    
+    if (pathCoords.length > 0) {
+      // 创建路线折线
+      const polyline = new AMap.Polyline({
+        path: pathCoords,
+        strokeColor: '#3366FF',
+        strokeWeight: 6,
+        strokeOpacity: 0.8
+      })
+      
+      map.value.add(polyline)
+      
+      // 添加起点和终点标记
+      const startMarker = new AMap.Marker({
+        position: pathCoords[0],
+        title: '起点',
+        icon: new AMap.Icon({
+          size: new AMap.Size(25, 34),
+          image: 'https://webapi.amap.com/theme/v1.3/markers/n/start.png'
+        })
+      })
+      
+      const endMarker = new AMap.Marker({
+        position: pathCoords[pathCoords.length - 1],
+        title: '终点',
+        icon: new AMap.Icon({
+          size: new AMap.Size(25, 34),
+          image: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png'
+        })
+      })
+      
+      map.value.add([startMarker, endMarker])
+      
+      // 调整地图视野以显示完整路线
+      map.value.setFitView([polyline])
+    }
+  } catch (error) {
+    console.error('绘制路线失败:', error)
+  }
+}
+
+// 规划路线
+const calculateRoute = async () => {
+  if (!startPoint.value || !endPoint.value) {
+    alert('请输入起点和终点')
+    return
+  }
+  
+  try {
+    console.log('开始解析起点地址:', startPoint.value)
+    const startLngLat = await geocodeAddress(startPoint.value)
+    console.log('起点坐标:', startLngLat.toString())
+    
+    console.log('开始解析终点地址:', endPoint.value)
+    const endLngLat = await geocodeAddress(endPoint.value)
+    console.log('终点坐标:', endLngLat.toString())
+    
+    // 使用Web服务API进行骑行路线规划
+    const origin = `${startLngLat.lng},${startLngLat.lat}`
+    const destination = `${endLngLat.lng},${endLngLat.lat}`
+    
+    await planBicyclingRoute(origin, destination)
+    
+  } catch (error) {
+    console.error('路线规划失败:', error)
+    alert('路线规划失败: ' + error.message)
+  }
+}
+
+// 组件挂载时初始化地图
+onMounted(async () => {
+  // 等待DOM渲染完成后再初始化地图
+  await nextTick()
+  initAMap()
+  
+  // 绑定按钮事件
+  setTimeout(() => {
+    const calculateBtn = document.getElementById('calculateRoute')
+    if (calculateBtn) {
+      calculateBtn.addEventListener('click', calculateRoute)
+    }
+    
+    // 绑定输入框
+    const startInput = document.getElementById('startPoint')
+    const endInput = document.getElementById('endPoint')
+    
+    if (startInput) {
+      startInput.addEventListener('input', (e) => {
+        startPoint.value = e.target.value
+      })
+    }
+    
+    if (endInput) {
+      endInput.addEventListener('input', (e) => {
+        endPoint.value = e.target.value
+      })
+    }
+  }, 100)
+})
+
+// 组件卸载时销毁地图
+onUnmounted(() => {
+  if (map.value) {
+    map.value.destroy()
+  }
+})
 </script>
 
 <style scoped>
