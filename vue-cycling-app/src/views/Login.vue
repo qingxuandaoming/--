@@ -17,6 +17,18 @@
           <input type="password" id="password" v-model="password" placeholder="请输入您的密码" required>
         </div>
         
+        <!-- 错误消息 -->
+        <div v-if="errorMessage" class="error-message">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ errorMessage }}
+        </div>
+        
+        <!-- 成功消息 -->
+        <div v-if="successMessage" class="success-message">
+          <i class="fas fa-check-circle"></i>
+          {{ successMessage }}
+        </div>
+        
         <div class="form-footer">
           <div class="remember-me">
             <input type="checkbox" id="remember" v-model="remember">
@@ -26,7 +38,12 @@
           <a href="#" class="forgot-password">忘记密码？</a>
         </div>
         
-        <button type="submit" class="submit-btn">登录</button>
+        <button type="submit" class="submit-btn" :disabled="loading">
+          <span v-if="loading">
+            <i class="fas fa-spinner fa-spin"></i> 登录中...
+          </span>
+          <span v-else>登录</span>
+        </button>
       </form>
       
       <div class="auth-footer">
@@ -56,18 +73,56 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import ApiService from '@/services/api.js';
 
+const router = useRouter();
+const route = useRoute();
 const username = ref('');
 const password = ref('');
 const remember = ref(false);
+const loading = ref(false);
+const errorMessage = ref('');
+const successMessage = ref('');
 
-const handleSubmit = () => {
-  // 这里实现登录逻辑
-  console.log('登录信息:', {
-    username: username.value,
-    password: password.value,
-    remember: remember.value
-  });
+const handleSubmit = async () => {
+  try {
+    loading.value = true;
+    errorMessage.value = '';
+    
+    const response = await ApiService.user.login({
+      usernameOrEmail: username.value,
+      password: password.value,
+      remember: remember.value
+    });
+    
+    if (response.success) {
+      // 存储token
+      localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
+      
+      // 存储用户信息
+      localStorage.setItem('userInfo', JSON.stringify(response.user));
+      
+      // 显示成功消息
+      successMessage.value = '登录成功！正在跳转...';
+      
+      // 获取重定向路径，如果没有则跳转到主页
+      const redirectPath = route.query.redirect || '/';
+      
+      // 跳转到目标页面
+      setTimeout(() => {
+        router.push(redirectPath);
+      }, 1000);
+    } else {
+      errorMessage.value = response.message || '登录失败';
+    }
+  } catch (error) {
+    console.error('登录错误:', error);
+    errorMessage.value = error.response?.data?.message || '登录失败，请稍后重试';
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 
@@ -157,13 +212,57 @@ const handleSubmit = () => {
 }
 
 .submit-btn:hover {
+  background: linear-gradient(135deg, #2980b9, #1abc9c);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+}
+
+.submit-btn:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 消息样式 */
+.error-message {
+  background: #fee;
+  color: #e74c3c;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 4px solid #e74c3c;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.success-message {
+  background: #efe;
+  color: #27ae60;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 4px solid #27ae60;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .auth-footer {
   text-align: center;
   margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #ecf0f1;
   color: #7f8c8d;
 }
 

@@ -7,16 +7,9 @@
       </div>
       
       <form @submit.prevent="handleSubmit">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="firstName">姓</label>
-            <input type="text" id="firstName" v-model="firstName" placeholder="请输入您的姓" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="lastName">名</label>
-            <input type="text" id="lastName" v-model="lastName" placeholder="请输入您的名" required>
-          </div>
+        <div class="form-group">
+          <label for="username">用户名</label>
+          <input type="text" id="username" v-model="username" placeholder="请输入用户名（3-20个字符）" required minlength="3" maxlength="20">
         </div>
         
         <div class="form-group">
@@ -28,11 +21,21 @@
           <label for="password">密码</label>
           <input type="password" id="password" v-model="password" @input="checkPasswordStrength" placeholder="请设置您的密码" required>
           
+          <div class="password-requirements">
+            <p>密码要求：</p>
+            <ul>
+              <li :class="{ valid: hasMinLength }">至少8个字符</li>
+              <li :class="{ valid: hasNumber }">包含数字</li>
+              <li :class="{ valid: hasLetter }">包含字母</li>
+              <li :class="{ valid: hasSpecialChar }">包含特殊字符（推荐）</li>
+            </ul>
+          </div>
+          
           <div class="password-strength">
             <div class="password-strength-bar" :style="{ width: passwordStrength + '%', background: passwordStrengthColor }"></div>
           </div>
           
-          <div class="password-strength-text">{{ passwordStrengthText }}</div>
+          <div class="password-strength-text">密码强度：{{ passwordStrengthText }}</div>
         </div>
         
         <div class="form-group">
@@ -40,12 +43,29 @@
           <input type="password" id="confirmPassword" v-model="confirmPassword" placeholder="请再次输入您的密码" required>
         </div>
         
+        <!-- 错误消息 -->
+        <div v-if="errorMessage" class="error-message">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ errorMessage }}
+        </div>
+        
+        <!-- 成功消息 -->
+        <div v-if="successMessage" class="success-message">
+          <i class="fas fa-check-circle"></i>
+          {{ successMessage }}
+        </div>
+        
         <div class="terms-checkbox">
           <input type="checkbox" id="terms" v-model="agreeTerms" required>
           <label for="terms">我已阅读并同意 <a href="#">服务条款</a> 和 <a href="#">隐私政策</a></label>
         </div>
         
-        <button type="submit" class="submit-btn" :disabled="!agreeTerms">注册</button>
+        <button type="submit" class="submit-btn" :disabled="!agreeTerms || loading">
+          <span v-if="loading">
+            <i class="fas fa-spinner fa-spin"></i> 注册中...
+          </span>
+          <span v-else>注册</span>
+        </button>
       </form>
       
       <div class="auth-footer">
@@ -75,14 +95,25 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import ApiService from '@/services/api.js';
 
-const firstName = ref('');
-const lastName = ref('');
+const router = useRouter();
+const username = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const agreeTerms = ref(false);
 const passwordStrength = ref(0);
+const loading = ref(false);
+const errorMessage = ref('');
+const successMessage = ref('');
+
+// 密码要求检查
+const hasMinLength = computed(() => password.value.length >= 8);
+const hasNumber = computed(() => /[0-9]/.test(password.value));
+const hasLetter = computed(() => /[A-Za-z]/.test(password.value));
+const hasSpecialChar = computed(() => /[^A-Za-z0-9]/.test(password.value));
 
 const passwordStrengthColor = computed(() => {
   if (passwordStrength.value < 30) return '#e74c3c';
@@ -100,29 +131,74 @@ const checkPasswordStrength = () => {
   const pwd = password.value;
   let strength = 0;
   
-  if (pwd.length > 6) strength += 20;
-  if (pwd.length > 10) strength += 10;
-  if (/[A-Z]/.test(pwd)) strength += 20;
-  if (/[0-9]/.test(pwd)) strength += 20;
-  if (/[^A-Za-z0-9]/.test(pwd)) strength += 30;
+  // 基础长度要求
+  if (pwd.length >= 8) strength += 25;
+  if (pwd.length >= 12) strength += 15;
+  
+  // 字符类型要求
+  if (/[A-Za-z]/.test(pwd)) strength += 25; // 包含字母
+  if (/[0-9]/.test(pwd)) strength += 25; // 包含数字
+  if (/[^A-Za-z0-9]/.test(pwd)) strength += 10; // 包含特殊字符
   
   passwordStrength.value = Math.min(100, strength);
 };
 
-const handleSubmit = () => {
-  // 这里实现注册逻辑
-  if (password.value !== confirmPassword.value) {
-    alert('两次输入的密码不一致');
-    return;
+const handleSubmit = async () => {
+  try {
+    loading.value = true;
+    errorMessage.value = '';
+    
+    // 验证密码
+    if (password.value !== confirmPassword.value) {
+      errorMessage.value = '两次输入的密码不一致';
+      return;
+    }
+    
+    // 验证密码要求
+    if (!hasMinLength.value) {
+      errorMessage.value = '密码至少需要8个字符';
+      return;
+    }
+    
+    if (!hasNumber.value) {
+      errorMessage.value = '密码必须包含数字';
+      return;
+    }
+    
+    if (!hasLetter.value) {
+      errorMessage.value = '密码必须包含字母';
+      return;
+    }
+    
+    // 验证密码强度
+    if (passwordStrength.value < 50) {
+      errorMessage.value = '密码强度不足，请确保包含字母和数字，建议添加特殊字符';
+      return;
+    }
+    
+    const response = await ApiService.user.register({
+      username: username.value,
+      email: email.value,
+      password: password.value,
+      confirmPassword: confirmPassword.value
+    });
+    
+    if (response.success) {
+      successMessage.value = '注册成功！正在跳转到登录页面...';
+      
+      // 跳转到登录页
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
+    } else {
+      errorMessage.value = response.message || '注册失败';
+    }
+  } catch (error) {
+    console.error('注册错误:', error);
+    errorMessage.value = error.response?.data?.message || '注册失败，请稍后重试';
+  } finally {
+    loading.value = false;
   }
-  
-  console.log('注册信息:', {
-    firstName: firstName.value,
-    lastName: lastName.value,
-    email: email.value,
-    password: password.value,
-    agreeTerms: agreeTerms.value
-  });
 };
 </script>
 
@@ -198,10 +274,57 @@ const handleSubmit = () => {
   transition: width 0.3s ease, background 0.3s ease;
 }
 
+.password-requirements {
+  margin-top: 10px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #FF9800;
+}
+
+.password-requirements p {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.password-requirements ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.password-requirements li {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  margin-bottom: 4px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.password-requirements li::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.password-requirements li.valid {
+  color: #27ae60;
+}
+
+.password-requirements li.valid::before {
+  content: '✓';
+  color: #27ae60;
+}
+
 .password-strength-text {
   font-size: 0.8rem;
   margin-top: 5px;
   color: #7f8c8d;
+  font-weight: 500;
 }
 
 .terms-checkbox {
@@ -245,30 +368,75 @@ const handleSubmit = () => {
 }
 
 .submit-btn:hover {
+  background: linear-gradient(135deg, #2980b9, #1abc9c);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
 }
 
 .submit-btn:disabled {
-  opacity: 0.7;
+  background: #bdc3c7;
+  cursor: not-allowed;
   transform: none;
   box-shadow: none;
-  cursor: not-allowed;
 }
 
-.auth-footer {
-  text-align: center;
-  margin-top: 30px;
+/* 消息样式 */
+.error-message {
+  background: #fee;
+  color: #e74c3c;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 4px solid #e74c3c;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.success-message {
+  background: #efe;
+  color: #27ae60;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 4px solid #27ae60;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.terms-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.terms-checkbox input {
+  margin-top: 5px;
+}
+
+.terms-checkbox label {
+  font-size: 0.9rem;
   color: #7f8c8d;
+  line-height: 1.4;
 }
 
-.auth-footer a {
+.terms-checkbox a {
   color: #E65100;
   text-decoration: none;
-  font-weight: 500;
 }
 
-.auth-footer a:hover {
+.terms-checkbox a:hover {
   text-decoration: underline;
 }
 

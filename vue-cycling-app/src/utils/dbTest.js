@@ -1,4 +1,5 @@
 import Database from './database.js';
+import { DB_TEST_CONFIG } from './dbTestConfig.js';
 
 // 数据库连接测试函数
 export async function testDatabaseConnection() {
@@ -13,11 +14,11 @@ export async function testDatabaseConnection() {
       
       // 测试基本查询
       try {
-        const result = await Database.query('SELECT 1 as test');
+        const result = await Database.query('/test');
         console.log('✅ 数据库查询测试成功:', result);
         
         // 测试数据库和表是否存在
-        const tables = await Database.query('SHOW TABLES');
+        const tables = await Database.query('/tables');
         console.log('📋 数据库中的表:', tables);
         
         return true;
@@ -40,8 +41,8 @@ export async function testDatabaseOperations() {
   console.log('开始测试数据库操作...');
   
   try {
-    // 测试查询路线数据
-    const routes = await Database.query('SELECT * FROM cycling_routes LIMIT 3');
+    // 测试查询路线数据 - 使用RESTful API端点
+    const routes = await Database.query('/cycling-routes', { limit: 3 });
     console.log('✅ 查询路线数据成功:', routes);
     
     // 测试插入操作（示例）
@@ -52,12 +53,14 @@ export async function testDatabaseOperations() {
       status: 'pending'
     };
     
-    const insertResult = await Database.insert('feedback', testData);
+    const insertResult = await Database.insert('/feedback', testData);
     console.log('✅ 插入测试数据成功:', insertResult);
     
     // 删除测试数据
-    await Database.delete('feedback', 'id = ?', [insertResult.insertId]);
-    console.log('✅ 删除测试数据成功');
+    if (insertResult && insertResult.id) {
+      await Database.delete(`/feedback/${insertResult.id}`);
+      console.log('✅ 删除测试数据成功');
+    }
     
     return true;
   } catch (error) {
@@ -67,10 +70,13 @@ export async function testDatabaseOperations() {
 }
 
 // 在开发环境中自动运行测试
-if (import.meta.env.DEV) {
+if (import.meta.env.DEV && DB_TEST_CONFIG.enableAutoTest) {
   // 延迟执行，确保应用初始化完成
   setTimeout(async () => {
+    console.log('🔧 开始数据库连接测试...');
     await testDatabaseConnection();
     await testDatabaseOperations();
-  }, 1000);
+  }, DB_TEST_CONFIG.testDelay);
+} else if (import.meta.env.DEV) {
+  console.log('ℹ️ 数据库自动测试已禁用。如需测试，请手动调用 testDatabaseConnection() 和 testDatabaseOperations()');
 }

@@ -2,6 +2,7 @@ package com.ljxz.cycling.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -25,7 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000")
+                .allowedOriginPatterns("http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)
@@ -36,11 +37,12 @@ public class WebConfig implements WebMvcConfigurer {
      * CORS配置源
      */
     @Bean
+    @Primary
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // 允许的源
-        configuration.setAllowedOrigins(Arrays.asList(
+        // 允许的源模式
+        configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"
         ));
         

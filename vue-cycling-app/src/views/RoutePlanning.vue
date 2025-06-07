@@ -372,10 +372,10 @@ export default {
         // 使用API服务发送请求
         const response = await ApiService.routePlanning.planRoute(requestData)
         
-        if (response.data.success) {
-          routeResult.value = response.data.route
+        if (response.success) {
+          routeResult.value = response.route
         } else {
-          errorMessage.value = response.data.message || '路线规划失败'
+          errorMessage.value = response.message || '路线规划失败'
         }
         
       } catch (error) {
@@ -412,10 +412,10 @@ export default {
           '石家庄'
         )
         
-        if (response.data.success) {
-          routeResult.value = response.data.route
+        if (response.success) {
+          routeResult.value = response.route
         } else {
-          errorMessage.value = response.data.message || '快速规划失败'
+          errorMessage.value = response.message || '快速规划失败'
         }
         
       } catch (error) {

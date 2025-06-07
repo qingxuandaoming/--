@@ -1,12 +1,18 @@
 import axios from 'axios';
+import { API_CONFIG, DEFAULT_HEADERS, API_ENDPOINTS, ERROR_CODES, ERROR_MESSAGES } from '@/config/api.js';
 
-// 创建axios实例
+// 创建axios实例 - Java后端
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api', // 后端API基础URL
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  baseURL: API_CONFIG.JAVA_BACKEND.baseURL,
+  timeout: API_CONFIG.JAVA_BACKEND.timeout,
+  headers: DEFAULT_HEADERS
+});
+
+// 创建Python后端axios实例
+const pythonApi = axios.create({
+  baseURL: API_CONFIG.PYTHON_BACKEND.baseURL,
+  timeout: API_CONFIG.PYTHON_BACKEND.timeout,
+  headers: DEFAULT_HEADERS
 });
 
 // 请求拦截器
@@ -34,26 +40,34 @@ api.interceptors.response.use(
     
     // 处理不同的错误状态码
     if (error.response) {
-      switch (error.response.status) {
-        case 401:
+      const status = error.response.status;
+      const message = ERROR_MESSAGES[status] || error.response.data?.message || '未知错误';
+      
+      switch (status) {
+        case ERROR_CODES.UNAUTHORIZED:
           // 未授权，清除token并跳转到登录页
           localStorage.removeItem('token');
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('userInfo');
           window.location.href = '/login';
           break;
-        case 403:
-          console.error('权限不足');
+        case ERROR_CODES.FORBIDDEN:
+          console.error('权限不足:', message);
           break;
-        case 404:
-          console.error('请求的资源不存在');
+        case ERROR_CODES.NOT_FOUND:
+          console.error('资源不存在:', message);
           break;
-        case 500:
-          console.error('服务器内部错误');
+        case ERROR_CODES.INTERNAL_SERVER_ERROR:
+          console.error('服务器错误:', message);
           break;
         default:
-          console.error('请求失败:', error.response.data.message || '未知错误');
+          console.error('请求失败:', message);
       }
     } else if (error.request) {
-      console.error('网络错误，请检查网络连接');
+      const errorCode = error.code;
+      const message = ERROR_MESSAGES[errorCode] || '网络错误，请检查网络连接';
+      console.error(message);
     } else {
       console.error('请求配置错误:', error.message);
     }
@@ -67,19 +81,22 @@ class ApiService {
   // 用户相关API
   static user = {
     // 用户登录
-    login: (credentials) => api.post('/auth/login', credentials),
+    login: (credentials) => api.post(API_ENDPOINTS.AUTH.LOGIN, credentials),
     
     // 用户注册
-    register: (userData) => api.post('/auth/register', userData),
+    register: (userData) => api.post(API_ENDPOINTS.AUTH.REGISTER, userData),
     
     // 获取用户信息
-    getProfile: () => api.get('/user/profile'),
+    getProfile: () => api.get(API_ENDPOINTS.USER.PROFILE),
     
     // 更新用户信息
-    updateProfile: (userData) => api.put('/user/profile', userData),
+    updateProfile: (userData) => api.put(API_ENDPOINTS.USER.UPDATE_PROFILE, userData),
     
     // 用户登出
-    logout: () => api.post('/auth/logout')
+    logout: () => api.post(API_ENDPOINTS.AUTH.LOGOUT),
+    
+    // 刷新token
+    refreshToken: () => api.post(API_ENDPOINTS.AUTH.REFRESH)
   };
 
   // 骑行路线相关API
@@ -103,80 +120,56 @@ class ApiService {
     search: (query) => api.get(`/routes/search?q=${encodeURIComponent(query)}`)
   };
 
+  // 创建路线规划专用axios实例（需要更长超时时间）
+  static #routePlanningApi = axios.create({
+    baseURL: API_CONFIG.ROUTE_PLANNING.baseURL,
+    timeout: API_CONFIG.ROUTE_PLANNING.timeout,
+    headers: DEFAULT_HEADERS
+  });
+
   // 路线规划相关API (Java后端)
   static routePlanning = {
     // 完整路线规划
     planRoute: (routeData) => {
-      const javaApi = axios.create({
-        baseURL: 'http://localhost:8080/api',
-        timeout: 30000,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      return javaApi.post('/route/plan', routeData);
+      return this.#routePlanningApi.post(API_ENDPOINTS.ROUTE_PLANNING.PLAN, routeData);
     },
     
     // 快速路线规划
     quickPlan: (origin, destination, transportMode, city = '石家庄') => {
-      const javaApi = axios.create({
-        baseURL: 'http://localhost:8080/api',
-        timeout: 30000
-      });
       const params = new URLSearchParams({
         origin,
         destination,
         transportMode,
         city
       });
-      return javaApi.get(`/route/quick-plan?${params}`);
+      return this.#routePlanningApi.get(`${API_ENDPOINTS.ROUTE_PLANNING.QUICK_PLAN}?${params}`);
     },
     
     // 地理编码（地址转坐标）
     geocode: (address, city = '石家庄') => {
-      const javaApi = axios.create({
-        baseURL: 'http://localhost:8080/api',
-        timeout: 10000
-      });
       const params = new URLSearchParams({ address, city });
-      return javaApi.get(`/route/geocode?${params}`);
+      return api.get(`${API_ENDPOINTS.ROUTE_PLANNING.GEOCODE}?${params}`);
     },
     
     // 逆地理编码（坐标转地址）
     reverseGeocode: (longitude, latitude) => {
-      const javaApi = axios.create({
-        baseURL: 'http://localhost:8080/api',
-        timeout: 10000
-      });
       const params = new URLSearchParams({ longitude, latitude });
-      return javaApi.get(`/route/reverse-geocode?${params}`);
+      return api.get(`${API_ENDPOINTS.ROUTE_PLANNING.REVERSE_GEOCODE}?${params}`);
     },
     
     // 获取支持的交通方式
     getTransportModes: () => {
-      const javaApi = axios.create({
-        baseURL: 'http://localhost:8080/api',
-        timeout: 5000
-      });
-      return javaApi.get('/route/transport-modes');
+      return api.get(API_ENDPOINTS.ROUTE_PLANNING.TRANSPORT_MODES);
     },
     
     // 获取路线策略
     getStrategies: () => {
-      const javaApi = axios.create({
-        baseURL: 'http://localhost:8080/api',
-        timeout: 5000
-      });
-      return javaApi.get('/route/strategies');
+      return api.get(API_ENDPOINTS.ROUTE_PLANNING.STRATEGIES);
     },
     
     // 健康检查
     healthCheck: () => {
-      const javaApi = axios.create({
-        baseURL: 'http://localhost:8080/api',
-        timeout: 5000
-      });
-      return javaApi.get('/route/health');
+      return api.get(API_ENDPOINTS.ROUTE_PLANNING.HEALTH);
     }
   };
 
@@ -195,12 +188,54 @@ class ApiService {
   // 反馈相关API
   static feedback = {
     // 提交反馈
-    submit: (feedbackData) => api.post('/feedback', feedbackData),
+    submit: (feedbackData) => api.post(API_ENDPOINTS.FEEDBACK.SUBMIT, feedbackData),
     
     // 获取反馈列表（管理员）
-    getAll: () => api.get('/feedback')
+    getAll: () => api.get(API_ENDPOINTS.FEEDBACK.LIST)
+  };
+
+  // Python后端 - 爬虫服务API
+  static crawler = {
+    // 获取爬虫状态
+    getStatus: () => pythonApi.get(API_ENDPOINTS.CRAWLER.STATUS),
+    
+    // 启动爬虫
+    start: (config = {}) => pythonApi.post(API_ENDPOINTS.CRAWLER.START, config),
+    
+    // 停止爬虫
+    stop: () => pythonApi.post(API_ENDPOINTS.CRAWLER.STOP)
+  };
+
+  // Python后端 - 设备管理API
+  static equipment = {
+    // 获取设备列表
+    getAll: (params = {}) => pythonApi.get(API_ENDPOINTS.EQUIPMENT.LIST, { params }),
+    
+    // 创建新设备
+    create: (equipmentData) => pythonApi.post(API_ENDPOINTS.EQUIPMENT.CREATE, equipmentData),
+    
+    // 更新设备信息
+    update: (id, equipmentData) => pythonApi.put(API_ENDPOINTS.EQUIPMENT.UPDATE(id), equipmentData),
+    
+    // 删除设备
+    delete: (id) => pythonApi.delete(API_ENDPOINTS.EQUIPMENT.DELETE(id))
+  };
+
+  // 数据库测试相关API
+  static database = {
+    // 健康检查
+    healthCheck: () => api.get(API_ENDPOINTS.DATABASE.HEALTH),
+    
+    // 基本测试
+    test: () => api.get(API_ENDPOINTS.DATABASE.TEST),
+    
+    // 获取表列表
+    getTables: () => api.get(API_ENDPOINTS.DATABASE.TABLES),
+    
+    // 获取骑行路线数据
+    getCyclingRoutes: (params = {}) => api.get(API_ENDPOINTS.DATABASE.CYCLING_ROUTES, { params })
   };
 }
 
 export default ApiService;
-export { api };
+export { api, pythonApi };

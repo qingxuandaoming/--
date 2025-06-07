@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { isAuthenticated } from '../utils/auth.js'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -21,7 +22,8 @@ const router = createRouter({
     {
       path: '/feedback',
       name: 'Feedback',
-      component: () => import('../views/Feedback.vue')
+      component: () => import('../views/Feedback.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/help',
@@ -31,14 +33,37 @@ const router = createRouter({
     {
       path: '/vr',
       name: 'VR',
-      component: () => import('../views/VR.vue')
+      component: () => import('../views/VR.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/route-planning',
       name: 'RoutePlanning',
-      component: () => import('../views/RoutePlanning.vue')
+      component: () => import('../views/RoutePlanning.vue'),
+      meta: { requiresAuth: true }
     }
   ]
+})
+
+// 全局前置守卫 - 检查登录状态
+router.beforeEach((to, from, next) => {
+  // 检查目标路由是否需要认证
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // 检查用户是否已登录
+    if (!isAuthenticated()) {
+      // 未登录，跳转到登录页面
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath } // 保存原始目标路径，登录后可以跳转回去
+      })
+    } else {
+      // 已登录，继续访问
+      next()
+    }
+  } else {
+    // 不需要认证的路由，直接访问
+    next()
+  }
 })
 
 export default router

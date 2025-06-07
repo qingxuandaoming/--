@@ -1,7 +1,17 @@
 {
     "cSpell.words": [
+        "databind",
+        "fasterxml",
         "httpclient",
+        "httpcomponents",
+        "jdbc",
+        "jjwt",
+        "jsonwebtoken",
         "ljxz",
-        "projectlombok"
+        "mybatis",
+        "projectlombok",
+        "springframework",
+        "wechat",
+        "weibo"
     ]
 }
