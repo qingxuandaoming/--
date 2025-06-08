@@ -418,7 +418,7 @@ def get_price_alerts():
         }), 500
 
 @app.route('/api/analysis/recommendations', methods=['GET'])
-def get_equipment_recommendations():
+def get_analysis_recommendations():
     """获取装备推荐"""
     try:
         category = request.args.get('category')

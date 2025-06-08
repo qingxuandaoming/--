@@ -1,0 +1,320 @@
+{
+  "crawler_settings": {
+    "request_delay": {
+      "min": 2,
+      "max": 5,
+      "description": "请求间隔时间范围（秒）"
+    },
+    "max_retries": {
+      "value": 3,
+      "description": "最大重试次数"
+    },
+    "timeout": {
+      "value": 30,
+      "description": "请求超时时间（秒）"
+    },
+    "max_workers": {
+      "value": 3,
+      "description": "最大并发线程数"
+    },
+    "max_items_per_keyword": {
+      "value": 50,
+      "description": "每个关键词最大爬取商品数"
+    },
+    "enable_proxy": {
+      "value": false,
+      "description": "是否启用代理"
+    },
+    "enable_headless": {
+      "value": true,
+      "description": "是否启用无头浏览器"
+    }
+  },
+  "anti_detection": {
+    "user_agent_rotation": {
+      "enabled": true,
+      "description": "是否启用User-Agent轮换"
+    },
+    "random_delays": {
+      "enabled": true,
+      "description": "是否启用随机延迟"
+    },
+    "disable_images": {
+      "enabled": true,
+      "description": "是否禁用图片加载"
+    },
+    "stealth_mode": {
+      "enabled": true,
+      "description": "是否启用隐身模式"
+    }
+  },
+  "platforms": {
+    "taobao": {
+      "enabled": true,
+      "name": "淘宝",
+      "search_url": "https://s.taobao.com/search?q={keyword}&sort=sale-desc",
+      "selectors": {
+        "items": ".item",
+        "title": ".title a",
+        "price": ".price strong",
+        "image": ".pic img",
+        "shop": ".shop a",
+        "sales": ".deal-cnt"
+      },
+      "rate_limit": {
+        "requests_per_minute": 30,
+        "description": "每分钟最大请求数"
+      }
+    },
+    "jd": {
+      "enabled": true,
+      "name": "京东",
+      "search_url": "https://search.jd.com/Search?keyword={keyword}&enc=utf-8",
+      "selectors": {
+        "items": ".gl-item",
+        "title": ".p-name a em",
+        "price": ".p-price i",
+        "image": ".p-img img",
+        "shop": ".p-shop a",
+        "sales": ".p-commit a"
+      },
+      "rate_limit": {
+        "requests_per_minute": 40,
+        "description": "每分钟最大请求数"
+      }
+    },
+    "tmall": {
+      "enabled": false,
+      "name": "天猫",
+      "search_url": "https://list.tmall.com/search_product.htm?q={keyword}&sort=s&style=g",
+      "selectors": {
+        "items": ".product",
+        "title": ".productTitle a",
+        "price": ".productPrice em",
+        "image": ".productImg img",
+        "shop": ".productShop a",
+        "sales": ".productStatus span"
+      },
+      "rate_limit": {
+        "requests_per_minute": 20,
+        "description": "每分钟最大请求数"
+      }
+    }
+  },
+  "categories": {
+    "bike": {
+      "name": "自行车",
+      "enabled": true,
+      "keywords": [
+        "自行车",
+        "山地车",
+        "公路车",
+        "折叠车",
+        "电动车",
+        "单车",
+        "bike",
+        "bicycle"
+      ],
+      "subcategories": [
+        "山地车",
+        "公路车",
+        "折叠车",
+        "电动车",
+        "城市车",
+        "儿童车"
+      ],
+      "priority": 1
+    },
+    "helmet": {
+      "name": "头盔",
+      "enabled": true,
+      "keywords": [
+        "头盔",
+        "骑行头盔",
+        "安全帽",
+        "helmet",
+        "防护帽"
+      ],
+      "subcategories": [
+        "山地头盔",
+        "公路头盔",
+        "城市头盔",
+        "儿童头盔"
+      ],
+      "priority": 2
+    },
+    "clothing": {
+      "name": "骑行服装",
+      "enabled": true,
+      "keywords": [
+        "骑行服",
+        "骑行裤",
+        "骑行手套",
+        "骑行鞋",
+        "骑行袜",
+        "jersey",
+        "shorts"
+      ],
+      "subcategories": [
+        "骑行上衣",
+        "骑行裤",
+        "骑行手套",
+        "骑行鞋",
+        "骑行袜子"
+      ],
+      "priority": 3
+    },
+    "accessories": {
+      "name": "骑行配件",
+      "enabled": true,
+      "keywords": [
+        "车灯",
+        "码表",
+        "水壶",
+        "车锁",
+        "打气筒",
+        "工具包",
+        "light",
+        "computer"
+      ],
+      "subcategories": [
+        "车灯",
+        "码表",
+        "水壶架",
+        "车锁",
+        "打气筒",
+        "维修工具"
+      ],
+      "priority": 4
+    },
+    "parts": {
+      "name": "自行车零件",
+      "enabled": true,
+      "keywords": [
+        "轮胎",
+        "内胎",
+        "刹车片",
+        "链条",
+        "齿轮",
+        "座垫",
+        "tire",
+        "brake"
+      ],
+      "subcategories": [
+        "轮胎",
+        "内胎",
+        "刹车系统",
+        "传动系统",
+        "座垫",
+        "把手"
+      ],
+      "priority": 5
+    },
+    "safety": {
+      "name": "安全防护",
+      "enabled": true,
+      "keywords": [
+        "护膝",
+        "护肘",
+        "护具",
+        "反光衣",
+        "尾灯",
+        "铃铛"
+      ],
+      "subcategories": [
+        "护具",
+        "反光装备",
+        "警示装备"
+      ],
+      "priority": 6
+    }
+  },
+  "data_quality": {
+    "min_title_length": {
+      "value": 5,
+      "description": "商品标题最小长度"
+    },
+    "max_title_length": {
+      "value": 200,
+      "description": "商品标题最大长度"
+    },
+    "min_price": {
+      "value": 1,
+      "description": "最小价格（元）"
+    },
+    "max_price": {
+      "value": 100000,
+      "description": "最大价格（元）"
+    },
+    "required_fields": {
+      "value": [
+        "name",
+        "price",
+        "platform"
+      ],
+      "description": "必需字段列表"
+    },
+    "duplicate_check": {
+      "enabled": true,
+      "fields": [
+        "name",
+        "platform_url"
+      ],
+      "description": "重复检查配置"
+    }
+  },
+  "scheduling": {
+    "daily_crawl": {
+      "enabled": true,
+      "time": "02:00",
+      "description": "每日全量爬取时间"
+    },
+    "price_update": {
+      "enabled": true,
+      "interval_hours": 4,
+      "description": "价格更新间隔（小时）"
+    },
+    "cleanup": {
+      "enabled": true,
+      "interval_hours": 1,
+      "keep_days": 7,
+      "description": "任务清理配置"
+    }
+  },
+  "proxy_settings": {
+    "enabled": false,
+    "proxy_list": [],
+    "rotation_strategy": "round_robin",
+    "test_url": "https://httpbin.org/ip",
+    "timeout": 10,
+    "max_failures": 3
+  },
+  "notification": {
+    "email": {
+      "enabled": false,
+      "smtp_server": "",
+      "smtp_port": 587,
+      "username": "",
+      "password": "",
+      "recipients": []
+    },
+    "webhook": {
+      "enabled": false,
+      "url": "",
+      "events": [
+        "task_completed",
+        "task_failed",
+        "price_alert"
+      ]
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "file_path": "logs/crawler.log",
+    "max_file_size": "10MB",
+    "backup_count": 5,
+    "format": "{time:YYYY-MM-DD HH:mm:ss} | {level} | {name}:{function}:{line} - {message}"
+  },
+  "version": "1.0.0",
+  "last_updated": "2025-06-08T19:16:19.864856"
+}

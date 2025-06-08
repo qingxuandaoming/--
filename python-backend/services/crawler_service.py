@@ -23,12 +23,13 @@ class CrawlerService:
         self.ua = UserAgent()
         self.tasks = {}  # 存储爬虫任务状态
         self.session = requests.Session()
-        self._setup_session()
         
         # 反反爬配置
         self.request_delay = (1, 3)  # 请求间隔范围（秒）
         self.max_retries = 3  # 最大重试次数
         self.timeout = 30  # 请求超时时间
+        
+        self._setup_session()
         
         # 代理池（可选）
         self.proxy_pool = []

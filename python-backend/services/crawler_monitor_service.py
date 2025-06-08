@@ -7,9 +7,6 @@ import json
 import os
 from dataclasses import dataclass, asdict
 from sqlalchemy import create_engine, text
-from database import get_db_session
-from models.equipment import Equipment
-from models.price_history import PriceHistory
 import logging
 
 logger = logging.getLogger(__name__)
@@ -301,51 +298,16 @@ class CrawlerMonitorService:
     def get_database_stats(self) -> Dict[str, Any]:
         """获取数据库统计信息"""
         try:
-            with get_db_session() as session:
-                # 设备总数
-                total_equipment = session.query(Equipment).count()
-                
-                # 今日新增设备
-                today = datetime.now().date()
-                today_equipment = session.query(Equipment).filter(
-                    Equipment.created_at >= today
-                ).count()
-                
-                # 价格历史记录总数
-                total_price_history = session.query(PriceHistory).count()
-                
-                # 今日价格更新
-                today_price_updates = session.query(PriceHistory).filter(
-                    PriceHistory.recorded_at >= today
-                ).count()
-                
-                # 平台分布
-                platform_stats = session.execute(
-                    text("""
-                    SELECT platform_url, COUNT(*) as count 
-                    FROM equipment 
-                    GROUP BY platform_url
-                    """)
-                ).fetchall()
-                
-                # 分类分布
-                category_stats = session.execute(
-                    text("""
-                    SELECT category, COUNT(*) as count 
-                    FROM equipment 
-                    WHERE category IS NOT NULL
-                    GROUP BY category
-                    """)
-                ).fetchall()
-                
-                return {
-                    'total_equipment': total_equipment,
-                    'today_equipment': today_equipment,
-                    'total_price_history': total_price_history,
-                    'today_price_updates': today_price_updates,
-                    'platform_distribution': [{'platform': row[0], 'count': row[1]} for row in platform_stats],
-                    'category_distribution': [{'category': row[0], 'count': row[1]} for row in category_stats]
-                }
+            # 暂时返回模拟数据，等待数据库连接修复
+            return {
+                'total_equipment': 0,
+                'today_equipment': 0,
+                'total_price_history': 0,
+                'today_price_updates': 0,
+                'platform_distribution': [],
+                'category_distribution': [],
+                'status': 'database_connection_pending'
+            }
                 
         except Exception as e:
             logger.error(f"获取数据库统计失败: {str(e)}")
