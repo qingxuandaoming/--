@@ -23,6 +23,18 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      // Python后端 - 装备和爬虫相关API
+      '/api/equipment': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false
+      },
+      '/api/crawler': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false
+      },
+      // Java后端 - 其他所有API
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,

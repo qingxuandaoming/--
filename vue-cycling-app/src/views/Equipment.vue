@@ -12,15 +12,36 @@
       <!-- 搜索和筛选区域 -->
       <section class="search-section">
         <div class="search-bar">
-          <div class="search-input-wrapper">
+          <div class="search-input-wrapper" :class="{ 'dropdown-open': showSearchSuggestions }">
             <i class="fas fa-search"></i>
             <input 
               type="text" 
               v-model="searchKeyword" 
               placeholder="搜索装备名称、品牌或型号..."
+              class="search-input"
               @keyup.enter="searchEquipment"
+              @focus="showSearchSuggestions = true; filterSuggestions()"
+              @blur="hideSearchSuggestions"
+              @input="filterSuggestions"
             >
             <button @click="searchEquipment" class="search-btn">搜索</button>
+            
+            <!-- 搜索建议下拉菜单 -->
+            <div v-if="showSearchSuggestions" class="search-suggestions">
+              <div class="suggestions-header">热门搜索建议</div>
+              <div 
+                v-for="suggestion in filteredSuggestions" 
+                :key="suggestion"
+                class="suggestion-item"
+                @mousedown="selectSuggestion(suggestion)"
+              >
+                <i class="fas fa-search suggestion-icon"></i>
+                <span>{{ suggestion }}</span>
+              </div>
+              <div v-if="filteredSuggestions.length === 0" class="no-suggestions">
+                暂无相关建议
+              </div>
+            </div>
           </div>
         </div>
         
@@ -95,7 +116,7 @@
                 :alt="equipment.name"
                 @error="handleImageError"
               >
-              <div class="equipment-badge" v-if="equipment.avg_rating >= 4.5">
+              <div class="equipment-badge" v-if="equipment.rating_avg >= 4.5">
                 <i class="fas fa-star"></i>
                 推荐
               </div>
@@ -261,7 +282,7 @@
 
 <script>
 import { ref, reactive, onMounted, computed } from 'vue'
-import { ApiService } from '@/services/api.js'
+import ApiService from '@/services/api.js'
 
 export default {
   name: 'Equipment',
@@ -283,6 +304,30 @@ export default {
     
     const showDetailModal = ref(false)
     const selectedEquipment = ref({})
+    
+    // 搜索建议相关
+    const showSearchSuggestions = ref(false)
+    const searchSuggestions = ref([
+      '山地车',
+      '公路车',
+      '折叠车',
+      '电动车',
+      '骑行头盔',
+      '骑行服',
+      '骑行手套',
+      '骑行眼镜',
+      '车灯',
+      '水壶',
+      '码表',
+      '车锁',
+      '捷安特',
+      '美利达',
+      '喜德盛',
+      'Trek',
+      'Giant',
+      'Specialized'
+    ])
+    const filteredSuggestions = ref([])
     
     // 计算属性
     const priceFilter = computed(() => {
@@ -321,15 +366,26 @@ export default {
           sort_by: sortBy.value
         }
         
+        console.log('搜索参数:', params)
         const response = await ApiService.equipment.search(params)
-        if (response.success) {
-          equipmentList.value = response.data.items
-          totalItems.value = response.data.total
-          totalPages.value = response.data.pages
+        console.log('API响应完整内容:', JSON.stringify(response, null, 2))
+        
+        if (response && response.success) {
+          equipmentList.value = response.data.items || []
+          totalItems.value = response.data.total || 0
+          totalPages.value = response.data.pages || 0
+          console.log('搜索成功，找到', equipmentList.value.length, '条记录')
+        } else {
+          console.error('API响应失败，完整响应:', JSON.stringify(response, null, 2))
+          equipmentList.value = []
+          totalItems.value = 0
+          totalPages.value = 0
         }
       } catch (error) {
         console.error('搜索装备失败:', error)
         equipmentList.value = []
+        totalItems.value = 0
+        totalPages.value = 0
       } finally {
         loading.value = false
       }
@@ -356,10 +412,36 @@ export default {
       event.target.src = '/source/default-equipment.jpg'
     }
     
+    // 搜索建议相关方法
+    const filterSuggestions = () => {
+      if (!searchKeyword.value.trim()) {
+        filteredSuggestions.value = searchSuggestions.value.slice(0, 8)
+      } else {
+        filteredSuggestions.value = searchSuggestions.value
+          .filter(suggestion => 
+            suggestion.toLowerCase().includes(searchKeyword.value.toLowerCase())
+          )
+          .slice(0, 8)
+      }
+    }
+    
+    const selectSuggestion = (suggestion) => {
+      searchKeyword.value = suggestion
+      showSearchSuggestions.value = false
+      searchEquipment()
+    }
+    
+    const hideSearchSuggestions = () => {
+      setTimeout(() => {
+        showSearchSuggestions.value = false
+      }, 200) // 延迟隐藏，允许点击建议项
+    }
+    
     // 生命周期
     onMounted(() => {
       loadCategories()
       searchEquipment()
+      filterSuggestions() // 初始化建议列表
     })
     
     return {
@@ -379,7 +461,13 @@ export default {
       changePage,
       viewEquipmentDetail,
       closeDetailModal,
-      handleImageError
+      handleImageError,
+      // 搜索建议相关
+      showSearchSuggestions,
+      filteredSuggestions,
+      filterSuggestions,
+      selectSuggestion,
+      hideSearchSuggestions
     }
   }
 }
@@ -432,6 +520,7 @@ export default {
 }
 
 .search-input-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
   background: #f8f9fa;
@@ -457,6 +546,58 @@ export default {
   padding: 15px 0;
   font-size: 1rem;
   outline: none;
+}
+
+/* 搜索建议下拉菜单样式 */
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.suggestions-header {
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.suggestions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggestion-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.suggestion-item:hover {
+  background-color: #f8f9fa;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.no-suggestions {
+  padding: 16px;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
 }
 
 .search-btn {

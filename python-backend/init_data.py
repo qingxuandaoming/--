@@ -154,28 +154,15 @@ def init_sample_equipment():
                     name=equipment_data['name'],
                     brand=equipment_data['brand'],
                     model=equipment_data['model'],
-                    category_id=category.id,
+                    category=category.name,
                     description=equipment_data['description'],
                     specifications=equipment_data['specifications'],
-                    images=equipment_data['images'],
-                    tags=equipment_data['tags'],
-                    weight=equipment_data['weight'],
-                    material=equipment_data['material'],
-                    color_options=equipment_data['color_options'],
-                    size_options=equipment_data['size_options'],
-                    avg_rating=random.uniform(4.0, 5.0),
-                    review_count=random.randint(10, 200)
+                    image_urls=equipment_data['images'],
+                    rating_avg=random.uniform(4.0, 5.0),
+                    rating_count=random.randint(10, 200)
                 )
                 
                 db.session.add(equipment)
-                db.session.flush()  # 获取ID
-                
-                # 添加价格数据
-                add_sample_prices(equipment.id)
-                
-                # 添加评价数据
-                add_sample_reviews(equipment.id)
-                
                 logger.info(f"添加装备: {equipment_data['name']}")
             
             db.session.commit()
@@ -257,11 +244,11 @@ def add_sample_reviews(equipment_id):
             title=review_data['title'],
             content=review_data['content'],
             images=[],
-            purchase_info={'verified': True, 'purchase_date': '2023-10-01'},
+            purchase_info={'verified': True, 'purchase_date': '2024-01-01'},
             helpful_count=random.randint(0, 50),
             reply_count=random.randint(0, 5),
             is_verified=True,
-            review_date=datetime.now() - timedelta(days=random.randint(1, 90))
+            review_date=datetime.now() - timedelta(days=random.randint(1, 30))
         )
         
         db.session.add(review)

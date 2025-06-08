@@ -15,6 +15,17 @@ const pythonApi = axios.create({
   headers: DEFAULT_HEADERS
 });
 
+// Python后端响应拦截器
+pythonApi.interceptors.response.use(
+  response => {
+    return response.data;
+  },
+  error => {
+    console.error('Python API请求错误:', error);
+    return Promise.reject(error);
+  }
+);
+
 // 请求拦截器
 api.interceptors.request.use(
   config => {
@@ -194,20 +205,7 @@ class ApiService {
     getAll: () => api.get(API_ENDPOINTS.FEEDBACK.LIST)
   };
 
-  // Python后端 - 装备相关API
-  static equipment = {
-    // 搜索装备
-    search: (params) => pythonApi.get(API_ENDPOINTS.EQUIPMENT.SEARCH, { params }),
-    
-    // 获取装备分类
-    getCategories: () => pythonApi.get(API_ENDPOINTS.EQUIPMENT.CATEGORIES),
-    
-    // 获取装备详情
-    getDetail: (id) => pythonApi.get(API_ENDPOINTS.EQUIPMENT.DETAIL(id)),
-    
-    // 获取装备列表
-    getList: (params) => pythonApi.get(API_ENDPOINTS.EQUIPMENT.LIST, { params })
-  };
+  // Python后端 - 装备相关API (已合并到下方的equipment定义中)
 
   // Python后端 - 爬虫服务API
   static crawler = {
@@ -221,9 +219,21 @@ class ApiService {
     stop: () => pythonApi.post(API_ENDPOINTS.CRAWLER.STOP)
   };
 
-  // Python后端 - 设备管理API
+  // Python后端 - 设备管理API (合并所有equipment相关方法)
   static equipment = {
-    // 获取设备列表
+    // 搜索装备
+    search: (params) => pythonApi.get(API_ENDPOINTS.EQUIPMENT.SEARCH, { params }),
+    
+    // 获取装备分类
+    getCategories: () => pythonApi.get(API_ENDPOINTS.EQUIPMENT.CATEGORIES),
+    
+    // 获取装备详情
+    getDetail: (id) => pythonApi.get(API_ENDPOINTS.EQUIPMENT.DETAIL(id)),
+    
+    // 获取装备列表
+    getList: (params) => pythonApi.get(API_ENDPOINTS.EQUIPMENT.LIST, { params }),
+    
+    // 获取设备列表 (别名)
     getAll: (params = {}) => pythonApi.get(API_ENDPOINTS.EQUIPMENT.LIST, { params }),
     
     // 创建新设备

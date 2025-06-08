@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS equipment (
 -- 装备价格表
 CREATE TABLE IF NOT EXISTS equipment_prices (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    equipment_id BIGINT UNSIGNED NOT NULL COMMENT '装备ID',
+    equipment_id INT NOT NULL COMMENT '装备ID',
     platform VARCHAR(50) NOT NULL COMMENT '平台名称',
     platform_url VARCHAR(500) COMMENT '商品链接',
     platform_id VARCHAR(100) COMMENT '平台商品ID',
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS equipment_prices (
 -- 装备标签表
 CREATE TABLE IF NOT EXISTS equipment_tags (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    equipment_id BIGINT UNSIGNED NOT NULL COMMENT '装备ID',
+    equipment_id INT NOT NULL COMMENT '装备ID',
     tag_name VARCHAR(50) NOT NULL COMMENT '标签名称',
     tag_type VARCHAR(20) DEFAULT 'custom' COMMENT '标签类型',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS equipment_tags (
 -- 装备评价表
 CREATE TABLE IF NOT EXISTS equipment_reviews (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    equipment_id BIGINT UNSIGNED NOT NULL COMMENT '装备ID',
+    equipment_id INT NOT NULL COMMENT '装备ID',
     platform VARCHAR(50) NOT NULL COMMENT '平台名称',
     platform_review_id VARCHAR(100) COMMENT '平台评价ID',
     user_name VARCHAR(100) COMMENT '用户名',
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS equipment_reviews (
 CREATE TABLE IF NOT EXISTS user_equipment_favorites (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL COMMENT '用户ID',
-    equipment_id BIGINT UNSIGNED NOT NULL COMMENT '装备ID',
+    equipment_id INT NOT NULL COMMENT '装备ID',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (equipment_id) REFERENCES equipment(id) ON DELETE CASCADE,
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS user_equipment_favorites (
 CREATE TABLE IF NOT EXISTS price_alerts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL COMMENT '用户ID',
-    equipment_id BIGINT UNSIGNED NOT NULL COMMENT '装备ID',
+    equipment_id INT NOT NULL COMMENT '装备ID',
     target_price DECIMAL(10,2) NOT NULL COMMENT '目标价格',
     platform VARCHAR(50) COMMENT '指定平台',
     is_active BOOLEAN DEFAULT TRUE COMMENT '是否启用',
