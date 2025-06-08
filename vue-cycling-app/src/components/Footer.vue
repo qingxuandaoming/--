@@ -59,7 +59,7 @@
                 <p class="resource-description">掌握正确骑行姿势与道路安全规范</p>
               </div>
             </div>
-            <div class="resource-card">
+            <div class="resource-card" @click="navigateToEquipment">
               <div class="resource-image">
                 <img src="/source/骑行装备推荐.jpg" alt="装备推荐">
               </div>
@@ -122,6 +122,10 @@ const navigateToMaintenanceGuide = () => {
 
 const navigateToEventCalendar = () => {
   router.push('/event-calendar')
+}
+
+const navigateToEquipment = () => {
+  router.push('/equipment')
 }
 </script>
 

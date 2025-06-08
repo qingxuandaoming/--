@@ -67,20 +67,28 @@ class Database {
     }
   }
 
-  // 测试后端连接
+  // 测试连接 - 检查后端服务是否可用
   static async testConnection() {
     try {
-      const response = await apiClient.get('/health');
-      console.log('后端服务连接成功!');
-      return response.data;
-    } catch (error) {
-      console.error('后端服务连接失败:', error);
-      return false;
+      // 优先尝试Python后端
+      const pythonResponse = await pythonApiClient.get('/health');
+      console.log('✅ Python后端服务连接成功:', pythonResponse.data);
+      return true;
+    } catch (pythonError) {
+      console.log('⚠️ Python后端连接失败，尝试Java后端:', pythonError.message);
+      try {
+        const javaResponse = await apiClient.get('/health');
+        console.log('✅ Java后端服务连接成功:', javaResponse.data);
+        return true;
+      } catch (javaError) {
+        console.error('❌ 所有后端服务连接失败:', { python: pythonError.message, java: javaError.message });
+        return false;
+      }
     }
   }
 
   // Python后端API调用
-  static async pythonQuery(endpoint, params = {}) {
+  static async queryPython(endpoint, params = {}) {
     try {
       const response = await pythonApiClient.get(endpoint, { params });
       return response.data;
@@ -90,13 +98,38 @@ class Database {
     }
   }
 
-  static async pythonPost(endpoint, data) {
+  static async insertPython(endpoint, data) {
     try {
       const response = await pythonApiClient.post(endpoint, data);
       return response.data;
     } catch (error) {
       console.error('Python API请求错误:', error);
       throw error;
+    }
+  }
+
+  // 智能查询 - 自动选择可用的后端
+  static async smartQuery(endpoint, params = {}) {
+    try {
+      // 如果是装备相关的查询，优先使用Python后端
+      if (endpoint.includes('equipment') || endpoint.includes('categories')) {
+        return await this.queryPython(endpoint, params);
+      }
+      // 其他查询优先使用Java后端
+      return await this.query(endpoint, params);
+    } catch (error) {
+      console.log(`主要后端查询失败，尝试备用后端: ${error.message}`);
+      try {
+        // 如果主要后端失败，尝试另一个后端
+        if (endpoint.includes('equipment') || endpoint.includes('categories')) {
+          return await this.query(endpoint, params);
+        } else {
+          return await this.queryPython(endpoint, params);
+        }
+      } catch (fallbackError) {
+        console.error('所有后端查询都失败:', fallbackError);
+        throw fallbackError;
+      }
     }
   }
 }

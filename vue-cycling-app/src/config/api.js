@@ -103,6 +103,9 @@ export const API_ENDPOINTS = {
   // Python后端 - 设备管理
   EQUIPMENT: {
     LIST: '/equipment',
+    SEARCH: '/equipment/search',
+    DETAIL: (id) => `/equipment/${id}`,
+    CATEGORIES: '/equipment/categories',
     CREATE: '/equipment',
     UPDATE: (id) => `/equipment/${id}`,
     DELETE: (id) => `/equipment/${id}`

@@ -415,6 +415,26 @@
           <a href="#" class="share-btn qq"><i class="fab fa-qq"></i></a>
         </div>
       </div>
+      
+      <div class="action-card" @click="goToEquipment">
+        <h3><i class="fas fa-bicycle"></i> 装备推荐</h3>
+        <p>为您推荐适合的骑行装备</p>
+        <div class="equipment-preview">
+          <div class="equipment-item">
+            <i class="fas fa-helmet-safety"></i>
+            <span>头盔</span>
+          </div>
+          <div class="equipment-item">
+            <i class="fas fa-tshirt"></i>
+            <span>骑行服</span>
+          </div>
+          <div class="equipment-item">
+            <i class="fas fa-tools"></i>
+            <span>工具</span>
+          </div>
+        </div>
+        <button class="btn">查看更多</button>
+      </div>
     </section>
    </main>
 
@@ -916,6 +936,9 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const imageLoaded = (event) => {
   event.target.parentElement.classList.add('loaded');
@@ -1239,6 +1262,11 @@ onUnmounted(() => {
     map.value.destroy()
   }
 })
+
+// 跳转到装备推荐页面
+const goToEquipment = () => {
+  router.push('/equipment')
+}
 </script>
 
 <style scoped>
@@ -1602,5 +1630,33 @@ onUnmounted(() => {
 @keyframes spin {
   0% { transform: translate(-50%, -50%) rotate(0deg); }
   100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 装备推荐卡片样式 */
+.equipment-preview {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.equipment-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.equipment-item i {
+  font-size: 1.5rem;
+  color: #FF9800;
+}
+
+.action-card:hover {
+  cursor: pointer;
 }
 </style>

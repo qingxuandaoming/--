@@ -45,46 +45,21 @@ class EquipmentService:
             
             # 分类筛选
             if category_id:
-                query = query.filter(Equipment.category_id == category_id)
+                # 根据分类ID查找分类名称
+                category = EquipmentCategory.query.get(category_id)
+                if category:
+                    query = query.filter(Equipment.category == category.name)
             
-            # 价格筛选（基于最新价格）
-            if min_price is not None or max_price is not None:
-                # 子查询获取每个装备的最新价格
-                latest_price_subquery = db.session.query(
-                    EquipmentPrice.equipment_id,
-                    func.max(EquipmentPrice.created_at).label('latest_time')
-                ).group_by(EquipmentPrice.equipment_id).subquery()
-                
-                latest_prices = db.session.query(EquipmentPrice).join(
-                    latest_price_subquery,
-                    and_(
-                        EquipmentPrice.equipment_id == latest_price_subquery.c.equipment_id,
-                        EquipmentPrice.created_at == latest_price_subquery.c.latest_time
-                    )
-                ).subquery()
-                
-                query = query.join(latest_prices, Equipment.id == latest_prices.c.equipment_id)
-                
-                if min_price is not None:
-                    query = query.filter(latest_prices.c.price >= min_price)
-                if max_price is not None:
-                    query = query.filter(latest_prices.c.price <= max_price)
+            # 价格筛选
+            if min_price is not None:
+                query = query.filter(Equipment.price >= min_price)
+            if max_price is not None:
+                query = query.filter(Equipment.price <= max_price)
             
-            # 平台筛选
-            if platform:
-                equipment_ids_with_platform = db.session.query(
-                    EquipmentPrice.equipment_id
-                ).filter(EquipmentPrice.platform == platform).distinct().subquery()
-                
-                query = query.join(
-                    equipment_ids_with_platform,
-                    Equipment.id == equipment_ids_with_platform.c.equipment_id
-                )
-            
-            # 排序：按评分和评价数量排序
+            # 排序：按评分排序
             query = query.order_by(
-                desc(Equipment.avg_rating),
-                desc(Equipment.review_count),
+                desc(Equipment.rating_avg),
+                desc(Equipment.rating_count),
                 desc(Equipment.created_at)
             )
             
@@ -92,19 +67,10 @@ class EquipmentService:
             total = query.count()
             equipment_list = query.offset((page - 1) * per_page).limit(per_page).all()
             
-            # 获取装备的最新价格信息
+            # 获取装备数据
             equipment_data = []
             for equipment in equipment_list:
                 equipment_dict = equipment.to_dict()
-                
-                # 获取最新价格
-                latest_prices = self.get_latest_prices(equipment.id)
-                equipment_dict['latest_prices'] = latest_prices
-                
-                # 获取价格范围
-                price_range = self.get_price_range(equipment.id)
-                equipment_dict['price_range'] = price_range
-                
                 equipment_data.append(equipment_dict)
             
             return {
@@ -114,9 +80,112 @@ class EquipmentService:
                 'per_page': per_page,
                 'pages': (total + per_page - 1) // per_page
             }
-        
         except Exception as e:
             logger.error(f"搜索装备失败: {str(e)}")
+            raise
+    
+    def get_equipment_list(self, page=1, per_page=20, category_id=None):
+        """获取装备列表"""
+        query = Equipment.query.filter_by(is_active=True)
+        
+        if category_id:
+            query = query.filter_by(category_id=category_id)
+            
+        # 按评分和评价数量排序
+        query = query.order_by(
+            Equipment.rating.desc().nullslast(),
+            Equipment.created_at.desc()
+        )
+        
+        total = query.count()
+        equipment_items = query.offset((page - 1) * per_page).limit(per_page).all()
+        
+        equipment_list = []
+        for equipment in equipment_items:
+            # 获取最新价格
+            latest_price = EquipmentPrice.query.filter_by(
+                equipment_id=equipment.id
+            ).order_by(EquipmentPrice.created_at.desc()).first()
+            
+            # 获取评价数量
+            review_count = EquipmentReview.query.filter_by(
+                equipment_id=equipment.id
+            ).count()
+            
+            equipment_list.append({
+                'id': equipment.id,
+                'name': equipment.name,
+                'brand': equipment.brand,
+                'model': equipment.model,
+                'category': {
+                    'id': equipment.category.id,
+                    'name': equipment.category.name
+                } if equipment.category else None,
+                'description': equipment.description[:200] + '...' if len(equipment.description or '') > 200 else equipment.description,
+                'images': equipment.images[:1] if equipment.images else [],  # 只返回第一张图片
+                'tags': equipment.tags[:5] if equipment.tags else [],  # 只返回前5个标签
+                'rating': float(equipment.rating) if equipment.rating else 0,
+                'review_count': review_count,
+                'current_price': {
+                    'price': float(latest_price.price) if latest_price else None,
+                    'platform': latest_price.platform if latest_price else None
+                } if latest_price else None
+            })
+        
+        return {
+            'items': equipment_list,
+            'total': total,
+            'page': page,
+            'per_page': per_page,
+            'pages': (total + per_page - 1) // per_page
+        }
+    
+    def get_equipment_detail(self, equipment_id):
+        """获取装备详情"""
+        try:
+            equipment = Equipment.query.get(equipment_id)
+            if not equipment:
+                return None
+                
+            # 获取最新价格
+            latest_price = EquipmentPrice.query.filter_by(
+                equipment_id=equipment_id
+            ).order_by(EquipmentPrice.created_at.desc()).first()
+            
+            # 获取评价统计
+            reviews = EquipmentReview.query.filter_by(equipment_id=equipment_id).all()
+            avg_rating = sum(r.rating for r in reviews) / len(reviews) if reviews else 0
+            
+            return {
+                'id': equipment.id,
+                'name': equipment.name,
+                'brand': equipment.brand,
+                'model': equipment.model,
+                'category': {
+                    'id': equipment.category.id,
+                    'name': equipment.category.name
+                } if equipment.category else None,
+                'description': equipment.description,
+                'specifications': equipment.specifications,
+                'images': equipment.images,
+                'tags': equipment.tags,
+                'weight': float(equipment.weight) if equipment.weight else None,
+                'material': equipment.material,
+                'color_options': equipment.color_options,
+                'size_options': equipment.size_options,
+                'rating': float(equipment.rating) if equipment.rating else avg_rating,
+                'review_count': len(reviews),
+                'current_price': {
+                    'price': float(latest_price.price) if latest_price else None,
+                    'platform': latest_price.platform if latest_price else None,
+                    'url': latest_price.url if latest_price else None,
+                    'updated_at': latest_price.created_at.isoformat() if latest_price else None
+                } if latest_price else None,
+                'created_at': equipment.created_at.isoformat(),
+                'updated_at': equipment.updated_at.isoformat()
+            }
+        except Exception as e:
+            logger.error(f"获取装备详情失败: {str(e)}")
             raise
     
     def get_latest_prices(self, equipment_id, limit=5):

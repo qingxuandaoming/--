@@ -41,27 +41,25 @@ export async function testDatabaseOperations() {
   console.log('开始测试数据库操作...');
   
   try {
-    // 测试查询路线数据 - 使用RESTful API端点
-    const routes = await Database.query('/cycling-routes', { limit: 3 });
-    console.log('✅ 查询路线数据成功:', routes);
+    // 测试Python后端 - 装备分类查询
+    console.log('🔧 测试Python后端装备API...');
+    const categories = await Database.queryPython('/equipment/categories');
+    console.log('✅ Python后端装备分类查询成功:', categories);
     
-    // 测试插入操作（示例）
-    const testData = {
-      subject: '数据库连接测试',
-      message: '这是一条测试反馈信息',
-      contact_email: 'test@example.com',
-      status: 'pending'
-    };
+    // 测试Python后端 - 装备搜索
+    const equipment = await Database.queryPython('/equipment/search', { 
+      keyword: '自行车', 
+      page: 1, 
+      per_page: 3 
+    });
+    console.log('✅ Python后端装备搜索成功:', equipment);
     
-    const insertResult = await Database.insert('/feedback', testData);
-    console.log('✅ 插入测试数据成功:', insertResult);
+    // 测试智能查询 - 会自动选择合适的后端
+    console.log('🧠 测试智能查询...');
+    const smartResult = await Database.smartQuery('/equipment/categories');
+    console.log('✅ 智能查询装备分类成功:', smartResult);
     
-    // 删除测试数据
-    if (insertResult && insertResult.id) {
-      await Database.delete(`/feedback/${insertResult.id}`);
-      console.log('✅ 删除测试数据成功');
-    }
-    
+    console.log('✅ 数据库操作测试完成');
     return true;
   } catch (error) {
     console.error('❌ 数据库操作测试失败:', error.message);

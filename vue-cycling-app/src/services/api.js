@@ -194,6 +194,21 @@ class ApiService {
     getAll: () => api.get(API_ENDPOINTS.FEEDBACK.LIST)
   };
 
+  // Python后端 - 装备相关API
+  static equipment = {
+    // 搜索装备
+    search: (params) => pythonApi.get(API_ENDPOINTS.EQUIPMENT.SEARCH, { params }),
+    
+    // 获取装备分类
+    getCategories: () => pythonApi.get(API_ENDPOINTS.EQUIPMENT.CATEGORIES),
+    
+    // 获取装备详情
+    getDetail: (id) => pythonApi.get(API_ENDPOINTS.EQUIPMENT.DETAIL(id)),
+    
+    // 获取装备列表
+    getList: (params) => pythonApi.get(API_ENDPOINTS.EQUIPMENT.LIST, { params })
+  };
+
   // Python后端 - 爬虫服务API
   static crawler = {
     // 获取爬虫状态

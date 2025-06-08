@@ -1,61 +1,6 @@
 from datetime import datetime
 from sqlalchemy import Index, DECIMAL
 from decimal import Decimal
-from flask_sqlalchemy import SQLAlchemy
-
-# 延迟导入db实例
-def get_db():
-    from app import db
-    return db
-
-# 创建基类
-class BaseModel:
-    @property
-    def db(self):
-        return get_db()
-
-class EquipmentCategory(BaseModel):
-    """装备分类表"""
-    def __init__(self):
-        # 动态创建模型类
-        db = get_db()
-        
-        class _EquipmentCategory(db.Model):
-            __tablename__ = 'equipment_categories'
-            
-            id = db.Column(db.Integer, primary_key=True)
-            name = db.Column(db.String(50), nullable=False, unique=True, comment='分类名称')
-            name_en = db.Column(db.String(50), nullable=False, comment='英文名称')
-            description = db.Column(db.Text, comment='分类描述')
-            parent_id = db.Column(db.Integer, db.ForeignKey('equipment_categories.id'), comment='父分类ID')
-            sort_order = db.Column(db.Integer, default=0, comment='排序')
-            is_active = db.Column(db.Boolean, default=True, comment='是否启用')
-            created_at = db.Column(db.DateTime, default=datetime.utcnow)
-            updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-            
-            # 关系
-            children = db.relationship('EquipmentCategory', backref=db.backref('parent', remote_side=[id]))
-            equipment = db.relationship('Equipment', backref='category', lazy='dynamic')
-            
-            def to_dict(self):
-                return {
-                    'id': self.id,
-                    'name': self.name,
-                    'name_en': self.name_en,
-                    'description': self.description,
-                    'parent_id': self.parent_id,
-                    'sort_order': self.sort_order,
-                    'is_active': self.is_active,
-                    'children': [child.to_dict() for child in self.children if child.is_active]
-                }
-        
-        self.__class__ = _EquipmentCategory
-
-# 简化方法：直接在模块级别创建模型
-# 这需要在app.py中正确设置导入顺序
-
-# 让我们使用更简单的方法
-from flask import current_app
 
 def create_models(db):
     """创建所有模型类"""
@@ -76,7 +21,6 @@ def create_models(db):
         
         # 关系
         children = db.relationship('EquipmentCategory', backref=db.backref('parent', remote_side=[id]))
-        equipment = db.relationship('Equipment', backref='category', lazy='dynamic')
         
         def to_dict(self):
             return {
@@ -98,65 +42,52 @@ def create_models(db):
         name = db.Column(db.String(200), nullable=False, comment='装备名称')
         brand = db.Column(db.String(100), comment='品牌')
         model = db.Column(db.String(100), comment='型号')
-        category_id = db.Column(db.Integer, db.ForeignKey('equipment_categories.id'), nullable=False)
+        category = db.Column(db.String(50), nullable=False, comment='分类')
+        subcategory = db.Column(db.String(50), comment='子分类')
+        price = db.Column(db.Float, comment='价格')
+        currency = db.Column(db.String(10), default='CNY', comment='货币')
         description = db.Column(db.Text, comment='装备描述')
         specifications = db.Column(db.JSON, comment='规格参数')
-        images = db.Column(db.JSON, comment='装备图片')
-        tags = db.Column(db.JSON, comment='标签')
-        weight = db.Column(db.Float, comment='重量(克)')
-        material = db.Column(db.String(200), comment='材质')
-        color_options = db.Column(db.JSON, comment='颜色选项')
-        size_options = db.Column(db.JSON, comment='尺寸选项')
-        avg_rating = db.Column(db.Float, default=0.0, comment='平均评分')
-        review_count = db.Column(db.Integer, default=0, comment='评价数量')
-        is_active = db.Column(db.Boolean, default=True, comment='是否启用')
+        image_urls = db.Column(db.JSON, comment='装备图片')
+        purchase_urls = db.Column(db.JSON, comment='购买链接')
+        rating_avg = db.Column(db.Float, default=0.0, comment='平均评分')
+        rating_count = db.Column(db.Integer, default=0, comment='评价数量')
+        view_count = db.Column(db.Integer, default=0, comment='浏览次数')
+        favorite_count = db.Column(db.Integer, default=0, comment='收藏次数')
+        status = db.Column(db.String(20), default='active', comment='状态')
         created_at = db.Column(db.DateTime, default=datetime.utcnow)
         updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
         
-        # 关系
-        prices = db.relationship('EquipmentPrice', backref='equipment', lazy='dynamic', cascade='all, delete-orphan')
-        reviews = db.relationship('EquipmentReview', backref='equipment', lazy='dynamic', cascade='all, delete-orphan')
-        
         # 索引
         __table_args__ = (
-            Index('idx_equipment_name', 'name'),
+            Index('idx_equipment_category', 'category'),
             Index('idx_equipment_brand', 'brand'),
-            Index('idx_equipment_category', 'category_id'),
-            Index('idx_equipment_rating', 'avg_rating'),
+            Index('idx_equipment_rating_avg', 'rating_avg'),
+            Index('idx_equipment_created', 'created_at'),
         )
         
         def to_dict(self, include_prices=False, include_reviews=False):
-            result = {
+            return {
                 'id': self.id,
                 'name': self.name,
                 'brand': self.brand,
                 'model': self.model,
-                'category_id': self.category_id,
-                'category_name': self.category.name if self.category else None,
+                'category': self.category,
+                'subcategory': self.subcategory,
+                'price': self.price,
+                'currency': self.currency,
                 'description': self.description,
                 'specifications': self.specifications,
-                'images': self.images,
-                'tags': self.tags,
-                'weight': self.weight,
-                'material': self.material,
-                'color_options': self.color_options,
-                'size_options': self.size_options,
-                'avg_rating': self.avg_rating,
-                'review_count': self.review_count,
-                'is_active': self.is_active,
+                'image_urls': self.image_urls,
+                'purchase_urls': self.purchase_urls,
+                'rating_avg': self.rating_avg,
+                'rating_count': self.rating_count,
+                'view_count': self.view_count,
+                'favorite_count': self.favorite_count,
+                'status': self.status,
                 'created_at': self.created_at.isoformat() if self.created_at else None,
                 'updated_at': self.updated_at.isoformat() if self.updated_at else None
             }
-            
-            if include_prices:
-                latest_prices = self.prices.order_by(EquipmentPrice.created_at.desc()).limit(5).all()
-                result['latest_prices'] = [price.to_dict() for price in latest_prices]
-                
-            if include_reviews:
-                latest_reviews = self.reviews.order_by(EquipmentReview.created_at.desc()).limit(10).all()
-                result['latest_reviews'] = [review.to_dict() for review in latest_reviews]
-                
-            return result
     
     class EquipmentPrice(db.Model):
         """装备价格表"""
@@ -217,7 +148,7 @@ def create_models(db):
         platform_review_id = db.Column(db.String(100), comment='平台评价ID')
         user_name = db.Column(db.String(100), comment='用户名')
         user_avatar = db.Column(db.String(500), comment='用户头像')
-        rating = db.Column(db.Integer, nullable=False, comment='评分(1-5)')
+        rating = db.Column(db.Float, nullable=False, comment='评分')
         title = db.Column(db.String(200), comment='评价标题')
         content = db.Column(db.Text, comment='评价内容')
         images = db.Column(db.JSON, comment='评价图片')
