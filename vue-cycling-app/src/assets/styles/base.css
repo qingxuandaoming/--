@@ -556,11 +556,14 @@ footer {
 }
 
 .footer-route-item .route-description {
-    margin: 0;
-    color: #FFF8E1;
-    font-size: 13px;
+    margin: 0 !important;
+    color: #FFF8E1 !important;
+    font-size: 13px !important;
     opacity: 0.9;
-    line-height: 1.4;
+    line-height: 1.4 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
 }
 
 /* 更多链接块样式 */
