@@ -122,6 +122,108 @@ def update_crawler_config():
             'message': f'更新配置失败: {str(e)}'
         }), 500
 
+# API配置管理
+@app.route('/api/crawler/api-config', methods=['GET'])
+def get_api_config():
+    """获取API配置状态"""
+    try:
+        status = crawler_service.get_api_status()
+        return jsonify({
+            'success': True,
+            'data': status
+        })
+    except Exception as e:
+        logger.error(f"获取API配置失败: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'获取API配置失败: {str(e)}'
+        }), 500
+
+@app.route('/api/crawler/api-config', methods=['POST'])
+def configure_api():
+    """配置第三方API"""
+    try:
+        data = request.get_json()
+        provider = data.get('provider')
+        app_key = data.get('app_key')
+        app_secret = data.get('app_secret')
+        
+        if not provider or not app_key:
+            return jsonify({
+                'success': False,
+                'message': '缺少必需参数: provider 和 app_key'
+            }), 400
+        
+        success = crawler_service.configure_api(provider, app_key, app_secret)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': f'{provider} API配置成功'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': '不支持的API提供商'
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"配置API失败: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'配置API失败: {str(e)}'
+        }), 500
+
+@app.route('/api/crawler/crawl-method', methods=['GET'])
+def get_crawl_methods():
+    """获取爬取方式配置"""
+    try:
+        methods = crawler_service.crawl_methods
+        return jsonify({
+            'success': True,
+            'data': methods
+        })
+    except Exception as e:
+        logger.error(f"获取爬取方式配置失败: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'获取爬取方式配置失败: {str(e)}'
+        }), 500
+
+@app.route('/api/crawler/crawl-method', methods=['PUT'])
+def set_crawl_method():
+    """设置爬取方式"""
+    try:
+        data = request.get_json()
+        method = data.get('method')
+        enabled = data.get('enabled')
+        
+        if method is None or enabled is None:
+            return jsonify({
+                'success': False,
+                'message': '缺少必需参数: method 和 enabled'
+            }), 400
+        
+        success = crawler_service.set_crawl_method(method, enabled)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': f'爬取方式设置成功'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': '不支持的爬取方式'
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"设置爬取方式失败: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'设置爬取方式失败: {str(e)}'
+        }), 500
+
 # 基础爬虫API
 @app.route('/api/crawler/start', methods=['POST'])
 def start_crawler():

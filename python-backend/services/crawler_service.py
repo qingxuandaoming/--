@@ -17,6 +17,9 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 import re
 from urllib.parse import urljoin, urlparse
+import hashlib
+import hmac
+import base64
 
 class CrawlerService:
     """爬虫服务类"""
@@ -36,6 +39,28 @@ class CrawlerService:
         # 代理池（可选）
         self.proxy_pool = []
         self.current_proxy_index = 0
+        
+        # 第三方API配置
+        self.api_config = {
+            'onebound': {
+                'base_url': 'https://api-gw.onebound.cn',
+                'app_key': '',  # 需要配置
+                'app_secret': '',  # 需要配置
+                'enabled': False
+            },
+            'juhe': {
+                'base_url': 'http://apis.juhe.cn',
+                'app_key': '',  # 需要配置
+                'enabled': False
+            }
+        }
+        
+        # 爬取方式配置
+        self.crawl_methods = {
+            'selenium': True,  # 使用Selenium爬取
+            'api': True,      # 使用API接口
+            'requests': False  # 使用requests直接爬取（容易被反爬）
+        }
         
         # 骑行装备关键词分类
         self.equipment_categories = {
@@ -205,11 +230,32 @@ class CrawlerService:
         try:
             self.tasks[task_id]['message'] = '正在获取商品列表...'
             
+            # 优先使用API方式，如果失败则使用Selenium
             if platform == 'all' or platform == 'taobao':
-                self._crawl_taobao(task_id, category)
+                success = False
+                if self.crawl_methods['api']:
+                    try:
+                        self._crawl_taobao_api(task_id, category)
+                        success = True
+                        logger.info("使用API方式成功爬取淘宝数据")
+                    except Exception as e:
+                        logger.warning(f"API方式爬取淘宝失败，尝试Selenium方式: {str(e)}")
+                
+                if not success and self.crawl_methods['selenium']:
+                    self._crawl_taobao(task_id, category)
             
             if platform == 'all' or platform == 'jd':
-                self._crawl_jd(task_id, category)
+                success = False
+                if self.crawl_methods['api']:
+                    try:
+                        self._crawl_jd_api(task_id, category)
+                        success = True
+                        logger.info("使用API方式成功爬取京东数据")
+                    except Exception as e:
+                        logger.warning(f"API方式爬取京东失败，尝试Selenium方式: {str(e)}")
+                
+                if not success and self.crawl_methods['selenium']:
+                    self._crawl_jd(task_id, category)
             
             self.tasks[task_id]['status'] = 'completed'
             self.tasks[task_id]['message'] = '爬取任务完成'
@@ -226,7 +272,7 @@ class CrawlerService:
         """爬取淘宝数据"""
         logger.info(f"开始爬取淘宝数据，分类: {category}")
         
-        keywords = self._get_keywords_by_category(category)
+        keywords = self._get_keywords_for_category(category)
         
         for keyword in keywords:
                 try:
@@ -332,7 +378,7 @@ class CrawlerService:
         """爬取京东数据"""
         logger.info(f"开始爬取京东数据，分类: {category}")
         
-        keywords = self._get_keywords_by_category(category)
+        keywords = self._get_keywords_for_category(category)
         
         for keyword in keywords:
             try:
@@ -498,6 +544,189 @@ class CrawlerService:
                 cleaned['shop_name'] = re.sub(r'\s+', ' ', shop_name).strip()[:100]
         
         return cleaned
+    
+    # ==================== API接口方法 ====================
+    
+    def configure_api(self, provider, app_key, app_secret=None):
+        """配置API接口"""
+        if provider in self.api_config:
+            self.api_config[provider]['app_key'] = app_key
+            if app_secret:
+                self.api_config[provider]['app_secret'] = app_secret
+            self.api_config[provider]['enabled'] = True
+            logger.info(f"已配置{provider} API接口")
+            return True
+        return False
+    
+    def _generate_onebound_signature(self, params, app_secret):
+        """生成万邦API签名"""
+        # 按参数名排序
+        sorted_params = sorted(params.items())
+        # 拼接参数字符串
+        param_str = '&'.join([f'{k}={v}' for k, v in sorted_params])
+        # 生成签名
+        sign_str = app_secret + param_str + app_secret
+        signature = hashlib.md5(sign_str.encode('utf-8')).hexdigest().upper()
+        return signature
+    
+    def _crawl_taobao_api(self, task_id, category):
+        """使用API方式爬取淘宝数据"""
+        if not self.api_config['onebound']['enabled']:
+            raise Exception("万邦API未配置")
+        
+        keywords = self._get_keywords_for_category(category)
+        
+        for keyword in keywords:
+            try:
+                self.tasks[task_id]['message'] = f'正在通过API搜索: {keyword}'
+                
+                # 万邦API - 淘宝商品搜索
+                params = {
+                    'key': self.api_config['onebound']['app_key'],
+                    'secret': self.api_config['onebound']['app_secret'],
+                    'api_name': 'item_search',
+                    'cache': 'yes',
+                    'result_type': 'json',
+                    'lang': 'cn',
+                    'q': keyword,
+                    'start_price': '0',
+                    'end_price': '10000',
+                    'page': '1',
+                    'page_size': '20',
+                    'sort': 'sale-desc',
+                    'platform': '1688'  # 使用1688平台作为替代
+                }
+                
+                # 生成签名
+                sign_params = {k: v for k, v in params.items() if k != 'secret'}
+                signature = self._generate_onebound_signature(sign_params, params['secret'])
+                params['sign'] = signature
+                del params['secret']
+                
+                response = self.session.get(
+                    f"{self.api_config['onebound']['base_url']}/taobao/item_search",
+                    params=params,
+                    timeout=self.timeout
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get('error') == 0:
+                        items = data.get('results', {}).get('items', [])
+                        
+                        for item in items:
+                            equipment_data = {
+                                'name': item.get('title', ''),
+                                'platform_url': item.get('detail_url', ''),
+                                'price': self._extract_number(item.get('price', '0')),
+                                'image_url': item.get('pic_url', ''),
+                                'shop_name': item.get('shop_name', ''),
+                                'sales': self._extract_number(item.get('volume', '0')),
+                                'platform': 'taobao',
+                                'keyword': keyword,
+                                'crawl_time': datetime.now()
+                            }
+                            
+                            self._save_equipment_data(equipment_data)
+                            self.tasks[task_id]['crawled_items'] += 1
+                    else:
+                        logger.error(f"API返回错误: {data.get('reason', '未知错误')}")
+                else:
+                    logger.error(f"API请求失败: {response.status_code}")
+                
+                time.sleep(1)  # API请求间隔
+                
+            except Exception as e:
+                logger.error(f"API爬取淘宝商品失败 - 关键词: {keyword}, 错误: {str(e)}")
+                self.tasks[task_id]['errors'].append(f"API爬取失败: {keyword} - {str(e)}")
+    
+    def _crawl_jd_api(self, task_id, category):
+        """使用API方式爬取京东数据"""
+        if not self.api_config['onebound']['enabled']:
+            raise Exception("万邦API未配置")
+        
+        keywords = self._get_keywords_for_category(category)
+        
+        for keyword in keywords:
+            try:
+                self.tasks[task_id]['message'] = f'正在通过API搜索京东: {keyword}'
+                
+                # 万邦API - 京东商品搜索
+                params = {
+                    'key': self.api_config['onebound']['app_key'],
+                    'secret': self.api_config['onebound']['app_secret'],
+                    'api_name': 'jd_item_search',
+                    'cache': 'yes',
+                    'result_type': 'json',
+                    'lang': 'cn',
+                    'q': keyword,
+                    'start_price': '0',
+                    'end_price': '10000',
+                    'page': '1',
+                    'page_size': '20',
+                    'sort': 'sale-desc'
+                }
+                
+                # 生成签名
+                sign_params = {k: v for k, v in params.items() if k != 'secret'}
+                signature = self._generate_onebound_signature(sign_params, params['secret'])
+                params['sign'] = signature
+                del params['secret']
+                
+                response = self.session.get(
+                    f"{self.api_config['onebound']['base_url']}/jd/item_search",
+                    params=params,
+                    timeout=self.timeout
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get('error') == 0:
+                        items = data.get('results', {}).get('items', [])
+                        
+                        for item in items:
+                            equipment_data = {
+                                'name': item.get('title', ''),
+                                'platform_url': item.get('item_url', ''),
+                                'price': self._extract_number(item.get('price', '0')),
+                                'image_url': item.get('pic_url', ''),
+                                'shop_name': item.get('shop_name', ''),
+                                'commit_count': self._extract_number(item.get('comment_count', '0')),
+                                'platform': 'jd',
+                                'keyword': keyword,
+                                'crawl_time': datetime.now()
+                            }
+                            
+                            self._save_equipment_data(equipment_data)
+                            self.tasks[task_id]['crawled_items'] += 1
+                    else:
+                        logger.error(f"京东API返回错误: {data.get('reason', '未知错误')}")
+                else:
+                    logger.error(f"京东API请求失败: {response.status_code}")
+                
+                time.sleep(1)  # API请求间隔
+                
+            except Exception as e:
+                logger.error(f"API爬取京东商品失败 - 关键词: {keyword}, 错误: {str(e)}")
+                self.tasks[task_id]['errors'].append(f"API爬取失败: {keyword} - {str(e)}")
+    
+    def get_api_status(self):
+        """获取API配置状态"""
+        status = {}
+        for provider, config in self.api_config.items():
+            status[provider] = {
+                'enabled': config['enabled'],
+                'configured': bool(config['app_key'])
+            }
+        return status
+    
+    def set_crawl_method(self, method, enabled):
+        """设置爬取方式"""
+        if method in self.crawl_methods:
+            self.crawl_methods[method] = enabled
+            logger.info(f"已{'启用' if enabled else '禁用'}{method}爬取方式")
+            return True
+        return False
     
     def _classify_equipment(self, name, keyword=''):
         """根据商品名称和关键词自动分类"""
