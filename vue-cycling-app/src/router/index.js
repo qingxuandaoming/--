@@ -3,6 +3,21 @@ import { isAuthenticated } from '../utils/auth.js'
 
 const router = createRouter({
   history: createWebHistory(),
+  scrollBehavior(to, from, savedPosition) {
+    // 如果有保存的位置（比如浏览器前进后退），则返回到保存的位置
+    if (savedPosition) {
+      return savedPosition
+    }
+    // 如果路由有hash，则滚动到对应的元素
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth'
+      }
+    }
+    // 默认滚动到页面顶部
+    return { top: 0, behavior: 'smooth' }
+  },
   routes: [
     {
       path: '/',

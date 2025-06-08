@@ -49,7 +49,6 @@ services:
       DB_NAME: ljxz
       
       # Flask配置
-      FLASK_ENV: production
       FLASK_DEBUG: false
       SECRET_KEY: your-secret-key-here
       

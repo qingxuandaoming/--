@@ -1,9 +1,25 @@
 <template>
   <div class="event-calendar">
+    <!-- 樱花装饰背景 -->
+    <div class="cherry-decoration">
+      <div class="floating-petals">
+        <img src="/source/floating-sakura.svg" alt="Floating sakura petals" />
+      </div>
+      <div class="floating-petals-layer2">
+        <img src="/source/cherry-petals.svg" alt="Additional petals" />
+      </div>
+      <img src="/source/cherry-branch.svg" alt="Cherry branch" class="branch-decoration branch-top-left" />
+      <img src="/source/cherry-branch.svg" alt="Cherry branch" class="branch-decoration branch-top-right" />
+    </div>
+    
     <!-- 页面头部 -->
     <section class="hero calendar-hero">
       <div class="hero-content">
-        <h1>骑行活动日历</h1>
+        <div class="hero-title-wrapper">
+          <img src="/source/cherry-blossom.svg" alt="" class="title-blossom" />
+          <h1>骑行活动日历</h1>
+          <img src="/source/cherry-blossom.svg" alt="" class="title-blossom" />
+        </div>
         <p>最新骑行赛事与俱乐部活动安排，与志同道合的骑友一起享受骑行乐趣</p>
         <div class="hero-stats">
           <div class="stat-item">
@@ -541,16 +557,160 @@ onMounted(() => {
 <style scoped>
 .event-calendar {
   min-height: 100vh;
-  background: linear-gradient(135deg, #F3E5F5 0%, #FCE4EC 100%);
+  background: linear-gradient(135deg, #ffdcdc 0%, #ffa7a6 30%, #f9bdc2 60%, #f25477 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 樱花装饰背景 */
+.cherry-decoration {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floating-petals {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0.8;
+  z-index: 1;
+}
+
+.floating-petals img {
+  position: absolute;
+  width: 100%;
+  height: auto;
+  animation: naturalPetalsFloat 25s infinite linear;
+}
+
+@keyframes naturalPetalsFloat {
+  0% { 
+    transform: translateY(-200px) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% { 
+    transform: translateY(calc(100vh + 200px)) translateX(100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* 添加多个樱花飘落层 */
+.floating-petals::before,
+.floating-petals::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: url('/source/cherry-petals.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+}
+
+.floating-petals::before {
+  animation: naturalPetalsFloat 30s infinite linear;
+  animation-delay: -10s;
+  opacity: 0.5;
+  transform: scale(0.8);
+}
+
+.floating-petals::after {
+  animation: naturalPetalsFloat 35s infinite linear;
+  animation-delay: -20s;
+  opacity: 0.4;
+  transform: scale(0.6) translateX(50px);
+}
+
+/* 第二层樱花飘落 */
+.floating-petals-layer2 {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0.6;
+  z-index: 2;
+}
+
+.floating-petals-layer2 img {
+  position: absolute;
+  width: 100%;
+  height: auto;
+  animation: gentlePetalsFloat 20s infinite linear;
+  animation-delay: -5s;
+}
+
+@keyframes gentlePetalsFloat {
+  0% { 
+    transform: translateY(-150px) translateX(-30px) rotate(0deg) scale(0.8);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.6;
+  }
+  85% {
+    opacity: 0.4;
+  }
+  100% { 
+    transform: translateY(calc(100vh + 150px)) translateX(80px) rotate(270deg) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* 添加微风摆动效果 */
+.cherry-decoration {
+  animation: gentleWind 8s infinite ease-in-out;
+}
+
+@keyframes gentleWind {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(2px); }
+  50% { transform: translateX(-1px); }
+  75% { transform: translateX(1px); }
+}
+
+.branch-decoration {
+  position: absolute;
+  width: 300px;
+  height: auto;
+  opacity: 0.4;
+}
+
+.branch-top-left {
+  top: 20px;
+  left: -50px;
+  transform: rotate(-15deg);
+}
+
+.branch-top-right {
+  top: 20px;
+  right: -50px;
+  transform: rotate(15deg) scaleX(-1);
 }
 
 .calendar-hero {
-  background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 100%);
+  background: linear-gradient(135deg, #f25477, #ffa7a6, #ffdcdc);
   color: white;
   padding: 80px 0;
   text-align: center;
   position: relative;
   overflow: hidden;
+  z-index: 2;
 }
 
 .calendar-hero::before {
@@ -558,15 +718,34 @@ onMounted(() => {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60" rx="10" fill="rgba(255,255,255,0.1)"/><circle cx="35" cy="35" r="3" fill="rgba(255,255,255,0.2)"/><circle cx="65" cy="35" r="3" fill="rgba(255,255,255,0.2)"/></svg>') repeat;
-  animation: slide 25s infinite linear;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="25" cy="25" r="1" fill="%23ffffff" opacity="0.3"/><circle cx="75" cy="75" r="1.5" fill="%23ffffff" opacity="0.2"/><circle cx="50" cy="10" r="0.8" fill="%23ffffff" opacity="0.4"/></svg>') repeat;
+  animation: sparkle 8s infinite ease-in-out;
 }
 
-@keyframes slide {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100px); }
+@keyframes sparkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.hero-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.title-blossom {
+  width: 40px;
+  height: 40px;
+  animation: blossomRotate 6s infinite ease-in-out;
+}
+
+@keyframes blossomRotate {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(10deg) scale(1.1); }
 }
 
 .hero-content h1 {
@@ -605,8 +784,9 @@ onMounted(() => {
   background: white;
   padding: 30px;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(156, 39, 176, 0.1);
+  box-shadow: 0 10px 30px rgba(242, 84, 119, 0.1);
   margin: 40px 0;
+  border: 1px solid rgba(255, 182, 193, 0.3);
 }
 
 .filter-container {
@@ -624,7 +804,7 @@ onMounted(() => {
 
 .filter-group label {
   font-weight: 600;
-  color: #7B1FA2;
+  color: #d63384;
   min-width: 80px;
 }
 
@@ -636,9 +816,9 @@ onMounted(() => {
 
 .filter-btn {
   padding: 10px 20px;
-  border: 2px solid #E1BEE7;
+  border: 2px solid #ffb6c1;
   background: white;
-  color: #7B1FA2;
+  color: #d63384;
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -649,14 +829,14 @@ onMounted(() => {
 }
 
 .filter-btn:hover {
-  background: #F3E5F5;
+  background: #ffe4e6;
   transform: translateY(-2px);
 }
 
 .filter-btn.active {
-  background: linear-gradient(135deg, #9C27B0, #BA68C8);
+  background: linear-gradient(135deg, #f25477, #ffa7a6);
   color: white;
-  border-color: #9C27B0;
+  border-color: #f25477;
 }
 
 .difficulty-dot {
@@ -680,7 +860,7 @@ onMounted(() => {
 
 .section-title {
   font-size: 2.5rem;
-  color: #7B1FA2;
+  color: #d63384;
   text-align: center;
   margin-bottom: 50px;
   display: flex;
@@ -690,7 +870,7 @@ onMounted(() => {
 }
 
 .section-title i {
-  color: #9C27B0;
+  color: #f25477;
 }
 
 .upcoming-events {
@@ -707,7 +887,7 @@ onMounted(() => {
   background: white;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(156, 39, 176, 0.1);
+  box-shadow: 0 10px 30px rgba(242, 84, 119, 0.1);
   transition: all 0.3s ease;
   display: flex;
   border: 2px solid transparent;
@@ -715,12 +895,12 @@ onMounted(() => {
 
 .event-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(156, 39, 176, 0.2);
-  border-color: #9C27B0;
+  box-shadow: 0 20px 40px rgba(242, 84, 119, 0.2);
+  border-color: #f25477;
 }
 
 .event-date {
-  background: linear-gradient(135deg, #9C27B0, #BA68C8);
+  background: linear-gradient(135deg, #f25477, #ffa7a6);
   color: white;
   padding: 30px 25px;
   text-align: center;
@@ -754,7 +934,7 @@ onMounted(() => {
 }
 
 .event-header h3 {
-  color: #7B1FA2;
+  color: #d63384;
   font-size: 1.5rem;
   margin: 0;
 }
@@ -798,7 +978,7 @@ onMounted(() => {
 }
 
 .detail-item i {
-  color: #9C27B0;
+  color: #f25477;
   width: 16px;
 }
 
@@ -823,23 +1003,23 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #9C27B0, #BA68C8);
+  background: linear-gradient(135deg, #f25477, #ffa7a6);
   color: white;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
+  box-shadow: 0 5px 15px rgba(242, 84, 119, 0.4);
 }
 
 .btn-secondary {
   background: transparent;
-  color: #9C27B0;
-  border: 2px solid #9C27B0;
+  color: #f25477;
+  border: 2px solid #f25477;
 }
 
 .btn-secondary:hover {
-  background: #9C27B0;
+  background: #f25477;
   color: white;
 }
 
@@ -851,7 +1031,8 @@ onMounted(() => {
   background: white;
   border-radius: 20px;
   padding: 30px;
-  box-shadow: 0 10px 30px rgba(156, 39, 176, 0.1);
+  box-shadow: 0 10px 30px rgba(242, 84, 119, 0.1);
+  border: 1px solid rgba(255, 182, 193, 0.2);
 }
 
 .calendar-header {
@@ -862,7 +1043,7 @@ onMounted(() => {
 }
 
 .calendar-header h3 {
-  color: #7B1FA2;
+  color: #d63384;
   font-size: 1.5rem;
   margin: 0;
 }
@@ -871,7 +1052,7 @@ onMounted(() => {
   width: 40px;
   height: 40px;
   border: none;
-  background: linear-gradient(135deg, #9C27B0, #BA68C8);
+  background: linear-gradient(135deg, #f25477, #ffa7a6);
   color: white;
   border-radius: 50%;
   cursor: pointer;
@@ -880,20 +1061,20 @@ onMounted(() => {
 
 .nav-btn:hover {
   transform: scale(1.1);
-  box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
+  box-shadow: 0 5px 15px rgba(242, 84, 119, 0.4);
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 1px;
-  background: #E1BEE7;
+  background: #ffb6c1;
   border-radius: 10px;
   overflow: hidden;
 }
 
 .weekday {
-  background: linear-gradient(135deg, #9C27B0, #BA68C8);
+  background: linear-gradient(135deg, #f25477, #ffa7a6);
   color: white;
   padding: 15px;
   text-align: center;
@@ -910,7 +1091,7 @@ onMounted(() => {
 }
 
 .calendar-date:hover {
-  background: #F3E5F5;
+  background: #ffe4e6;
 }
 
 .calendar-date.other-month {
@@ -919,12 +1100,12 @@ onMounted(() => {
 }
 
 .calendar-date.today {
-  background: linear-gradient(135deg, #9C27B0, #BA68C8);
+  background: linear-gradient(135deg, #f25477, #ffa7a6);
   color: white;
 }
 
 .calendar-date.has-event {
-  background: #F3E5F5;
+  background: #ffe4e6;
 }
 
 .date-number {
@@ -964,7 +1145,7 @@ onMounted(() => {
 
 .more-events {
   font-size: 0.7rem;
-  color: #9C27B0;
+  color: #f25477;
   font-weight: bold;
 }
 
@@ -982,7 +1163,7 @@ onMounted(() => {
   background: white;
   padding: 30px;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(156, 39, 176, 0.1);
+  box-shadow: 0 10px 30px rgba(242, 84, 119, 0.1);
   text-align: center;
   transition: all 0.3s ease;
   border: 2px solid transparent;
@@ -990,14 +1171,14 @@ onMounted(() => {
 
 .type-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(156, 39, 176, 0.2);
-  border-color: #9C27B0;
+  box-shadow: 0 20px 40px rgba(242, 84, 119, 0.2);
+  border-color: #f25477;
 }
 
 .type-icon {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #9C27B0, #BA68C8);
+  background: linear-gradient(135deg, #f25477, #ffa7a6);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1008,7 +1189,7 @@ onMounted(() => {
 }
 
 .type-card h3 {
-  color: #7B1FA2;
+  color: #d63384;
   margin-bottom: 15px;
   font-size: 1.3rem;
 }
@@ -1027,8 +1208,8 @@ onMounted(() => {
 }
 
 .feature {
-  background: #F3E5F5;
-  color: #7B1FA2;
+  background: #ffe4e6;
+  color: #d63384;
   padding: 6px 12px;
   border-radius: 15px;
   font-size: 0.8rem;
@@ -1049,13 +1230,13 @@ onMounted(() => {
   background: white;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 15px 35px rgba(156, 39, 176, 0.15);
+  box-shadow: 0 15px 35px rgba(242, 84, 119, 0.15);
   transition: all 0.3s ease;
 }
 
 .featured-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 25px 50px rgba(156, 39, 176, 0.25);
+  box-shadow: 0 25px 50px rgba(242, 84, 119, 0.25);
 }
 
 .featured-image {
@@ -1082,7 +1263,7 @@ onMounted(() => {
 }
 
 .featured-tag {
-  background: linear-gradient(135deg, #9C27B0, #BA68C8);
+  background: linear-gradient(135deg, #f25477, #ffa7a6);
   color: white;
   padding: 8px 16px;
   border-radius: 20px;
@@ -1095,7 +1276,7 @@ onMounted(() => {
 }
 
 .featured-content h3 {
-  color: #7B1FA2;
+  color: #d63384;
   font-size: 1.5rem;
   margin-bottom: 15px;
 }
@@ -1122,14 +1303,14 @@ onMounted(() => {
 }
 
 .info-item i {
-  color: #9C27B0;
+  color: #f25477;
   width: 16px;
 }
 
 .btn-featured {
   width: 100%;
   padding: 15px;
-  background: linear-gradient(135deg, #9C27B0, #BA68C8);
+  background: linear-gradient(135deg, #f25477, #ffa7a6);
   color: white;
   border: none;
   border-radius: 25px;
@@ -1140,7 +1321,7 @@ onMounted(() => {
 
 .btn-featured:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4);
+  box-shadow: 0 8px 20px rgba(242, 84, 119, 0.4);
 }
 
 .organize-guide {
@@ -1157,21 +1338,22 @@ onMounted(() => {
   background: white;
   padding: 30px;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(156, 39, 176, 0.1);
+  box-shadow: 0 10px 30px rgba(242, 84, 119, 0.1);
   display: flex;
   gap: 25px;
   transition: all 0.3s ease;
+  border: 1px solid rgba(255, 182, 193, 0.2);
 }
 
 .guide-step:hover {
   transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(156, 39, 176, 0.2);
+  box-shadow: 0 20px 40px rgba(242, 84, 119, 0.2);
 }
 
 .step-number {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #9C27B0, #BA68C8);
+  background: linear-gradient(135deg, #f25477, #ffa7a6);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -1183,7 +1365,7 @@ onMounted(() => {
 }
 
 .step-content h3 {
-  color: #7B1FA2;
+  color: #d63384;
   margin-bottom: 15px;
   font-size: 1.3rem;
 }
@@ -1210,7 +1392,7 @@ onMounted(() => {
   content: '•';
   position: absolute;
   left: 0;
-  color: #9C27B0;
+  color: #f25477;
   font-weight: bold;
 }
 

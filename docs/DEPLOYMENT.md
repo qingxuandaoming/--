@@ -1,0 +1,1120 @@
+# 灵境行者 - 部署指南
+
+## 📋 目录
+
+- [部署概览](#-部署概览)
+- [环境准备](#-环境准备)
+- [开发环境部署](#-开发环境部署)
+- [生产环境部署](#-生产环境部署)
+- [Docker部署](#-docker部署)
+- [云服务部署](#-云服务部署)
+- [监控与维护](#-监控与维护)
+
+## 🌐 部署概览
+
+### 部署架构图
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      生产环境架构                            │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐    ┌─────────────────────────────────┐  │
+│  │   负载均衡器     │    │            CDN服务              │  │
+│  │    Nginx        │    │         静态资源分发             │  │
+│  └─────────────────┘    └─────────────────────────────────┘  │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐    ┌─────────────────┐ ┌─────────────┐  │
+│  │   前端服务       │    │   Java后端      │ │ Python后端  │  │
+│  │   Vue3 App      │    │  Spring Boot   │ │   Flask     │  │
+│  │   Port: 80      │    │   Port: 8080   │ │ Port: 5000  │  │
+│  └─────────────────┘    └─────────────────┘ └─────────────┘  │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐    ┌─────────────────┐ ┌─────────────┐  │
+│  │   MySQL主库     │    │   MySQL从库     │ │  Redis缓存  │  │
+│  │   Port: 3306    │    │   Port: 3307   │ │ Port: 6379  │  │
+│  └─────────────────┘    └─────────────────┘ └─────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 部署环境对比
+
+| 环境 | 用途 | 特点 | 配置要求 |
+|------|------|------|----------|
+| **开发环境** | 本地开发调试 | 快速启动，热更新 | 低配置，单机部署 |
+| **测试环境** | 功能测试验证 | 模拟生产，数据隔离 | 中等配置，集群部署 |
+| **生产环境** | 正式服务运行 | 高可用，高性能 | 高配置，分布式部署 |
+
+## 🛠️ 环境准备
+
+### 系统要求
+
+#### 最低配置
+- **CPU**: 2核心
+- **内存**: 4GB RAM
+- **存储**: 20GB 可用空间
+- **网络**: 稳定的互联网连接
+
+#### 推荐配置
+- **CPU**: 4核心或更多
+- **内存**: 8GB RAM或更多
+- **存储**: 50GB SSD
+- **网络**: 高速稳定连接
+
+### 软件依赖
+
+#### 基础环境
+```bash
+# 操作系统支持
+- Windows 10/11
+- Ubuntu 20.04+
+- CentOS 8+
+- macOS 12+
+
+# 必需软件
+- Git 2.30+
+- Docker 20.10+ (可选)
+- Docker Compose 2.0+ (可选)
+```
+
+#### 运行时环境
+```bash
+# Node.js环境
+Node.js 16.x+
+npm 8.x+
+
+# Java环境
+JDK 17+
+Maven 3.8+
+
+# Python环境
+Python 3.8+
+pip 21.0+
+
+# 数据库
+MySQL 8.0+
+Redis 6.0+ (可选)
+```
+
+## 💻 开发环境部署
+
+### 快速启动脚本
+
+#### Windows PowerShell
+```powershell
+# 创建启动脚本 start-dev.ps1
+
+# 检查环境
+Write-Host "检查开发环境..." -ForegroundColor Green
+
+# 检查Node.js
+if (!(Get-Command node -ErrorAction SilentlyContinue)) {
+    Write-Host "错误: 未安装Node.js" -ForegroundColor Red
+    exit 1
+}
+
+# 检查Java
+if (!(Get-Command java -ErrorAction SilentlyContinue)) {
+    Write-Host "错误: 未安装Java" -ForegroundColor Red
+    exit 1
+}
+
+# 检查Python
+if (!(Get-Command python -ErrorAction SilentlyContinue)) {
+    Write-Host "错误: 未安装Python" -ForegroundColor Red
+    exit 1
+}
+
+# 检查MySQL
+if (!(Get-Command mysql -ErrorAction SilentlyContinue)) {
+    Write-Host "警告: 未安装MySQL，请手动安装" -ForegroundColor Yellow
+}
+
+Write-Host "环境检查完成，开始启动服务..." -ForegroundColor Green
+
+# 启动数据库
+Write-Host "启动MySQL服务..." -ForegroundColor Blue
+Start-Service MySQL80  # 根据实际服务名调整
+
+# 启动Java后端
+Write-Host "启动Java后端服务..." -ForegroundColor Blue
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd java-backend; mvn spring-boot:run"
+
+# 等待Java服务启动
+Start-Sleep -Seconds 10
+
+# 启动Python后端
+Write-Host "启动Python后端服务..." -ForegroundColor Blue
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd python-backend; python app.py"
+
+# 等待Python服务启动
+Start-Sleep -Seconds 5
+
+# 启动前端
+Write-Host "启动前端应用..." -ForegroundColor Blue
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd vue-cycling-app; npm run dev"
+
+Write-Host "所有服务启动完成！" -ForegroundColor Green
+Write-Host "前端地址: http://localhost:5173" -ForegroundColor Cyan
+Write-Host "Java后端: http://localhost:8080" -ForegroundColor Cyan
+Write-Host "Python后端: http://localhost:5000" -ForegroundColor Cyan
+```
+
+#### Linux/Mac Bash
+```bash
+#!/bin/bash
+# 创建启动脚本 start-dev.sh
+
+echo "🚀 启动灵境行者开发环境"
+
+# 检查环境
+echo "📋 检查开发环境..."
+
+# 检查命令是否存在
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# 检查必需软件
+if ! command_exists node; then
+    echo "❌ 错误: 未安装Node.js"
+    exit 1
+fi
+
+if ! command_exists java; then
+    echo "❌ 错误: 未安装Java"
+    exit 1
+fi
+
+if ! command_exists python3; then
+    echo "❌ 错误: 未安装Python"
+    exit 1
+fi
+
+if ! command_exists mysql; then
+    echo "⚠️  警告: 未安装MySQL，请手动安装"
+fi
+
+echo "✅ 环境检查完成"
+
+# 启动服务
+echo "🔧 启动服务..."
+
+# 启动Java后端
+echo "☕ 启动Java后端服务..."
+gnome-terminal -- bash -c "cd java-backend && mvn spring-boot:run; exec bash" 2>/dev/null || \
+xterm -e "cd java-backend && mvn spring-boot:run" 2>/dev/null || \
+echo "请在新终端中运行: cd java-backend && mvn spring-boot:run"
+
+# 等待服务启动
+sleep 10
+
+# 启动Python后端
+echo "🐍 启动Python后端服务..."
+gnome-terminal -- bash -c "cd python-backend && python3 app.py; exec bash" 2>/dev/null || \
+xterm -e "cd python-backend && python3 app.py" 2>/dev/null || \
+echo "请在新终端中运行: cd python-backend && python3 app.py"
+
+# 等待服务启动
+sleep 5
+
+# 启动前端
+echo "🎨 启动前端应用..."
+gnome-terminal -- bash -c "cd vue-cycling-app && npm run dev; exec bash" 2>/dev/null || \
+xterm -e "cd vue-cycling-app && npm run dev" 2>/dev/null || \
+echo "请在新终端中运行: cd vue-cycling-app && npm run dev"
+
+echo "🎉 所有服务启动完成！"
+echo "🌐 前端地址: http://localhost:5173"
+echo "☕ Java后端: http://localhost:8080"
+echo "🐍 Python后端: http://localhost:5000"
+```
+
+### 开发环境配置
+
+#### 1. 数据库配置
+```sql
+-- 创建开发数据库
+CREATE DATABASE ljxz_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- 创建开发用户
+CREATE USER 'ljxz_dev'@'localhost' IDENTIFIED BY 'dev_password';
+GRANT ALL PRIVILEGES ON ljxz_dev.* TO 'ljxz_dev'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+#### 2. 环境变量配置
+
+**Java后端 (application-dev.yml)**
+```yaml
+spring:
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:mysql://localhost:3306/ljxz_dev?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: ljxz_dev
+    password: dev_password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+logging:
+  level:
+    com.ljxz: DEBUG
+    org.springframework.web: DEBUG
+
+amap:
+  web-api-key: ${AMAP_WEB_API_KEY:your_dev_key}
+  js-api-key: ${AMAP_JS_API_KEY:your_dev_key}
+  security-key: ${AMAP_SECURITY_KEY:your_dev_key}
+```
+
+**Python后端 (.env.dev)**
+```bash
+# 数据库配置
+DATABASE_URL=mysql://ljxz_dev:dev_password@localhost:3306/ljxz_dev
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
+DATABASE_USER=ljxz_dev
+DATABASE_PASSWORD=dev_password
+DATABASE_NAME=ljxz_dev
+
+# Flask配置
+FLASK_ENV=development
+FLASK_DEBUG=True
+SECRET_KEY=dev_secret_key
+
+# 爬虫配置
+CRAWLER_DELAY=1
+CRAWLER_TIMEOUT=30
+USE_PROXY=False
+
+# 日志配置
+LOG_LEVEL=DEBUG
+```
+
+## 🏭 生产环境部署
+
+### 服务器配置
+
+#### 系统优化
+```bash
+# 系统参数优化
+echo 'vm.max_map_count=262144' >> /etc/sysctl.conf
+echo 'fs.file-max=65536' >> /etc/sysctl.conf
+sysctl -p
+
+# 用户限制优化
+echo '* soft nofile 65536' >> /etc/security/limits.conf
+echo '* hard nofile 65536' >> /etc/security/limits.conf
+```
+
+#### 防火墙配置
+```bash
+# Ubuntu/Debian
+sudo ufw allow 22/tcp    # SSH
+sudo ufw allow 80/tcp    # HTTP
+sudo ufw allow 443/tcp   # HTTPS
+sudo ufw allow 8080/tcp  # Java后端
+sudo ufw allow 5000/tcp  # Python后端
+sudo ufw enable
+
+# CentOS/RHEL
+sudo firewall-cmd --permanent --add-port=22/tcp
+sudo firewall-cmd --permanent --add-port=80/tcp
+sudo firewall-cmd --permanent --add-port=443/tcp
+sudo firewall-cmd --permanent --add-port=8080/tcp
+sudo firewall-cmd --permanent --add-port=5000/tcp
+sudo firewall-cmd --reload
+```
+
+### 数据库部署
+
+#### MySQL主从配置
+
+**主库配置 (my.cnf)**
+```ini
+[mysqld]
+# 服务器ID
+server-id = 1
+
+# 二进制日志
+log-bin = mysql-bin
+binlog-format = ROW
+
+# 数据库配置
+default-storage-engine = InnoDB
+innodb_buffer_pool_size = 2G
+innodb_log_file_size = 256M
+
+# 字符集
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+
+# 连接配置
+max_connections = 1000
+max_connect_errors = 10000
+```
+
+**从库配置 (my.cnf)**
+```ini
+[mysqld]
+# 服务器ID
+server-id = 2
+
+# 中继日志
+relay-log = mysql-relay-bin
+log-slave-updates = 1
+read-only = 1
+
+# 其他配置同主库
+```
+
+#### 数据库初始化脚本
+```bash
+#!/bin/bash
+# init-database.sh
+
+echo "初始化生产数据库..."
+
+# 创建数据库
+mysql -u root -p << EOF
+CREATE DATABASE ljxz_prod CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'ljxz_prod'@'%' IDENTIFIED BY '${DB_PASSWORD}';
+GRANT SELECT, INSERT, UPDATE, DELETE ON ljxz_prod.* TO 'ljxz_prod'@'%';
+FLUSH PRIVILEGES;
+EOF
+
+# 导入表结构
+mysql -u ljxz_prod -p${DB_PASSWORD} ljxz_prod < ../vue-cycling-app/database/init.sql
+mysql -u ljxz_prod -p${DB_PASSWORD} ljxz_prod < ../python-backend/database/equipment_tables.sql
+
+echo "数据库初始化完成"
+```
+
+### 应用部署
+
+#### Java后端部署
+
+**构建脚本 (build.sh)**
+```bash
+#!/bin/bash
+# java-backend/build.sh
+
+echo "构建Java后端应用..."
+
+# 清理构建
+mvn clean
+
+# 运行测试
+mvn test
+
+# 打包应用
+mvn package -DskipTests
+
+# 创建部署目录
+mkdir -p /opt/ljxz/java-backend
+
+# 复制JAR文件
+cp target/*.jar /opt/ljxz/java-backend/app.jar
+
+# 复制配置文件
+cp src/main/resources/application-prod.yml /opt/ljxz/java-backend/
+
+echo "Java后端构建完成"
+```
+
+**启动脚本 (start.sh)**
+```bash
+#!/bin/bash
+# java-backend/start.sh
+
+APP_HOME=/opt/ljxz/java-backend
+APP_JAR=$APP_HOME/app.jar
+PID_FILE=$APP_HOME/app.pid
+LOG_FILE=$APP_HOME/app.log
+
+# 检查是否已运行
+if [ -f $PID_FILE ]; then
+    PID=$(cat $PID_FILE)
+    if ps -p $PID > /dev/null; then
+        echo "应用已在运行 (PID: $PID)"
+        exit 1
+    fi
+fi
+
+# 启动应用
+echo "启动Java后端应用..."
+nohup java -jar \
+    -Xms2g -Xmx4g \
+    -Dspring.profiles.active=prod \
+    -Dserver.port=8080 \
+    $APP_JAR > $LOG_FILE 2>&1 &
+
+# 保存PID
+echo $! > $PID_FILE
+
+echo "Java后端启动完成 (PID: $(cat $PID_FILE))"
+```
+
+#### Python后端部署
+
+**部署脚本 (deploy.py)**
+```python
+#!/usr/bin/env python3
+# python-backend/deploy.py
+
+import os
+import sys
+import subprocess
+import shutil
+from pathlib import Path
+
+def deploy_python_backend():
+    """部署Python后端服务"""
+    print("🐍 部署Python后端服务...")
+    
+    # 创建部署目录
+    deploy_dir = Path('/opt/ljxz/python-backend')
+    deploy_dir.mkdir(parents=True, exist_ok=True)
+    
+    # 复制源代码
+    source_files = ['app.py', 'models/', 'services/', 'requirements.txt']
+    for file in source_files:
+        if os.path.isfile(file):
+            shutil.copy2(file, deploy_dir)
+        elif os.path.isdir(file):
+            shutil.copytree(file, deploy_dir / file, dirs_exist_ok=True)
+    
+    # 安装依赖
+    print("📦 安装Python依赖...")
+    subprocess.run([
+        sys.executable, '-m', 'pip', 'install', '-r', 
+        str(deploy_dir / 'requirements.txt')
+    ], check=True)
+    
+    # 创建systemd服务文件
+    service_content = f"""
+[Unit]
+Description=灵境行者Python后端服务
+After=network.target mysql.service
+
+[Service]
+Type=simple
+User=ljxz
+WorkingDirectory={deploy_dir}
+Environment=FLASK_ENV=production
+ExecStart={sys.executable} app.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+"""
+    
+    with open('/etc/systemd/system/ljxz-python.service', 'w') as f:
+        f.write(service_content)
+    
+    # 重载systemd并启动服务
+    subprocess.run(['systemctl', 'daemon-reload'], check=True)
+    subprocess.run(['systemctl', 'enable', 'ljxz-python'], check=True)
+    subprocess.run(['systemctl', 'start', 'ljxz-python'], check=True)
+    
+    print("✅ Python后端部署完成")
+
+if __name__ == '__main__':
+    deploy_python_backend()
+```
+
+#### 前端部署
+
+**构建脚本 (build.sh)**
+```bash
+#!/bin/bash
+# vue-cycling-app/build.sh
+
+echo "🎨 构建前端应用..."
+
+# 安装依赖
+npm ci
+
+# 运行测试
+npm run test:unit
+
+# 构建生产版本
+npm run build
+
+# 创建部署目录
+sudo mkdir -p /var/www/ljxz
+
+# 复制构建文件
+sudo cp -r dist/* /var/www/ljxz/
+
+# 设置权限
+sudo chown -R www-data:www-data /var/www/ljxz
+sudo chmod -R 755 /var/www/ljxz
+
+echo "✅ 前端构建完成"
+```
+
+**Nginx配置**
+```nginx
+# /etc/nginx/sites-available/ljxz
+server {
+    listen 80;
+    server_name your-domain.com;
+    
+    # 重定向到HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name your-domain.com;
+    
+    # SSL配置
+    ssl_certificate /path/to/ssl/cert.pem;
+    ssl_certificate_key /path/to/ssl/key.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384;
+    
+    # 前端静态文件
+    location / {
+        root /var/www/ljxz;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+        
+        # 缓存配置
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+    }
+    
+    # Java后端API代理
+    location /api/ {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # 超时配置
+        proxy_connect_timeout 30s;
+        proxy_send_timeout 30s;
+        proxy_read_timeout 30s;
+    }
+    
+    # Python后端API代理
+    location /api/equipment/ {
+        proxy_pass http://localhost:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    # 安全头
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.amap.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: *.amap.com; connect-src 'self' *.amap.com;" always;
+}
+```
+
+## 🐳 Docker部署
+
+### Docker Compose配置
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # MySQL数据库
+  mysql:
+    image: mysql:8.0
+    container_name: ljxz-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ljxz
+      MYSQL_USER: ljxz
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./vue-cycling-app/database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./python-backend/database/equipment_tables.sql:/docker-entrypoint-initdb.d/02-equipment.sql
+    networks:
+      - ljxz-network
+    restart: unless-stopped
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    container_name: ljxz-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ljxz-network
+    restart: unless-stopped
+
+  # Java后端
+  java-backend:
+    build:
+      context: ./java-backend
+      dockerfile: Dockerfile
+    container_name: ljxz-java
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ljxz?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: ljxz
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      AMAP_WEB_API_KEY: ${AMAP_WEB_API_KEY}
+      AMAP_JS_API_KEY: ${AMAP_JS_API_KEY}
+      AMAP_SECURITY_KEY: ${AMAP_SECURITY_KEY}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - ljxz-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/route/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Python后端
+  python-backend:
+    build:
+      context: ./python-backend
+      dockerfile: Dockerfile
+    container_name: ljxz-python
+    environment:
+      FLASK_ENV: production
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_USER: ljxz
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD}
+      DATABASE_NAME: ljxz
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - ljxz-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 前端应用
+  frontend:
+    build:
+      context: ./vue-cycling-app
+      dockerfile: Dockerfile
+    container_name: ljxz-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - java-backend
+      - python-backend
+    networks:
+      - ljxz-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  ljxz-network:
+    driver: bridge
+```
+
+### Dockerfile配置
+
+#### Java后端Dockerfile
+```dockerfile
+# java-backend/Dockerfile
+FROM openjdk:17-jdk-slim
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制Maven配置文件
+COPY pom.xml .
+COPY .mvn .mvn
+COPY mvnw .
+
+# 下载依赖
+RUN ./mvnw dependency:go-offline -B
+
+# 复制源代码
+COPY src src
+
+# 构建应用
+RUN ./mvnw package -DskipTests
+
+# 运行时镜像
+FROM openjdk:17-jre-slim
+
+# 安装curl用于健康检查
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# 创建应用用户
+RUN groupadd -r ljxz && useradd -r -g ljxz ljxz
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制JAR文件
+COPY --from=0 /app/target/*.jar app.jar
+
+# 更改所有者
+RUN chown ljxz:ljxz app.jar
+
+# 切换用户
+USER ljxz
+
+# 暴露端口
+EXPOSE 8080
+
+# 启动应用
+CMD ["java", "-jar", "app.jar"]
+```
+
+#### Python后端Dockerfile
+```dockerfile
+# python-backend/Dockerfile
+FROM python:3.9-slim
+
+# 设置工作目录
+WORKDIR /app
+
+# 安装系统依赖
+RUN apt-get update && apt-get install -y \
+    gcc \
+    default-libmysqlclient-dev \
+    pkg-config \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# 复制依赖文件
+COPY requirements.txt .
+
+# 安装Python依赖
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 复制应用代码
+COPY . .
+
+# 创建应用用户
+RUN groupadd -r ljxz && useradd -r -g ljxz ljxz
+RUN chown -R ljxz:ljxz /app
+USER ljxz
+
+# 暴露端口
+EXPOSE 5000
+
+# 启动应用
+CMD ["python", "app.py"]
+```
+
+#### 前端Dockerfile
+```dockerfile
+# vue-cycling-app/Dockerfile
+# 构建阶段
+FROM node:16-alpine AS builder
+
+WORKDIR /app
+
+# 复制package文件
+COPY package*.json ./
+
+# 安装依赖
+RUN npm ci --only=production
+
+# 复制源代码
+COPY . .
+
+# 构建应用
+RUN npm run build
+
+# 生产阶段
+FROM nginx:alpine
+
+# 复制构建文件
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# 复制Nginx配置
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# 暴露端口
+EXPOSE 80
+
+# 启动Nginx
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+### Docker部署命令
+
+```bash
+# 创建环境变量文件
+cat > .env << EOF
+MYSQL_ROOT_PASSWORD=your_root_password
+MYSQL_PASSWORD=your_mysql_password
+AMAP_WEB_API_KEY=your_web_api_key
+AMAP_JS_API_KEY=your_js_api_key
+AMAP_SECURITY_KEY=your_security_key
+EOF
+
+# 构建并启动所有服务
+docker-compose up -d --build
+
+# 查看服务状态
+docker-compose ps
+
+# 查看日志
+docker-compose logs -f
+
+# 停止服务
+docker-compose down
+
+# 清理数据（谨慎使用）
+docker-compose down -v
+```
+
+## ☁️ 云服务部署
+
+### 阿里云部署
+
+#### ECS服务器配置
+```bash
+# 推荐配置
+- CPU: 4核心
+- 内存: 8GB
+- 存储: 40GB SSD
+- 带宽: 5Mbps
+- 操作系统: Ubuntu 20.04
+```
+
+#### RDS数据库配置
+```bash
+# MySQL配置
+- 版本: MySQL 8.0
+- 规格: 2核4GB
+- 存储: 20GB SSD
+- 备份: 自动备份
+```
+
+#### SLB负载均衡配置
+```bash
+# 负载均衡规则
+- 前端: 80/443端口 -> ECS:80
+- Java API: /api/* -> ECS:8080
+- Python API: /api/equipment/* -> ECS:5000
+```
+
+### 腾讯云部署
+
+#### CVM服务器配置
+```bash
+# 推荐配置
+- 机型: 标准型S5
+- CPU: 4核心
+- 内存: 8GB
+- 存储: 50GB高性能云硬盘
+- 带宽: 5Mbps
+```
+
+#### TencentDB配置
+```bash
+# MySQL配置
+- 版本: MySQL 8.0
+- 规格: 2核4GB
+- 存储: 25GB SSD
+```
+
+## 📊 监控与维护
+
+### 应用监控
+
+#### 健康检查脚本
+```bash
+#!/bin/bash
+# health-check.sh
+
+echo "🔍 检查服务健康状态..."
+
+# 检查前端
+if curl -f http://localhost:5173 > /dev/null 2>&1; then
+    echo "✅ 前端服务正常"
+else
+    echo "❌ 前端服务异常"
+fi
+
+# 检查Java后端
+if curl -f http://localhost:8080/api/route/health > /dev/null 2>&1; then
+    echo "✅ Java后端服务正常"
+else
+    echo "❌ Java后端服务异常"
+fi
+
+# 检查Python后端
+if curl -f http://localhost:5000/api/health > /dev/null 2>&1; then
+    echo "✅ Python后端服务正常"
+else
+    echo "❌ Python后端服务异常"
+fi
+
+# 检查MySQL
+if mysqladmin ping -h localhost > /dev/null 2>&1; then
+    echo "✅ MySQL服务正常"
+else
+    echo "❌ MySQL服务异常"
+fi
+```
+
+#### 性能监控
+```bash
+#!/bin/bash
+# performance-monitor.sh
+
+echo "📈 系统性能监控"
+
+# CPU使用率
+echo "CPU使用率: $(top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | cut -d'%' -f1)"
+
+# 内存使用率
+echo "内存使用率: $(free | grep Mem | awk '{printf "%.2f%%", $3/$2 * 100.0}')"
+
+# 磁盘使用率
+echo "磁盘使用率: $(df -h / | awk 'NR==2{print $5}')"
+
+# 网络连接数
+echo "网络连接数: $(netstat -an | wc -l)"
+
+# Java进程内存
+echo "Java进程内存: $(ps aux | grep java | grep -v grep | awk '{sum+=$6} END {printf "%.2f MB", sum/1024}')"
+
+# Python进程内存
+echo "Python进程内存: $(ps aux | grep python | grep -v grep | awk '{sum+=$6} END {printf "%.2f MB", sum/1024}')"
+```
+
+### 日志管理
+
+#### 日志轮转配置
+```bash
+# /etc/logrotate.d/ljxz
+/opt/ljxz/*/logs/*.log {
+    daily
+    missingok
+    rotate 30
+    compress
+    delaycompress
+    notifempty
+    create 644 ljxz ljxz
+    postrotate
+        systemctl reload ljxz-java ljxz-python
+    endscript
+}
+```
+
+### 备份策略
+
+#### 数据库备份脚本
+```bash
+#!/bin/bash
+# backup-database.sh
+
+BACKUP_DIR="/backup/mysql"
+DATE=$(date +"%Y%m%d_%H%M%S")
+BACKUP_FILE="$BACKUP_DIR/ljxz_backup_$DATE.sql"
+
+# 创建备份目录
+mkdir -p $BACKUP_DIR
+
+# 备份数据库
+mysqldump -u root -p ljxz > $BACKUP_FILE
+
+# 压缩备份文件
+gzip $BACKUP_FILE
+
+# 删除7天前的备份
+find $BACKUP_DIR -name "*.gz" -mtime +7 -delete
+
+echo "数据库备份完成: ${BACKUP_FILE}.gz"
+```
+
+#### 应用备份脚本
+```bash
+#!/bin/bash
+# backup-application.sh
+
+BACKUP_DIR="/backup/application"
+DATE=$(date +"%Y%m%d_%H%M%S")
+APP_DIR="/opt/ljxz"
+
+# 创建备份目录
+mkdir -p $BACKUP_DIR
+
+# 备份应用文件
+tar -czf $BACKUP_DIR/ljxz_app_$DATE.tar.gz -C $APP_DIR .
+
+# 删除30天前的备份
+find $BACKUP_DIR -name "*.tar.gz" -mtime +30 -delete
+
+echo "应用备份完成: $BACKUP_DIR/ljxz_app_$DATE.tar.gz"
+```
+
+### 故障恢复
+
+#### 服务重启脚本
+```bash
+#!/bin/bash
+# restart-services.sh
+
+echo "🔄 重启所有服务..."
+
+# 重启Java后端
+echo "重启Java后端..."
+systemctl restart ljxz-java
+sleep 10
+
+# 重启Python后端
+echo "重启Python后端..."
+systemctl restart ljxz-python
+sleep 5
+
+# 重启Nginx
+echo "重启Nginx..."
+systemctl restart nginx
+
+# 检查服务状态
+echo "检查服务状态..."
+systemctl status ljxz-java ljxz-python nginx
+
+echo "✅ 服务重启完成"
+```
+
+---
+
+## 📚 相关文档
+
+- [架构设计](./ARCHITECTURE.md)
+- [测试指南](./TESTING.md)
+- [贡献指南](./CONTRIBUTING.md)
+- [API文档](../vue-cycling-app/API_ENDPOINTS.md)
