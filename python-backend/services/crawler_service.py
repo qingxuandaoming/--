@@ -9,6 +9,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 from fake_useragent import UserAgent
 from loguru import logger
 import threading
@@ -153,7 +155,9 @@ class CrawlerService:
         chrome_options.add_experimental_option("prefs", prefs)
         
         try:
-            driver = webdriver.Chrome(options=chrome_options)
+            # 使用webdriver-manager自动管理ChromeDriver
+            service = Service(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service, options=chrome_options)
             
             # 执行反检测脚本
             driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")

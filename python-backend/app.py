@@ -44,8 +44,8 @@ from services.crawler_config_service import CrawlerConfigService
 from services.crawler_monitor_service import CrawlerMonitorService
 from services.crawler_queue_service import CrawlerQueueService, TaskStatus, TaskPriority
 from services.data_validation_service import DataValidationService
-from services.recommendation_service import RecommendationService
-from services.price_alert_service import PriceAlertService
+# from services.recommendation_service import RecommendationService
+# from services.price_alert_service import PriceAlertService
 
 # 初始化服务
 crawler_service = CrawlerService()
@@ -56,8 +56,8 @@ crawler_config_service = CrawlerConfigService()
 crawler_monitor_service = CrawlerMonitorService()
 crawler_queue_service = CrawlerQueueService()
 data_validation_service = DataValidationService()
-recommendation_service = RecommendationService()
-price_alert_service = PriceAlertService()
+# recommendation_service = RecommendationService()
+# price_alert_service = PriceAlertService()
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
@@ -1304,44 +1304,44 @@ def get_validation_summary():
             'message': f'获取摘要失败: {str(e)}'
         }), 500
 
-# 推荐服务API
-@app.route('/api/recommendations/equipment/<int:equipment_id>', methods=['GET'])
-def get_equipment_recommendations_by_id(equipment_id):
-    """根据装备ID获取推荐"""
-    try:
-        limit = request.args.get('limit', 10, type=int)
-        recommendations = recommendation_service.get_equipment_recommendations(equipment_id, limit)
-        
-        return jsonify({
-            'success': True,
-            'data': recommendations
-        })
-        
-    except Exception as e:
-        logger.error(f"获取装备推荐失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'获取推荐失败: {str(e)}'
-        }), 500
+# 推荐服务API (暂时注释掉，需要安装scikit-learn)
+# @app.route('/api/recommendations/equipment/<int:equipment_id>', methods=['GET'])
+# def get_equipment_recommendations_by_id(equipment_id):
+#     """根据装备ID获取推荐"""
+#     try:
+#         limit = request.args.get('limit', 10, type=int)
+#         recommendations = recommendation_service.get_equipment_recommendations(equipment_id, limit)
+#         
+#         return jsonify({
+#             'success': True,
+#             'data': recommendations
+#         })
+#         
+#     except Exception as e:
+#         logger.error(f"获取装备推荐失败: {str(e)}")
+#         return jsonify({
+#             'success': False,
+#             'message': f'获取推荐失败: {str(e)}'
+#         }), 500
 
-@app.route('/api/recommendations/category/<category>', methods=['GET'])
-def get_category_recommendations(category):
-    """获取分类推荐"""
-    try:
-        limit = request.args.get('limit', 10, type=int)
-        recommendations = recommendation_service.get_category_recommendations(category, limit)
-        
-        return jsonify({
-            'success': True,
-            'data': recommendations
-        })
-        
-    except Exception as e:
-        logger.error(f"获取分类推荐失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'获取分类推荐失败: {str(e)}'
-        }), 500
+# @app.route('/api/recommendations/category/<category>', methods=['GET'])
+# def get_category_recommendations(category):
+#     """获取分类推荐"""
+#     try:
+#         limit = request.args.get('limit', 10, type=int)
+#         recommendations = recommendation_service.get_category_recommendations(category, limit)
+#         
+#         return jsonify({
+#             'success': True,
+#             'data': recommendations
+#         })
+#         
+#     except Exception as e:
+#         logger.error(f"获取分类推荐失败: {str(e)}")
+#         return jsonify({
+#             'success': False,
+#             'message': f'获取分类推荐失败: {str(e)}'
+#         }), 500
 
 @app.route('/api/recommendations/price-range', methods=['GET'])
 def get_price_range_recommendations():
