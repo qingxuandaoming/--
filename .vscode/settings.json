@@ -13,6 +13,7 @@
         "pois",
         "projectlombok",
         "springframework",
+        "varchar",
         "wechat",
         "weibo",
         "weixin"

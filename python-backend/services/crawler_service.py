@@ -25,6 +25,15 @@ class CrawlerService:
         self.session = requests.Session()
         self._setup_session()
         
+        # 反反爬配置
+        self.request_delay = (1, 3)  # 请求间隔范围（秒）
+        self.max_retries = 3  # 最大重试次数
+        self.timeout = 30  # 请求超时时间
+        
+        # 代理池（可选）
+        self.proxy_pool = []
+        self.current_proxy_index = 0
+        
         # 骑行装备关键词分类
         self.equipment_categories = {
             'bike': ['自行车', '山地车', '公路车', '折叠车', '电动车'],
@@ -43,27 +52,117 @@ class CrawlerService:
             'Accept-Encoding': 'gzip, deflate',
             'Connection': 'keep-alive',
             'Upgrade-Insecure-Requests': '1',
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
         })
+        
+        # 设置超时
+        self.session.timeout = self.timeout
+    
+    def _get_random_delay(self):
+        """获取随机延迟时间"""
+        import random
+        return random.uniform(self.request_delay[0], self.request_delay[1])
+    
+    def _rotate_user_agent(self):
+        """轮换User-Agent"""
+        self.session.headers['User-Agent'] = self.ua.random
+    
+    def _get_proxy(self):
+        """获取代理"""
+        if not self.proxy_pool:
+            return None
+        
+        proxy = self.proxy_pool[self.current_proxy_index]
+        self.current_proxy_index = (self.current_proxy_index + 1) % len(self.proxy_pool)
+        return proxy
+    
+    def _make_request_with_retry(self, url, method='GET', **kwargs):
+        """带重试机制的请求"""
+        for attempt in range(self.max_retries):
+            try:
+                # 轮换User-Agent
+                self._rotate_user_agent()
+                
+                # 添加随机延迟
+                if attempt > 0:
+                    delay = self._get_random_delay() * (attempt + 1)
+                    time.sleep(delay)
+                
+                # 获取代理
+                proxy = self._get_proxy()
+                if proxy:
+                    kwargs['proxies'] = {'http': proxy, 'https': proxy}
+                
+                # 发送请求
+                if method.upper() == 'GET':
+                    response = self.session.get(url, **kwargs)
+                else:
+                    response = self.session.post(url, **kwargs)
+                
+                # 检查响应状态
+                if response.status_code == 200:
+                    return response
+                elif response.status_code == 429:  # 请求过于频繁
+                    logger.warning(f"请求频率限制，等待重试: {url}")
+                    time.sleep(self._get_random_delay() * 2)
+                    continue
+                else:
+                    logger.warning(f"请求失败，状态码: {response.status_code}, URL: {url}")
+                    
+            except requests.exceptions.RequestException as e:
+                logger.error(f"请求异常 (尝试 {attempt + 1}/{self.max_retries}): {str(e)}")
+                if attempt == self.max_retries - 1:
+                    raise
+        
+        raise Exception(f"请求失败，已重试 {self.max_retries} 次: {url}")
     
     def _get_webdriver(self, headless=True):
         """获取WebDriver实例"""
         chrome_options = Options()
+        
         if headless:
             chrome_options.add_argument('--headless')
+        
+        # 基础配置
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--window-size=1920,1080')
         chrome_options.add_argument(f'--user-agent={self.ua.random}')
         
-        # 禁用图片加载以提高速度
+        # 反检测配置
+        chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        chrome_options.add_experimental_option('useAutomationExtension', False)
+        chrome_options.add_argument('--disable-extensions')
+        chrome_options.add_argument('--disable-plugins')
+        chrome_options.add_argument('--disable-images')
+        chrome_options.add_argument('--disable-javascript')
+        
+        # 性能优化
         prefs = {
-            "profile.managed_default_content_settings.images": 2
+            "profile.managed_default_content_settings.images": 2,
+            "profile.default_content_setting_values": {
+                "notifications": 2,
+                "media_stream": 2,
+            },
+            "profile.managed_default_content_settings.media_stream": 2
         }
         chrome_options.add_experimental_option("prefs", prefs)
         
         try:
             driver = webdriver.Chrome(options=chrome_options)
+            
+            # 执行反检测脚本
+            driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+            driver.execute_script("Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]})")
+            driver.execute_script("Object.defineProperty(navigator, 'languages', {get: () => ['zh-CN', 'zh']})")
+            
+            # 设置页面加载超时
+            driver.set_page_load_timeout(30)
+            driver.implicitly_wait(10)
+            
             return driver
         except Exception as e:
             logger.error(f"创建WebDriver失败: {str(e)}")
@@ -125,13 +224,17 @@ class CrawlerService:
         keywords = self._get_keywords_by_category(category)
         
         for keyword in keywords:
-            try:
-                self.tasks[task_id]['message'] = f'正在爬取淘宝: {keyword}'
-                self._crawl_taobao_keyword(task_id, keyword)
-                time.sleep(2)  # 避免请求过快
-            except Exception as e:
-                logger.error(f"爬取淘宝关键词 {keyword} 失败: {str(e)}")
-                self.tasks[task_id]['errors'].append(f"淘宝-{keyword}: {str(e)}")
+                try:
+                    self.tasks[task_id]['message'] = f'正在爬取淘宝: {keyword}'
+                    self._crawl_taobao_keyword(task_id, keyword)
+                    # 随机延迟，避免请求过快
+                    delay = self._get_random_delay()
+                    time.sleep(delay)
+                except Exception as e:
+                    logger.error(f"爬取淘宝关键词 {keyword} 失败: {str(e)}")
+                    self.tasks[task_id]['errors'].append(f"淘宝-{keyword}: {str(e)}")
+                    # 出错后增加延迟
+                    time.sleep(self._get_random_delay() * 2)
     
     def _crawl_taobao_keyword(self, task_id, keyword):
         """爬取淘宝特定关键词的商品"""
@@ -230,10 +333,14 @@ class CrawlerService:
             try:
                 self.tasks[task_id]['message'] = f'正在爬取京东: {keyword}'
                 self._crawl_jd_keyword(task_id, keyword)
-                time.sleep(2)
+                # 随机延迟，避免请求过快
+                delay = self._get_random_delay()
+                time.sleep(delay)
             except Exception as e:
                 logger.error(f"爬取京东关键词 {keyword} 失败: {str(e)}")
                 self.tasks[task_id]['errors'].append(f"京东-{keyword}: {str(e)}")
+                # 出错后增加延迟
+                time.sleep(self._get_random_delay() * 2)
     
     def _crawl_jd_keyword(self, task_id, keyword):
         """爬取京东特定关键词的商品"""
@@ -346,11 +453,141 @@ class CrawlerService:
         numbers = re.findall(r'\d+', text.replace(',', ''))
         return int(numbers[0]) if numbers else 0
     
+    def _clean_equipment_data(self, data):
+        """清洗装备数据"""
+        cleaned = data.copy()
+        
+        # 清洗商品名称
+        if 'name' in cleaned:
+            name = cleaned['name']
+            # 移除多余的空格和特殊字符
+            name = re.sub(r'\s+', ' ', name).strip()
+            # 移除HTML标签
+            name = re.sub(r'<[^>]+>', '', name)
+            # 限制长度
+            cleaned['name'] = name[:200] if name else ''
+        
+        # 清洗价格
+        if 'price' in cleaned:
+            price = cleaned['price']
+            if isinstance(price, str):
+                # 提取数字
+                price_match = re.search(r'\d+\.?\d*', price.replace(',', ''))
+                cleaned['price'] = float(price_match.group()) if price_match else 0.0
+            elif price is None:
+                cleaned['price'] = 0.0
+        
+        # 清洗图片URL
+        if 'image_url' in cleaned and cleaned['image_url']:
+            image_url = cleaned['image_url']
+            if not image_url.startswith('http'):
+                if image_url.startswith('//'):
+                    cleaned['image_url'] = 'https:' + image_url
+                elif image_url.startswith('/'):
+                    cleaned['image_url'] = 'https://img.alicdn.com' + image_url
+        
+        # 清洗店铺名称
+        if 'shop_name' in cleaned:
+            shop_name = cleaned['shop_name']
+            if shop_name:
+                cleaned['shop_name'] = re.sub(r'\s+', ' ', shop_name).strip()[:100]
+        
+        return cleaned
+    
+    def _classify_equipment(self, name, keyword=''):
+        """根据商品名称和关键词自动分类"""
+        name_lower = name.lower()
+        keyword_lower = keyword.lower()
+        text = f"{name_lower} {keyword_lower}"
+        
+        # 自行车分类
+        if any(word in text for word in ['自行车', '山地车', '公路车', '折叠车', '电动车', 'bike', 'bicycle']):
+            return '自行车'
+        
+        # 头盔分类
+        elif any(word in text for word in ['头盔', '安全帽', 'helmet']):
+            return '安全防护'
+        
+        # 服装分类
+        elif any(word in text for word in ['骑行服', '骑行裤', '手套', '骑行鞋', '袜子', 'jersey', 'shorts']):
+            return '骑行服装'
+        
+        # 配件分类
+        elif any(word in text for word in ['车灯', '码表', '水壶', '车锁', '打气筒', '工具', 'light', 'computer']):
+            return '骑行配件'
+        
+        # 零件分类
+        elif any(word in text for word in ['轮胎', '内胎', '刹车', '链条', '齿轮', '座垫', 'tire', 'brake']):
+            return '自行车零件'
+        
+        # 默认分类
+        else:
+            return '其他'
+    
     def _save_equipment_data(self, data):
         """保存装备数据到数据库"""
-        # 这里应该实现数据库保存逻辑
-        # 暂时只记录日志
-        logger.info(f"保存装备数据: {data['name']} - {data['platform']} - ¥{data['price']}")
+        try:
+            from app import db, Equipment, EquipmentPrice, EquipmentCategory
+            
+            # 数据清洗
+            cleaned_data = self._clean_equipment_data(data)
+            
+            # 检查是否已存在相同商品
+            existing_equipment = Equipment.query.filter(
+                Equipment.name == cleaned_data['name'],
+                Equipment.platform_url == cleaned_data.get('platform_url')
+            ).first()
+            
+            if existing_equipment:
+                # 更新现有商品信息
+                existing_equipment.price = cleaned_data['price']
+                existing_equipment.updated_at = datetime.now()
+                equipment_id = existing_equipment.id
+                logger.info(f"更新现有装备: {cleaned_data['name']}")
+            else:
+                # 创建新商品
+                equipment = Equipment(
+                    name=cleaned_data['name'],
+                    brand=cleaned_data.get('brand', ''),
+                    category=self._classify_equipment(cleaned_data['name'], cleaned_data.get('keyword', '')),
+                    price=cleaned_data['price'],
+                    description=cleaned_data.get('description', ''),
+                    image_urls=[cleaned_data.get('image_url')] if cleaned_data.get('image_url') else [],
+                    purchase_urls=[{
+                        'platform': cleaned_data['platform'],
+                        'url': cleaned_data.get('platform_url', ''),
+                        'shop_name': cleaned_data.get('shop_name', '')
+                    }],
+                    rating_count=cleaned_data.get('sales', 0),
+                    platform_url=cleaned_data.get('platform_url', ''),
+                    created_at=datetime.now(),
+                    updated_at=datetime.now()
+                )
+                db.session.add(equipment)
+                db.session.flush()  # 获取ID
+                equipment_id = equipment.id
+                logger.info(f"创建新装备: {cleaned_data['name']}")
+            
+            # 保存价格历史
+            price_record = EquipmentPrice(
+                equipment_id=equipment_id,
+                platform=cleaned_data['platform'],
+                price=cleaned_data['price'],
+                currency='CNY',
+                shop_name=cleaned_data.get('shop_name', ''),
+                shop_url=cleaned_data.get('shop_url', ''),
+                is_available=True,
+                recorded_at=datetime.now()
+            )
+            db.session.add(price_record)
+            
+            db.session.commit()
+            logger.info(f"成功保存装备数据: {cleaned_data['name']} - {cleaned_data['platform']} - ¥{cleaned_data['price']}")
+            
+        except Exception as e:
+            logger.error(f"保存装备数据失败: {str(e)}")
+            if 'db' in locals():
+                db.session.rollback()
     
     def get_task_status(self, task_id):
         """获取任务状态"""
