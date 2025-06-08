@@ -3141,3 +3141,6 @@ org.springframework.web.servlet.resource.NoResourceFoundException: No static res
 2025-06-07 20:29:39 [http-nio-8080-exec-3] INFO  c.l.c.controller.RouteController - 获取数据库表列表
 2025-06-07 20:29:39 [http-nio-8080-exec-4] INFO  c.l.c.controller.RouteController - 获取骑行路线列表，限制数量: 3
 2025-06-07 20:29:39 [http-nio-8080-exec-6] INFO  c.l.c.controller.RouteController - 收到用户反馈: {subject=数据库连接测试, message=这是一条测试反馈信息, contact_email=test@example.com, status=pending}
+2025-06-07 21:20:37 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-06-07 21:20:37 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-06-07 21:20:37 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
