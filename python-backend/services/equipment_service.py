@@ -1,8 +1,6 @@
 from sqlalchemy import and_, or_, desc, func
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta
-from models.equipment import Equipment, EquipmentCategory, EquipmentPrice, EquipmentReview
-from app import db
 from loguru import logger
 import re
 from collections import defaultdict
@@ -10,17 +8,21 @@ from collections import defaultdict
 class EquipmentService:
     """装备服务类"""
     
-    def __init__(self):
-        pass
+    def __init__(self, db=None, equipment_model=None, category_model=None, price_model=None, review_model=None):
+        self.db = db
+        self.Equipment = equipment_model
+        self.EquipmentCategory = category_model
+        self.EquipmentPrice = price_model
+        self.EquipmentReview = review_model
     
     def get_all_categories(self):
         """获取所有装备分类"""
         try:
             # 获取顶级分类（没有父分类的）
-            top_categories = EquipmentCategory.query.filter(
-                EquipmentCategory.parent_id.is_(None),
-                EquipmentCategory.is_active == True
-            ).order_by(EquipmentCategory.sort_order).all()
+            top_categories = self.EquipmentCategory.query.filter(
+                self.EquipmentCategory.parent_id.is_(None),
+                self.EquipmentCategory.is_active == True
+            ).order_by(self.EquipmentCategory.sort_order).all()
             
             return [category.to_dict() for category in top_categories]
         
@@ -32,35 +34,35 @@ class EquipmentService:
                         max_price=None, platform='', page=1, per_page=20):
         """搜索装备"""
         try:
-            query = Equipment.query.filter(Equipment.is_active == True)
+            query = self.Equipment.query.filter(self.Equipment.is_active == True)
             
             # 关键词搜索
             if keyword:
                 keyword_filter = or_(
-                    Equipment.name.contains(keyword),
-                    Equipment.brand.contains(keyword),
-                    Equipment.description.contains(keyword)
+                    self.Equipment.name.contains(keyword),
+                    self.Equipment.brand.contains(keyword),
+                    self.Equipment.description.contains(keyword)
                 )
                 query = query.filter(keyword_filter)
             
             # 分类筛选
             if category_id:
                 # 根据分类ID查找分类名称
-                category = EquipmentCategory.query.get(category_id)
+                category = self.EquipmentCategory.query.get(category_id)
                 if category:
-                    query = query.filter(Equipment.category == category.name)
+                    query = query.filter(self.Equipment.category == category.name)
             
             # 价格筛选
             if min_price is not None:
-                query = query.filter(Equipment.price >= min_price)
+                query = query.filter(self.Equipment.price >= min_price)
             if max_price is not None:
-                query = query.filter(Equipment.price <= max_price)
+                query = query.filter(self.Equipment.price <= max_price)
             
             # 排序：按评分排序
             query = query.order_by(
-                desc(Equipment.rating_avg),
-                desc(Equipment.rating_count),
-                desc(Equipment.created_at)
+                self.Equipment.rating_avg.desc(),
+                self.Equipment.rating_count.desc(),
+                self.Equipment.created_at.desc()
             )
             
             # 分页
@@ -86,15 +88,15 @@ class EquipmentService:
     
     def get_equipment_list(self, page=1, per_page=20, category_id=None):
         """获取装备列表"""
-        query = Equipment.query.filter_by(is_active=True)
+        query = self.Equipment.query.filter_by(is_active=True)
         
         if category_id:
             query = query.filter_by(category_id=category_id)
             
         # 按评分和评价数量排序
         query = query.order_by(
-            Equipment.rating.desc().nullslast(),
-            Equipment.created_at.desc()
+            self.Equipment.rating_avg.desc(),
+            self.Equipment.created_at.desc()
         )
         
         total = query.count()
@@ -103,12 +105,12 @@ class EquipmentService:
         equipment_list = []
         for equipment in equipment_items:
             # 获取最新价格
-            latest_price = EquipmentPrice.query.filter_by(
+            latest_price = self.EquipmentPrice.query.filter_by(
                 equipment_id=equipment.id
-            ).order_by(EquipmentPrice.created_at.desc()).first()
+            ).order_by(self.EquipmentPrice.created_at.desc()).first()
             
             # 获取评价数量
-            review_count = EquipmentReview.query.filter_by(
+            review_count = self.EquipmentReview.query.filter_by(
                 equipment_id=equipment.id
             ).count()
             
@@ -124,7 +126,7 @@ class EquipmentService:
                 'description': equipment.description[:200] + '...' if len(equipment.description or '') > 200 else equipment.description,
                 'images': equipment.images[:1] if equipment.images else [],  # 只返回第一张图片
                 'tags': equipment.tags[:5] if equipment.tags else [],  # 只返回前5个标签
-                'rating': float(equipment.rating) if equipment.rating else 0,
+                'rating': float(equipment.rating_avg) if equipment.rating_avg else 0,
                 'review_count': review_count,
                 'current_price': {
                     'price': float(latest_price.price) if latest_price else None,
@@ -143,17 +145,17 @@ class EquipmentService:
     def get_equipment_detail(self, equipment_id):
         """获取装备详情"""
         try:
-            equipment = Equipment.query.get(equipment_id)
+            equipment = self.Equipment.query.get(equipment_id)
             if not equipment:
                 return None
                 
             # 获取最新价格
-            latest_price = EquipmentPrice.query.filter_by(
+            latest_price = self.EquipmentPrice.query.filter_by(
                 equipment_id=equipment_id
-            ).order_by(EquipmentPrice.created_at.desc()).first()
+            ).order_by(self.EquipmentPrice.created_at.desc()).first()
             
             # 获取评价统计
-            reviews = EquipmentReview.query.filter_by(equipment_id=equipment_id).all()
+            reviews = self.EquipmentReview.query.filter_by(equipment_id=equipment_id).all()
             avg_rating = sum(r.rating for r in reviews) / len(reviews) if reviews else 0
             
             return {
@@ -173,7 +175,7 @@ class EquipmentService:
                 'material': equipment.material,
                 'color_options': equipment.color_options,
                 'size_options': equipment.size_options,
-                'rating': float(equipment.rating) if equipment.rating else avg_rating,
+                'rating': float(equipment.rating_avg) if equipment.rating_avg else avg_rating,
                 'review_count': len(reviews),
                 'current_price': {
                     'price': float(latest_price.price) if latest_price else None,
@@ -191,10 +193,10 @@ class EquipmentService:
     def get_latest_prices(self, equipment_id, limit=5):
         """获取装备的最新价格"""
         try:
-            prices = EquipmentPrice.query.filter(
-                EquipmentPrice.equipment_id == equipment_id,
-                EquipmentPrice.is_available == True
-            ).order_by(desc(EquipmentPrice.created_at)).limit(limit).all()
+            prices = self.EquipmentPrice.query.filter(
+                self.EquipmentPrice.equipment_id == equipment_id,
+                self.EquipmentPrice.is_available == True
+            ).order_by(desc(self.EquipmentPrice.created_at)).limit(limit).all()
             
             return [price.to_dict() for price in prices]
         
@@ -236,10 +238,10 @@ class EquipmentService:
         try:
             start_date = datetime.now() - timedelta(days=days)
             
-            prices = EquipmentPrice.query.filter(
-                EquipmentPrice.equipment_id == equipment_id,
-                EquipmentPrice.created_at >= start_date
-            ).order_by(EquipmentPrice.created_at).all()
+            prices = self.EquipmentPrice.query.filter(
+                self.EquipmentPrice.equipment_id == equipment_id,
+                self.EquipmentPrice.created_at >= start_date
+            ).order_by(self.EquipmentPrice.created_at).all()
             
             # 按平台分组
             platform_prices = defaultdict(list)
@@ -298,7 +300,7 @@ class EquipmentService:
         """获取装备推荐"""
         try:
             # 获取当前装备信息
-            current_equipment = Equipment.query.get(equipment_id)
+            current_equipment = self.Equipment.query.get(equipment_id)
             if not current_equipment:
                 raise ValueError(f"装备 {equipment_id} 不存在")
             
@@ -332,13 +334,13 @@ class EquipmentService:
     
     def _get_category_recommendations(self, equipment, limit):
         """基于分类的推荐"""
-        recommendations = Equipment.query.filter(
-            Equipment.category_id == equipment.category_id,
-            Equipment.id != equipment.id,
-            Equipment.is_active == True
+        recommendations = self.Equipment.query.filter(
+            self.Equipment.category == equipment.category,
+            self.Equipment.id != equipment.id,
+            self.Equipment.is_active == True
         ).order_by(
-            desc(Equipment.avg_rating),
-            desc(Equipment.review_count)
+            desc(self.Equipment.rating_avg),
+            desc(self.Equipment.rating_count)
         ).limit(limit).all()
         
         result = []
@@ -355,13 +357,13 @@ class EquipmentService:
         if not equipment.brand:
             return []
         
-        recommendations = Equipment.query.filter(
-            Equipment.brand == equipment.brand,
-            Equipment.id != equipment.id,
-            Equipment.is_active == True
+        recommendations = self.Equipment.query.filter(
+            self.Equipment.brand == equipment.brand,
+            self.Equipment.id != equipment.id,
+            self.Equipment.is_active == True
         ).order_by(
-            desc(Equipment.avg_rating),
-            desc(Equipment.review_count)
+            desc(self.Equipment.rating_avg),
+            desc(self.Equipment.rating_count)
         ).limit(limit).all()
         
         result = []
@@ -399,15 +401,15 @@ class EquipmentService:
     def get_popular_equipment(self, category_id=None, limit=20):
         """获取热门装备"""
         try:
-            query = Equipment.query.filter(Equipment.is_active == True)
+            query = self.Equipment.query.filter(self.Equipment.is_active == True)
             
             if category_id:
-                query = query.filter(Equipment.category_id == category_id)
+                query = query.filter(self.Equipment.category == category_id)
             
             # 按评分和评价数量排序
             equipment_list = query.order_by(
-                desc(Equipment.avg_rating),
-                desc(Equipment.review_count)
+                desc(self.Equipment.rating_avg),
+                desc(self.Equipment.rating_count)
             ).limit(limit).all()
             
             result = []
@@ -431,41 +433,41 @@ class EquipmentService:
     def add_equipment_category(self, name, name_en, description=None, parent_id=None):
         """添加装备分类"""
         try:
-            category = EquipmentCategory(
+            category = self.EquipmentCategory(
                 name=name,
                 name_en=name_en,
                 description=description,
                 parent_id=parent_id
             )
             
-            db.session.add(category)
-            db.session.commit()
+            self.db.session.add(category)
+            self.db.session.commit()
             
             return category.to_dict()
         
         except Exception as e:
             logger.error(f"添加装备分类失败: {str(e)}")
-            db.session.rollback()
+            self.db.session.rollback()
             raise
     
     def update_equipment_rating(self, equipment_id):
         """更新装备评分"""
         try:
             # 计算平均评分和评价数量
-            rating_stats = db.session.query(
-                func.avg(EquipmentReview.rating).label('avg_rating'),
-                func.count(EquipmentReview.id).label('review_count')
-            ).filter(EquipmentReview.equipment_id == equipment_id).first()
+            rating_stats = self.db.session.query(
+                func.avg(self.EquipmentReview.rating).label('avg_rating'),
+                func.count(self.EquipmentReview.id).label('review_count')
+            ).filter(self.EquipmentReview.equipment_id == equipment_id).first()
             
-            equipment = Equipment.query.get(equipment_id)
+            equipment = self.Equipment.query.get(equipment_id)
             if equipment and rating_stats:
-                equipment.avg_rating = float(rating_stats.avg_rating) if rating_stats.avg_rating else 0.0
-                equipment.review_count = rating_stats.review_count or 0
+                equipment.rating_avg = float(rating_stats.avg_rating) if rating_stats.avg_rating else 0.0
+                equipment.rating_count = rating_stats.review_count or 0
                 
-                db.session.commit()
+                self.db.session.commit()
                 
-                logger.info(f"更新装备 {equipment_id} 评分: {equipment.avg_rating}")
+                logger.info(f"更新装备 {equipment_id} 评分: {equipment.rating_avg}")
         
         except Exception as e:
             logger.error(f"更新装备评分失败: {str(e)}")
-            db.session.rollback()
+            self.db.session.rollback()

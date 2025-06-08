@@ -55,6 +55,7 @@ def create_models(db):
         view_count = db.Column(db.Integer, default=0, comment='浏览次数')
         favorite_count = db.Column(db.Integer, default=0, comment='收藏次数')
         status = db.Column(db.String(20), default='active', comment='状态')
+        is_active = db.Column(db.Boolean, default=True, comment='是否启用')
         created_at = db.Column(db.DateTime, default=datetime.utcnow)
         updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
         
@@ -80,11 +81,12 @@ def create_models(db):
                 'specifications': self.specifications,
                 'image_urls': self.image_urls,
                 'purchase_urls': self.purchase_urls,
-                'rating_avg': self.rating_avg,
-                'rating_count': self.rating_count,
+                'avg_rating': self.rating_avg,
+                'review_count': self.rating_count,
                 'view_count': self.view_count,
                 'favorite_count': self.favorite_count,
                 'status': self.status,
+                'is_active': self.is_active,
                 'created_at': self.created_at.isoformat() if self.created_at else None,
                 'updated_at': self.updated_at.isoformat() if self.updated_at else None
             }

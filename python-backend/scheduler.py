@@ -5,7 +5,7 @@ from loguru import logger
 import os
 from services.crawler_service import CrawlerService
 from services.equipment_service import EquipmentService
-from app import app, db
+from app import app, db, EquipmentCategory, Equipment, EquipmentPrice, EquipmentReview
 
 class TaskScheduler:
     """任务调度器"""
@@ -13,7 +13,13 @@ class TaskScheduler:
     def __init__(self):
         self.scheduler = BackgroundScheduler()
         self.crawler_service = CrawlerService()
-        self.equipment_service = EquipmentService()
+        self.equipment_service = EquipmentService(
+            db=db,
+            equipment_model=Equipment,
+            category_model=EquipmentCategory,
+            price_model=EquipmentPrice,
+            review_model=EquipmentReview
+        )
         self._setup_jobs()
     
     def _setup_jobs(self):
@@ -120,7 +126,6 @@ class TaskScheduler:
             
             with app.app_context():
                 # 获取所有活跃装备
-                from models.equipment import Equipment
                 equipment_list = Equipment.query.filter(
                     Equipment.is_active == True
                 ).all()

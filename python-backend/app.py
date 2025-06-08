@@ -55,7 +55,13 @@ def get_categories():
     """获取装备分类"""
     try:
         from services.equipment_service import EquipmentService
-        equipment_service = EquipmentService()
+        equipment_service = EquipmentService(
+            db=db,
+            equipment_model=Equipment,
+            category_model=EquipmentCategory,
+            price_model=EquipmentPrice,
+            review_model=EquipmentReview
+        )
         categories = equipment_service.get_all_categories()
         return jsonify({
             'success': True,
@@ -73,7 +79,13 @@ def search_equipment():
     """搜索装备"""
     try:
         from services.equipment_service import EquipmentService
-        equipment_service = EquipmentService()
+        equipment_service = EquipmentService(
+            db=db,
+            equipment_model=Equipment,
+            category_model=EquipmentCategory,
+            price_model=EquipmentPrice,
+            review_model=EquipmentReview
+        )
         
         # 获取查询参数
         keyword = request.args.get('keyword', '')
@@ -109,7 +121,13 @@ def get_equipment_detail(equipment_id):
     """获取装备详情"""
     try:
         from services.equipment_service import EquipmentService
-        equipment_service = EquipmentService()
+        equipment_service = EquipmentService(
+            db=db,
+            equipment_model=Equipment,
+            category_model=EquipmentCategory,
+            price_model=EquipmentPrice,
+            review_model=EquipmentReview
+        )
         
         equipment = equipment_service.get_equipment_detail(equipment_id)
         if not equipment:
@@ -134,7 +152,13 @@ def get_equipment_list():
     """获取装备列表"""
     try:
         from services.equipment_service import EquipmentService
-        equipment_service = EquipmentService()
+        equipment_service = EquipmentService(
+            db=db,
+            equipment_model=Equipment,
+            category_model=EquipmentCategory,
+            price_model=EquipmentPrice,
+            review_model=EquipmentReview
+        )
         
         # 获取查询参数
         category_id = request.args.get('category_id', type=int)
@@ -165,7 +189,13 @@ def get_equipment_prices(equipment_id):
     """获取装备价格历史"""
     try:
         from services.equipment_service import EquipmentService
-        equipment_service = EquipmentService()
+        equipment_service = EquipmentService(
+            db=db,
+            equipment_model=Equipment,
+            category_model=EquipmentCategory,
+            price_model=EquipmentPrice,
+            review_model=EquipmentReview
+        )
         
         days = request.args.get('days', 30, type=int)
         prices = equipment_service.get_price_history(equipment_id, days)
@@ -186,7 +216,13 @@ def get_equipment_recommendations(equipment_id):
     """获取装备推荐"""
     try:
         from services.equipment_service import EquipmentService
-        equipment_service = EquipmentService()
+        equipment_service = EquipmentService(
+            db=db,
+            equipment_model=Equipment,
+            category_model=EquipmentCategory,
+            price_model=EquipmentPrice,
+            review_model=EquipmentReview
+        )
         
         recommendations = equipment_service.get_recommendations(equipment_id)
         
