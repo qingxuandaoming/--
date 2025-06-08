@@ -42,7 +42,7 @@
               </div>
             </div>
             
-            <a href="route1.html" class="btn btn-full">查看详情</a>
+            <a href="#route-detail-beginner" class="btn btn-full">查看详情</a>
           </div>
         </div>
         
@@ -74,7 +74,7 @@
               </div>
             </div>
             
-            <a href="route2.html" class="btn btn-full">查看详情</a>
+            <a href="#route-detail-intermediate" class="btn btn-full">查看详情</a>
           </div>
         </div>
         
@@ -108,15 +108,15 @@
               </div>
             </div>
             
-            <a href="route3.html" class="btn btn-full">查看详情</a>
+            <a href="#route-detail-advanced" class="btn btn-full">查看详情</a>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- 路线详情页 -->
-  <main class="route-detail-container container">
+  <!-- 路线详情页 - 初级路线 -->
+  <main id="route-detail-beginner" class="route-detail-container container">
     <section class="map-section">
       <!-- 优化后的地图容器 - 支持高德地图API -->
       <div id="container" class="map-container">
@@ -147,8 +147,10 @@
     <section class="route-info-section">
       <div class="info-main">
         <div class="route-header">
-          <span class="difficulty easy">初级</span>
-          <h1>湖滨休闲道</h1>
+          <div class="header-top">
+            <span class="difficulty easy">初级</span>
+            <h1>湖滨休闲道</h1>
+          </div>
           
           <div class="route-stats">
             <div class="stat-item">
@@ -407,6 +409,499 @@
       <div class="action-card">
         <h3><i class="fas fa-share-alt"></i> 分享路线</h3>
         <p>与好友分享这条美丽路线</p>
+        <div class="share-buttons">
+          <a href="#" class="share-btn wechat"><i class="fab fa-weixin"></i></a>
+          <a href="#" class="share-btn weibo"><i class="fab fa-weibo"></i></a>
+          <a href="#" class="share-btn qq"><i class="fab fa-qq"></i></a>
+        </div>
+      </div>
+    </section>
+   </main>
+
+  <!-- 中级路线详情页 - 森林山地线 -->
+  <main id="route-detail-intermediate" class="route-detail-container container">
+    
+    <section class="route-info-section">
+      <div class="info-main">
+        <div class="route-header">
+          <div class="header-top">
+            <span class="difficulty moderate">中级</span>
+            <h1>森林山地线</h1>
+          </div>
+          
+          <div class="route-stats">
+            <div class="stat-item">
+              <i class="fas fa-route"></i>
+              <h4>距离</h4>
+              <p>25 公里</p>
+            </div>
+            <div class="stat-item">
+              <i class="far fa-clock"></i>
+              <h4>时间</h4>
+              <p>3-4 小时</p>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-mountain"></i>
+              <h4>海拔</h4>
+              <p>320m</p>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-road"></i>
+              <h4>路面</h4>
+              <p>山地路</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="route-description">
+          <p>森林山地线是一条充满挑战性的中级骑行路线，穿越茂密的森林和起伏的山地。这条路线为骑行爱好者提供了绝佳的自然体验，沿途可以欣赏到原始森林的美景，呼吸清新的空气，感受大自然的魅力。</p>
+        </div>
+        
+        <!-- 折叠面板 - 路线概览 -->
+        <div class="collapsible-panel">
+          <div class="panel-header">
+            <h3><i class="fas fa-info-circle"></i> 路线概览</h3>
+            <span>+</span>
+          </div>
+          <div class="panel-content">
+            <p>森林山地线全长约25公里，是一条点对点的山地骑行路线。起点位于森林公园入口，终点为山顶观景台，海拔爬升320米。</p>
+            
+            <ul>
+              <li><strong>起点:</strong> 森林公园入口</li>
+              <li><strong>途经:</strong> 竹林小径、瀑布观景点、山腰休息站、古树群</li>
+              <li><strong>终点:</strong> 山顶观景台</li>
+              <li><strong>推荐骑行方向:</strong> 由低到高</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 折叠面板 - 海拔剖面 -->
+        <div class="collapsible-panel">
+          <div class="panel-header">
+            <h3><i class="fas fa-chart-area"></i> 海拔剖面</h3>
+            <span>+</span>
+          </div>
+          <div class="panel-content">
+            <div class="elevation-profile">
+              海拔剖面图将在此显示
+            </div>
+            <p>这条路线具有明显的爬升特征，总爬升320米，平均坡度约5%，部分路段坡度可达12%，对体力和技术都有一定要求。</p>
+            <ul>
+              <li>最低点: 森林公园入口(180m)</li>
+              <li>最高点: 山顶观景台(500m)</li>
+              <li>平均坡度: 5%</li>
+              <li>最大坡度: 12%</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 折叠面板 - 路况详情 -->
+        <div class="collapsible-panel">
+          <div class="panel-header">
+            <h3><i class="fas fa-road"></i> 路况详情</h3>
+            <span>+</span>
+          </div>
+          <div class="panel-content">
+            <p>路面以碎石路和土路为主，部分路段为石阶，需要具备一定的山地骑行技能和合适的装备。</p>
+            <ul>
+              <li><strong>第1-8公里:</strong> 碎石路面，坡度较缓，适合热身</li>
+              <li><strong>第9-18公里:</strong> 土路和石阶混合，坡度较陡，技术要求较高</li>
+              <li><strong>第19-25公里:</strong> 山地小径，路况复杂，需要推车部分路段</li>
+            </ul>
+            <p><strong>注意事项:</strong> 雨后路面湿滑，建议避免骑行。携带头盔、护具和维修工具。</p>
+          </div>
+        </div>
+        
+        <!-- 折叠面板 - 骑行小贴士 -->
+        <div class="collapsible-panel">
+          <div class="panel-header">
+            <h3><i class="fas fa-lightbulb"></i> 骑行小贴士</h3>
+            <span>+</span>
+          </div>
+          <div class="panel-content">
+            <p>森林山地线对骑行者的体力和技术都有较高要求，请做好充分准备：</p>
+            <ul>
+              <li><strong>最佳骑行季节:</strong> 春季(3-5月)和秋季(9-11月)，避开雨季</li>
+              <li><strong>最佳骑行时段:</strong> 上午8-11点，下午气温过高不适宜</li>
+              <li><strong>必备装备:</strong> 山地车、头盔、护膝、手套、维修工具包</li>
+              <li><strong>补给建议:</strong> 充足的水和高能量食物，建议携带2-3升水</li>
+              <li><strong>安全提醒:</strong> 结伴骑行，告知家人行程，携带通讯设备</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="info-sidebar">
+        <!-- 周边设施板块 -->
+        <div class="sidebar-section">
+          <h3><i class="fas fa-utensils"></i> 周边设施</h3>
+          
+          <div class="facilities-cards">
+            <!-- 餐饮设施 -->
+            <div class="facility-card">
+              <div class="facility-icon">
+                <i class="fas fa-coffee"></i>
+              </div>
+              <div class="facility-content">
+                <h4>山腰茶屋</h4>
+                <p>位于路线15公里处，提供热饮和简餐</p>
+              </div>
+            </div>
+            
+            <!-- 维修点 -->
+            <div class="facility-card">
+              <div class="facility-icon">
+                <i class="fas fa-tools"></i>
+              </div>
+              <div class="facility-content">
+                <h4>森林维修站</h4>
+                <p>位于起点，提供专业山地车维修服务</p>
+              </div>
+            </div>
+            
+            <!-- 厕所 -->
+            <div class="facility-card">
+              <div class="facility-icon">
+                <i class="fas fa-restroom"></i>
+              </div>
+              <div class="facility-content">
+                <h4>公共厕所</h4>
+                <p>起点和山腰休息站各有1处</p>
+              </div>
+            </div>
+            
+            <!-- 停车场 -->
+            <div class="facility-card">
+              <div class="facility-icon">
+                <i class="fas fa-parking"></i>
+              </div>
+              <div class="facility-content">
+                <h4>停车场</h4>
+                <p>森林公园入口有收费停车场</p>
+              </div>
+            </div>
+            
+            <!-- 急救站 -->
+            <div class="facility-card">
+              <div class="facility-icon">
+                <i class="fas fa-first-aid"></i>
+              </div>
+              <div class="facility-content">
+                <h4>急救站</h4>
+                <p>山腰休息站设有医疗急救点</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 天气信息 -->
+        <div class="sidebar-section">
+          <h3><i class="fas fa-cloud-sun"></i> 今日天气</h3>
+          <p>多云，18°C-25°C，西南风2-3级</p>
+          <p>空气质量: 良 (AQI: 68)</p>
+          <p>骑行指数: <strong style="color: #f39c12;">适宜</strong></p>
+        </div>
+      </div>
+    </section>
+    
+    <section class="gallery-section">
+      <h2><i class="fas fa-image"></i> 沿途景点</h2>
+      
+      <div class="gallery-container">
+        <!-- 景点图片1 -->
+        <div class="gallery-item">
+          <img src="/source/森林山地线.jpg" alt="竹林小径">
+          <div class="gallery-caption">竹林小径 - 路线5公里处</div>
+        </div>
+        
+        <!-- 景点图片2 -->
+        <div class="gallery-item">
+          <img src="/source/森林山地线.jpg" alt="瀑布观景点">
+          <div class="gallery-caption">瀑布观景点 - 路线12公里处</div>
+        </div>
+        
+        <!-- 景点图片3 -->
+        <div class="gallery-item">
+          <img src="/source/森林山地线.jpg" alt="古树群">
+          <div class="gallery-caption">千年古树群 - 路线18公里处</div>
+        </div>
+        
+        <!-- 景点图片4 -->
+        <div class="gallery-item">
+          <img src="/source/森林山地线.jpg" alt="山顶观景台">
+          <div class="gallery-caption">山顶观景台 - 路线终点</div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 用户交互区域 -->
+    <section class="user-actions">
+      <div class="action-card">
+        <h3><i class="fas fa-star"></i> 路线评价</h3>
+        <div class="rating-stars">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+        </div>
+        <p>基于89位骑行者的评价</p>
+        <button class="btn">写评价</button>
+      </div>
+      
+      <div class="action-card">
+        <h3><i class="fas fa-share-alt"></i> 分享路线</h3>
+        <p>与好友分享这条挑战路线</p>
+        <div class="share-buttons">
+          <a href="#" class="share-btn wechat"><i class="fab fa-weixin"></i></a>
+          <a href="#" class="share-btn weibo"><i class="fab fa-weibo"></i></a>
+          <a href="#" class="share-btn qq"><i class="fab fa-qq"></i></a>
+        </div>
+      </div>
+    </section>
+   </main>
+
+  <!-- 高级路线详情页 - 海岸风景道 -->
+  <main id="route-detail-advanced" class="route-detail-container container">
+    
+    <section class="route-info-section">
+      <div class="info-main">
+        <div class="route-header">
+          <div class="header-top">
+            <span class="difficulty challenging">高级</span>
+            <h1>海岸风景道</h1>
+          </div>
+          
+          <div class="route-stats">
+            <div class="stat-item">
+              <i class="fas fa-route"></i>
+              <h4>距离</h4>
+              <p>40 公里</p>
+            </div>
+            <div class="stat-item">
+              <i class="far fa-clock"></i>
+              <h4>时间</h4>
+              <p>5-6 小时</p>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-mountain"></i>
+              <h4>海拔</h4>
+              <p>580m</p>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-road"></i>
+              <h4>路面</h4>
+              <p>混合路面</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="route-description">
+          <p>海岸风景道是最具挑战性的高级骑行路线，沿着壮丽的海岸线蜿蜒前行。这条路线结合了海景、山景和技术挑战，为经验丰富的骑行者提供了终极的骑行体验。沿途可以欣赏到无敌海景、悬崖峭壁和原始海岸风光。</p>
+        </div>
+        
+        <!-- 折叠面板 - 路线概览 -->
+        <div class="collapsible-panel">
+          <div class="panel-header">
+            <h3><i class="fas fa-info-circle"></i> 路线概览</h3>
+            <span>+</span>
+          </div>
+          <div class="panel-content">
+            <p>海岸风景道全长约40公里，是一条环形的高难度骑行路线。起点位于海滨大道，沿海岸线向北，经过多个观景点后返回起点。</p>
+            
+            <ul>
+              <li><strong>起点:</strong> 海滨大道游客中心</li>
+              <li><strong>途经:</strong> 灯塔观景台、悬崖栈道、海蚀洞、渔村古镇</li>
+              <li><strong>终点:</strong> 海滨大道游客中心</li>
+              <li><strong>推荐骑行方向:</strong> 顺时针</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 折叠面板 - 海拔剖面 -->
+        <div class="collapsible-panel">
+          <div class="panel-header">
+            <h3><i class="fas fa-chart-area"></i> 海拔剖面</h3>
+            <span>+</span>
+          </div>
+          <div class="panel-content">
+            <div class="elevation-profile">
+              海拔剖面图将在此显示
+            </div>
+            <p>这条路线海拔变化剧烈，总爬升580米，包含多个陡峭的爬坡和下坡路段，对骑行技术和体力都是极大考验。</p>
+            <ul>
+              <li>最低点: 海平面(0m)</li>
+              <li>最高点: 悬崖观景台(580m)</li>
+              <li>平均坡度: 8%</li>
+              <li>最大坡度: 18%</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 折叠面板 - 路况详情 -->
+        <div class="collapsible-panel">
+          <div class="panel-header">
+            <h3><i class="fas fa-road"></i> 路况详情</h3>
+            <span>+</span>
+          </div>
+          <div class="panel-content">
+            <p>路面条件复杂多变，包含柏油路、碎石路、沙滩路段等，部分路段路况较差，需要高超的骑行技术。</p>
+            <ul>
+              <li><strong>第1-12公里:</strong> 海滨柏油路，路况良好，但有强烈海风</li>
+              <li><strong>第13-28公里:</strong> 山地碎石路，坡度陡峭，技术要求极高</li>
+              <li><strong>第29-40公里:</strong> 混合路面，包含沙滩和栈道，需要适应性强</li>
+            </ul>
+            <p><strong>注意事项:</strong> 海风强劲，注意防风。潮汐时间影响部分路段通行。必须携带专业装备和通讯设备。</p>
+          </div>
+        </div>
+        
+        <!-- 折叠面板 - 骑行小贴士 -->
+        <div class="collapsible-panel">
+          <div class="panel-header">
+            <h3><i class="fas fa-lightbulb"></i> 骑行小贴士</h3>
+            <span>+</span>
+          </div>
+          <div class="panel-content">
+            <p>海岸风景道是极具挑战性的路线，仅适合经验丰富的高级骑行者：</p>
+            <ul>
+              <li><strong>最佳骑行季节:</strong> 夏季(6-8月)和初秋(9月)，避开台风季节</li>
+              <li><strong>最佳骑行时段:</strong> 清晨5-8点，避开强烈海风和高温</li>
+              <li><strong>专业装备:</strong> 公路车或山地车、专业头盔、防风衣、GPS设备</li>
+              <li><strong>安全要求:</strong> 必须结伴骑行，携带急救包和通讯设备</li>
+              <li><strong>体能要求:</strong> 建议有2年以上骑行经验，完成过中级路线</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="info-sidebar">
+        <!-- 周边设施板块 -->
+        <div class="sidebar-section">
+          <h3><i class="fas fa-utensils"></i> 周边设施</h3>
+          
+          <div class="facilities-cards">
+            <!-- 餐饮设施 -->
+            <div class="facility-card">
+              <div class="facility-icon">
+                <i class="fas fa-coffee"></i>
+              </div>
+              <div class="facility-content">
+                <h4>海景餐厅</h4>
+                <p>位于路线20公里处，提供海鲜和补给</p>
+              </div>
+            </div>
+            
+            <!-- 维修点 -->
+            <div class="facility-card">
+              <div class="facility-icon">
+                <i class="fas fa-tools"></i>
+              </div>
+              <div class="facility-content">
+                <h4>专业维修站</h4>
+                <p>起点设有专业自行车维修中心</p>
+              </div>
+            </div>
+            
+            <!-- 厕所 -->
+            <div class="facility-card">
+              <div class="facility-icon">
+                <i class="fas fa-restroom"></i>
+              </div>
+              <div class="facility-content">
+                <h4>公共厕所</h4>
+                <p>沿途3处，主要集中在观景点</p>
+              </div>
+            </div>
+            
+            <!-- 停车场 -->
+            <div class="facility-card">
+              <div class="facility-icon">
+                <i class="fas fa-parking"></i>
+              </div>
+              <div class="facility-content">
+                <h4>停车场</h4>
+                <p>游客中心有大型停车场</p>
+              </div>
+            </div>
+            
+            <!-- 救援站 -->
+            <div class="facility-card">
+              <div class="facility-icon">
+                <i class="fas fa-ambulance"></i>
+              </div>
+              <div class="facility-content">
+                <h4>海上救援站</h4>
+                <p>24小时海上救援服务</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 天气信息 -->
+        <div class="sidebar-section">
+          <h3><i class="fas fa-cloud-sun"></i> 今日天气</h3>
+          <p>晴朗，20°C-26°C，东南风4-5级</p>
+          <p>空气质量: 优 (AQI: 35)</p>
+          <p>骑行指数: <strong style="color: #e74c3c;">谨慎骑行</strong></p>
+          <p style="color: #e74c3c;">⚠️ 海风较强，注意安全</p>
+        </div>
+      </div>
+    </section>
+    
+    <section class="gallery-section">
+      <h2><i class="fas fa-image"></i> 沿途景点</h2>
+      
+      <div class="gallery-container">
+        <!-- 景点图片1 -->
+        <div class="gallery-item">
+          <img src="/source/海岸风景道.jpg" alt="灯塔观景台">
+          <div class="gallery-caption">灯塔观景台 - 路线8公里处</div>
+        </div>
+        
+        <!-- 景点图片2 -->
+        <div class="gallery-item">
+          <img src="/source/海岸风景道.jpg" alt="悬崖栈道">
+          <div class="gallery-caption">悬崖栈道 - 路线15公里处</div>
+        </div>
+        
+        <!-- 景点图片3 -->
+        <div class="gallery-item">
+          <img src="/source/海岸风景道.jpg" alt="海蚀洞">
+          <div class="gallery-caption">神秘海蚀洞 - 路线25公里处</div>
+        </div>
+        
+        <!-- 景点图片4 -->
+        <div class="gallery-item">
+          <img src="/source/海岸风景道.jpg" alt="渔村古镇">
+          <div class="gallery-caption">渔村古镇 - 路线32公里处</div>
+        </div>
+        
+        <!-- 景点图片5 -->
+        <div class="gallery-item">
+          <img src="/source/海岸风景道.jpg" alt="日出海景">
+          <div class="gallery-caption">日出海景 - 路线终点</div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 用户交互区域 -->
+    <section class="user-actions">
+      <div class="action-card">
+        <h3><i class="fas fa-star"></i> 路线评价</h3>
+        <div class="rating-stars">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+        </div>
+        <p>基于45位专业骑行者的评价</p>
+        <button class="btn">写评价</button>
+      </div>
+      
+      <div class="action-card">
+        <h3><i class="fas fa-share-alt"></i> 分享路线</h3>
+        <p>与专业骑友分享这条极限路线</p>
         <div class="share-buttons">
           <a href="#" class="share-btn wechat"><i class="fab fa-weixin"></i></a>
           <a href="#" class="share-btn weibo"><i class="fab fa-weibo"></i></a>

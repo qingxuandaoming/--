@@ -41,6 +41,21 @@ const router = createRouter({
       name: 'RoutePlanning',
       component: () => import('../views/RoutePlanning.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/safety-guide',
+      name: 'SafetyGuide',
+      component: () => import('../views/SafetyGuide.vue')
+    },
+    {
+      path: '/maintenance-guide',
+      name: 'MaintenanceGuide',
+      component: () => import('../views/MaintenanceGuide.vue')
+    },
+    {
+      path: '/event-calendar',
+      name: 'EventCalendar',
+      component: () => import('../views/EventCalendar.vue')
     }
   ]
 })

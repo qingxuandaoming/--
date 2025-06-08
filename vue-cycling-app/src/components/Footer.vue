@@ -50,7 +50,7 @@
         <div class="footer-section">
           <h4>骑行资源</h4>
           <div class="footer-resources">
-            <div class="resource-card">
+            <div class="resource-card" @click="navigateToSafetyGuide">
               <div class="resource-image">
                 <img src="/source/安全骑行指南.jpg" alt="安全骑行指南">
               </div>
@@ -61,14 +61,14 @@
             </div>
             <div class="resource-card">
               <div class="resource-image">
-                <img src="/source/骑行装备推荐.jpg" alt="骑行装备">
+                <img src="/source/骑行装备推荐.jpg" alt="装备推荐">
               </div>
               <div class="resource-content">
                 <h3 class="resource-title">骑行装备推荐</h3>
-                <p class="resource-description">专业级装备选购指南与使用技巧</p>
+                <p class="resource-description">专业装备选购指南与使用技巧</p>
               </div>
             </div>
-            <div class="resource-card">
+            <div class="resource-card" @click="navigateToMaintenanceGuide">
               <div class="resource-image">
                 <img src="/source/骑行设备保养技巧.jpg" alt="设备保养">
               </div>
@@ -77,7 +77,7 @@
                 <p class="resource-description">延长装备使用寿命的维护秘诀</p>
               </div>
             </div>
-            <div class="resource-card">
+            <div class="resource-card" @click="navigateToEventCalendar">
               <div class="resource-image">
                 <img src="/source/骑行活动日历.jpg" alt="活动日历">
               </div>
@@ -107,7 +107,22 @@
 </template>
 
 <script setup>
-// 页脚组件不需要特殊逻辑
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+// 导航方法
+const navigateToSafetyGuide = () => {
+  router.push('/safety-guide')
+}
+
+const navigateToMaintenanceGuide = () => {
+  router.push('/maintenance-guide')
+}
+
+const navigateToEventCalendar = () => {
+  router.push('/event-calendar')
+}
 </script>
 
 <style scoped>
