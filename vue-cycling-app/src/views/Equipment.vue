@@ -191,6 +191,48 @@
           </button>
         </div>
       </section>
+      
+      <!-- 数据分析区域 -->
+      <section class="analytics-section">
+        <div class="section-header">
+          <h2>数据分析</h2>
+          <p>深入了解骑行装备市场趋势和价格分析</p>
+        </div>
+        
+        <div class="analytics-grid">
+          <!-- 价格历史趋势 -->
+          <div class="analytics-card full-width">
+            <PriceHistoryChart 
+              title="热门产品价格历史趋势" 
+              :equipment-id="'sample-helmet-001'"
+            />
+          </div>
+          
+          <!-- 品牌市场份额和价格分布 -->
+          <div class="analytics-row">
+            <div class="analytics-card">
+              <BrandMarketShareChart 
+                title="品牌市场份额分析" 
+                :category-id="selectedCategory || 'helmet'"
+              />
+            </div>
+            <div class="analytics-card">
+              <PriceDistributionChart 
+                title="价格分布统计" 
+                :category-id="selectedCategory || 'all'"
+              />
+            </div>
+          </div>
+          
+          <!-- 品牌综合评分对比 -->
+          <div class="analytics-card full-width">
+            <BrandRadarChart 
+              title="品牌综合评分对比" 
+              :category="selectedCategory || 'helmet'"
+            />
+          </div>
+        </div>
+      </section>
     </main>
     
     <!-- 装备详情模态框 -->
@@ -283,9 +325,19 @@
 <script>
 import { ref, reactive, onMounted, computed } from 'vue'
 import ApiService from '@/services/api.js'
+import PriceHistoryChart from '@/components/PriceHistoryChart.vue'
+import BrandMarketShareChart from '@/components/BrandMarketShareChart.vue'
+import PriceDistributionChart from '@/components/PriceDistributionChart.vue'
+import BrandRadarChart from '@/components/BrandRadarChart.vue'
 
 export default {
   name: 'Equipment',
+  components: {
+    PriceHistoryChart,
+    BrandMarketShareChart,
+    PriceDistributionChart,
+    BrandRadarChart
+  },
   setup() {
     // 响应式数据
     const loading = ref(false)
@@ -1073,6 +1125,61 @@ export default {
   color: white;
 }
 
+/* 数据分析区域样式 */
+.analytics-section {
+  margin-top: 40px;
+  padding: 30px 0;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.analytics-section .section-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.analytics-section .section-header h2 {
+  color: #333;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.analytics-section .section-header p {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+}
+
+.analytics-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 20px;
+}
+
+.analytics-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.analytics-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.analytics-card.full-width {
+  width: 100%;
+}
+
+.analytics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .hero-content h1 {
@@ -1114,6 +1221,24 @@ export default {
   .modal-header,
   .modal-body {
     padding: 20px;
+  }
+  
+  /* 数据分析区域响应式 */
+  .analytics-section {
+    margin-top: 30px;
+    padding: 20px 0;
+  }
+  
+  .analytics-section .section-header h2 {
+    font-size: 24px;
+  }
+  
+  .analytics-grid {
+    padding: 0 15px;
+  }
+  
+  .analytics-row {
+    grid-template-columns: 1fr;
   }
 }
 </style>
