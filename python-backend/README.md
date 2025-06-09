@@ -4,6 +4,13 @@
 
 灵境行者Python爬虫服务是基于Flask开发的专业爬虫API服务，专注于骑行装备数据的采集、处理和分析。作为项目生态的重要组成部分，与Java主服务协同工作，为前端Vue应用提供丰富的骑行装备信息和智能推荐功能。
 
+### 数据库集成
+- **共享数据库**: MySQL 8.0，数据库名：`ljxz`（与Java后端共享）
+- **ORM框架**: SQLAlchemy
+- **连接池**: SQLAlchemy连接池管理
+- **主要数据表**: `equipment`, `equipment_categories`, `equipment_price_history`
+- **数据同步**: 与Java后端实时数据同步
+
 ## 🚀 功能特性
 
 ### 核心爬虫功能

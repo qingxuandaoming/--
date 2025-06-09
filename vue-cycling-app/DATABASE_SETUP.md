@@ -1,6 +1,10 @@
 # 灵境行者数据库设置指南
 
-本指南将帮助您设置灵境行者项目所需的MySQL数据库，包括Java后端和Python后端的数据库配置。
+> **更新时间**: 2025年1月  
+> **版本**: v2.1.0  
+> **适用于**: MySQL 8.0+  
+
+本指南将帮助您设置灵境行者项目所需的MySQL数据库，包括Java后端和Python后端的数据库配置。项目采用统一的数据库设计，支持用户管理、骑行路线、装备信息等核心功能。
 
 ## 📋 前置要求
 
@@ -375,10 +379,45 @@ GROUP BY table_schema;
 
 ## 🔗 相关文档
 
-- [API接口文档](./API_ENDPOINTS.md)
-- [前端应用文档](./README.md)
-- [Java后端文档](../java-backend/README.md)
-- [Python后端文档](../python-backend/README.md)
-- [MySQL官方文档](https://dev.mysql.com/doc/)
-- [Spring Boot数据库配置](https://docs.spring.io/spring-boot/docs/current/reference/html/data.html)
-- [Flask-SQLAlchemy文档](https://flask-sqlalchemy.palletsprojects.com/)
+### 项目文档
+- [项目总览](../README.md) - 项目整体介绍和架构
+- [前端应用文档](./README.md) - Vue3前端应用详细文档
+- [Java后端文档](../java-backend/README.md) - Spring Boot后端服务文档
+- [Python后端文档](../python-backend/README.md) - Flask爬虫服务文档
+
+### 数据库文档
+- [数据库设计文档](../docs/DATABASE.md) - 完整的数据库设计和架构文档
+- [API接口文档](./API_ENDPOINTS.md) - 数据库相关API接口说明
+- [完整初始化脚本](../database/complete_init.sql) - 数据库建表脚本
+- [测试数据脚本](../database/test_data.sql) - 测试数据插入脚本
+
+### 技术文档
+- [架构设计文档](../docs/ARCHITECTURE.md) - 系统架构设计
+- [开发指南](../docs/DEVELOPMENT.md) - 开发环境搭建和规范
+- [部署文档](../docs/DEPLOYMENT.md) - 生产环境部署指南
+- [安全文档](../docs/SECURITY.md) - 安全策略和最佳实践
+
+### 外部资源
+- [MySQL官方文档](https://dev.mysql.com/doc/) - MySQL数据库官方文档
+- [Spring Boot数据库配置](https://docs.spring.io/spring-boot/docs/current/reference/html/data.html) - Spring Boot数据库配置指南
+- [Flask-SQLAlchemy文档](https://flask-sqlalchemy.palletsprojects.com/) - Python Flask数据库ORM
+
+---
+
+## 📝 更新日志
+
+### v2.1.0 (2025年1月)
+- 更新数据库配置示例
+- 添加装备相关表的配置说明
+- 完善监控和维护章节
+- 更新相关文档链接
+
+### v2.0.0 (2024年12月)
+- 重构数据库设置流程
+- 添加Docker配置支持
+- 完善环境变量配置
+- 优化数据库初始化脚本
+
+---
+
+*最后更新时间：2025年1月*

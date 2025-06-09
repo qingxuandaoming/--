@@ -96,6 +96,23 @@
 
 ## 🚀 快速开始
 
+## 📊 数据库架构
+
+### 核心数据表
+- **用户系统**: `users` - 用户信息、认证、权限管理
+- **骑行路线**: `cycling_routes` - 路线规划、收藏、评分
+- **骑行记录**: `cycling_records` - 骑行轨迹、统计数据
+- **装备管理**: `equipment` - 装备信息、价格、规格
+- **价格监控**: `equipment_price_history` - 价格历史、趋势分析
+- **用户互动**: `route_likes`, `route_favorites`, `route_ratings`
+
+### 数据库特性
+- **高性能索引**: 优化的查询索引设计
+- **全文搜索**: 装备和路线的全文检索
+- **分区表**: 大数据量表的分区优化
+- **外键约束**: 完整的数据一致性保证
+- **软删除**: 数据安全的软删除机制
+
 ### 📋 环境要求
 
 | 组件 | 版本要求 | 说明 |
@@ -303,6 +320,31 @@ test(unit): 添加用户服务单元测试
 3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 开启 Pull Request
+
+## 📚 文档导航
+
+### 核心文档
+- 📖 [项目总览](./README.md) - 项目介绍和快速开始
+- 🏗️ [架构设计](./docs/ARCHITECTURE.md) - 系统架构和技术选型
+- 🛠️ [开发指南](./docs/DEVELOPMENT.md) - 开发环境和编码规范
+- 🚀 [部署文档](./docs/DEPLOYMENT.md) - 生产环境部署指南
+
+### 前端文档
+- 🎨 [Vue前端应用](./vue-cycling-app/README.md) - 前端应用详细文档
+- 📱 [API接口文档](./vue-cycling-app/API_ENDPOINTS.md) - 前端API调用指南
+
+### 后端文档
+- ☕ [Java后端服务](./java-backend/README.md) - Spring Boot主服务文档
+- 🐍 [Python爬虫服务](./python-backend/README.md) - Flask爬虫服务文档
+
+### 数据库文档
+- 🗄️ [数据库设计](./docs/DATABASE.md) - 完整的数据库设计文档
+- ⚙️ [数据库设置](./vue-cycling-app/DATABASE_SETUP.md) - 数据库安装配置指南
+- 📊 [初始化脚本](./database/complete_init.sql) - 数据库建表脚本
+
+### 技术文档
+- 🔒 [安全策略](./docs/SECURITY.md) - 安全设计和最佳实践
+- 📋 [API规范](./docs/API.md) - RESTful API设计规范
 
 ## 📄 许可证
 

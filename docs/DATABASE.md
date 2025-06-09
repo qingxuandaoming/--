@@ -1,5 +1,9 @@
 # 灵境行者 - 数据库设计文档
 
+> **更新时间**: 2025年6月  
+> **版本**: v2.1.0  
+> **数据库版本**: MySQL 8.0+  
+
 ## 📋 目录
 
 - [数据库概览](#数据库概览)
@@ -14,6 +18,7 @@
 - [数据迁移](#数据迁移)
 - [性能优化](#性能优化)
 - [备份策略](#备份策略)
+- [相关文档](#相关文档)
 
 ## 🗄️ 数据库概览
 
@@ -86,6 +91,9 @@ erDiagram
         varchar phone
         varchar avatar_url
         tinyint status
+        timestamp email_verified_at
+        timestamp last_login_at
+        int login_count
         timestamp created_at
         timestamp updated_at
         timestamp deleted_at
@@ -106,10 +114,13 @@ erDiagram
         enum difficulty
         int estimated_time
         decimal distance
+        decimal elevation_gain
         json tags
         tinyint is_public
         int view_count
         int like_count
+        varchar city
+        varchar province
         timestamp created_at
         timestamp updated_at
         timestamp deleted_at
@@ -128,10 +139,26 @@ erDiagram
         decimal average_speed
         decimal max_speed
         int calories
+        decimal elevation_gain
         json gps_data
         json heart_rate_data
+        json power_data
+        json weather_data
         timestamp start_time
         timestamp end_time
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    EQUIPMENT_CATEGORIES {
+        int id PK
+        varchar name UK
+        varchar name_en
+        text description
+        int parent_id FK
+        int sort_order
+        tinyint is_active
         timestamp created_at
         timestamp updated_at
     }
@@ -139,21 +166,85 @@ erDiagram
     EQUIPMENT {
         bigint id PK
         varchar name
-        varchar category
+        int category_id FK
+        varchar subcategory
         varchar brand
+        varchar model
         decimal price
         decimal original_price
         decimal discount
         text description
+        longtext detailed_description
         json specifications
         json images
+        json tags
+        float weight
+        varchar material
+        json color_options
+        json size_options
         tinyint availability
         int stock
         decimal rating
         int review_count
+        int sales_count
         varchar source
         varchar source_url
+        varchar source_id
         timestamp last_updated
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    EQUIPMENT_PRICE_HISTORY {
+        bigint id PK
+        bigint equipment_id FK
+        decimal price
+        decimal original_price
+        decimal discount
+        tinyint availability
+        int stock
+        timestamp recorded_at
+    }
+    
+    ROUTE_LIKES {
+        bigint id PK
+        bigint user_id FK
+        bigint route_id FK
+        timestamp created_at
+    }
+    
+    ROUTE_FAVORITES {
+        bigint id PK
+        bigint user_id FK
+        bigint route_id FK
+        timestamp created_at
+    }
+    
+    ROUTE_RATINGS {
+        bigint id PK
+        bigint user_id FK
+        bigint route_id FK
+        int rating
+        text comment
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    USER_EQUIPMENT_FAVORITES {
+        bigint id PK
+        bigint user_id FK
+        bigint equipment_id FK
+        timestamp created_at
+    }
+    
+    PRICE_ALERTS {
+        bigint id PK
+        bigint user_id FK
+        bigint equipment_id FK
+        decimal target_price
+        varchar platform
+        tinyint is_active
+        timestamp last_check_time
         timestamp created_at
         timestamp updated_at
     }
@@ -162,13 +253,43 @@ erDiagram
         bigint id PK
         bigint user_id FK
         varchar device_id UK
-        varchar device_type
+        enum device_type
         varchar device_name
         varchar manufacturer
         varchar model
+        varchar firmware_version
         json settings
         tinyint is_active
         timestamp last_sync
+        int sync_count
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    CRAWLER_TASKS {
+        bigint id PK
+        varchar task_id UK
+        enum task_type
+        json sources
+        json categories
+        enum status
+        json progress
+        json results
+        text error_message
+        timestamp start_time
+        timestamp end_time
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    FEEDBACK {
+        bigint id PK
+        bigint user_id FK
+        varchar subject
+        text message
+        varchar contact_email
+        enum status
+        text admin_reply
         timestamp created_at
         timestamp updated_at
     }
@@ -176,7 +297,21 @@ erDiagram
     USERS ||--o{ CYCLING_ROUTES : creates
     USERS ||--o{ CYCLING_RECORDS : records
     USERS ||--o{ USER_DEVICES : owns
+    USERS ||--o{ ROUTE_LIKES : likes
+    USERS ||--o{ ROUTE_FAVORITES : favorites
+    USERS ||--o{ ROUTE_RATINGS : rates
+    USERS ||--o{ USER_EQUIPMENT_FAVORITES : favorites
+    USERS ||--o{ PRICE_ALERTS : sets
+    USERS ||--o{ FEEDBACK : submits
     CYCLING_ROUTES ||--o{ CYCLING_RECORDS : follows
+    CYCLING_ROUTES ||--o{ ROUTE_LIKES : receives
+    CYCLING_ROUTES ||--o{ ROUTE_FAVORITES : receives
+    CYCLING_ROUTES ||--o{ ROUTE_RATINGS : receives
+    EQUIPMENT_CATEGORIES ||--o{ EQUIPMENT_CATEGORIES : contains
+    EQUIPMENT_CATEGORIES ||--o{ EQUIPMENT : categorizes
+    EQUIPMENT ||--o{ EQUIPMENT_PRICE_HISTORY : tracks
+    EQUIPMENT ||--o{ USER_EQUIPMENT_FAVORITES : receives
+    EQUIPMENT ||--o{ PRICE_ALERTS : monitors
 ```
 
 ## 📊 表结构设计
@@ -295,13 +430,35 @@ PARTITION BY RANGE (YEAR(start_time)) (
 );
 ```
 
-### 4. 设备信息表 (equipment)
+### 4. 装备分类表 (equipment_categories)
+
+```sql
+CREATE TABLE `equipment_categories` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '分类ID',
+  `name` VARCHAR(50) NOT NULL COMMENT '分类名称',
+  `name_en` VARCHAR(50) NOT NULL COMMENT '英文名称',
+  `description` TEXT DEFAULT NULL COMMENT '分类描述',
+  `parent_id` INT UNSIGNED DEFAULT NULL COMMENT '父分类ID',
+  `sort_order` INT NOT NULL DEFAULT 0 COMMENT '排序',
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_categories_name` (`name`),
+  KEY `fk_categories_parent` (`parent_id`),
+  KEY `idx_categories_sort` (`sort_order`),
+  KEY `idx_categories_active` (`is_active`),
+  CONSTRAINT `fk_categories_parent` FOREIGN KEY (`parent_id`) REFERENCES `equipment_categories` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='装备分类表';
+```
+
+### 5. 设备信息表 (equipment)
 
 ```sql
 CREATE TABLE `equipment` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '设备ID',
   `name` VARCHAR(255) NOT NULL COMMENT '设备名称',
-  `category` VARCHAR(50) NOT NULL COMMENT '设备类别',
+  `category_id` INT UNSIGNED NOT NULL COMMENT '分类ID',
   `subcategory` VARCHAR(50) DEFAULT NULL COMMENT '子类别',
   `brand` VARCHAR(100) NOT NULL COMMENT '品牌',
   `model` VARCHAR(100) DEFAULT NULL COMMENT '型号',
@@ -312,6 +469,11 @@ CREATE TABLE `equipment` (
   `detailed_description` LONGTEXT DEFAULT NULL COMMENT '详细描述',
   `specifications` JSON DEFAULT NULL COMMENT '规格参数',
   `images` JSON DEFAULT NULL COMMENT '图片URLs',
+  `tags` JSON DEFAULT NULL COMMENT '标签',
+  `weight` FLOAT DEFAULT NULL COMMENT '重量(克)',
+  `material` VARCHAR(200) DEFAULT NULL COMMENT '材质',
+  `color_options` JSON DEFAULT NULL COMMENT '颜色选项',
+  `size_options` JSON DEFAULT NULL COMMENT '尺寸选项',
   `availability` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '是否有货',
   `stock` INT UNSIGNED DEFAULT NULL COMMENT '库存数量',
   `rating` DECIMAL(3,2) DEFAULT NULL COMMENT '评分',
@@ -325,17 +487,96 @@ CREATE TABLE `equipment` (
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_equipment_source` (`source`, `source_id`),
-  KEY `idx_equipment_category` (`category`),
+  KEY `fk_equipment_category` (`category_id`),
   KEY `idx_equipment_brand` (`brand`),
   KEY `idx_equipment_price` (`price`),
   KEY `idx_equipment_rating` (`rating`),
   KEY `idx_equipment_availability` (`availability`),
   KEY `idx_equipment_last_updated` (`last_updated`),
-  FULLTEXT KEY `ft_equipment_search` (`name`, `description`, `brand`)
+  FULLTEXT KEY `ft_equipment_search` (`name`, `description`, `brand`),
+  CONSTRAINT `fk_equipment_category` FOREIGN KEY (`category_id`) REFERENCES `equipment_categories` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='设备信息表';
 ```
 
-### 5. 用户设备表 (user_devices)
+### 6. 路线收藏表 (route_favorites)
+
+```sql
+CREATE TABLE `route_favorites` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '记录ID',
+  `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+  `route_id` BIGINT UNSIGNED NOT NULL COMMENT '路线ID',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_route_favorites` (`user_id`, `route_id`),
+  KEY `fk_route_favorites_users` (`user_id`),
+  KEY `fk_route_favorites_routes` (`route_id`),
+  CONSTRAINT `fk_route_favorites_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_route_favorites_routes` FOREIGN KEY (`route_id`) REFERENCES `cycling_routes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='路线收藏表';
+```
+
+### 7. 路线评分表 (route_ratings)
+
+```sql
+CREATE TABLE `route_ratings` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '记录ID',
+  `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+  `route_id` BIGINT UNSIGNED NOT NULL COMMENT '路线ID',
+  `rating` INT NOT NULL COMMENT '评分（1-5）',
+  `comment` TEXT DEFAULT NULL COMMENT '评价内容',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_route_ratings` (`user_id`, `route_id`),
+  KEY `fk_route_ratings_users` (`user_id`),
+  KEY `fk_route_ratings_routes` (`route_id`),
+  KEY `idx_route_ratings_rating` (`rating`),
+  CONSTRAINT `fk_route_ratings_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_route_ratings_routes` FOREIGN KEY (`route_id`) REFERENCES `cycling_routes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `chk_rating_range` CHECK (`rating` >= 1 AND `rating` <= 5)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='路线评分表';
+```
+
+### 8. 用户装备收藏表 (user_equipment_favorites)
+
+```sql
+CREATE TABLE `user_equipment_favorites` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '记录ID',
+  `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+  `equipment_id` BIGINT UNSIGNED NOT NULL COMMENT '设备ID',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_equipment_favorites` (`user_id`, `equipment_id`),
+  KEY `fk_user_equipment_favorites_users` (`user_id`),
+  KEY `fk_user_equipment_favorites_equipment` (`equipment_id`),
+  CONSTRAINT `fk_user_equipment_favorites_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_user_equipment_favorites_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipment` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户设备收藏表';
+```
+
+### 9. 价格提醒表 (price_alerts)
+
+```sql
+CREATE TABLE `price_alerts` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '记录ID',
+  `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+  `equipment_id` BIGINT UNSIGNED NOT NULL COMMENT '设备ID',
+  `target_price` DECIMAL(10,2) NOT NULL COMMENT '目标价格',
+  `platform` VARCHAR(50) DEFAULT NULL COMMENT '指定平台',
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
+  `last_check_time` TIMESTAMP NULL DEFAULT NULL COMMENT '最后检查时间',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `fk_price_alerts_users` (`user_id`),
+  KEY `fk_price_alerts_equipment` (`equipment_id`),
+  KEY `idx_price_alerts_active` (`is_active`),
+  CONSTRAINT `fk_price_alerts_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_price_alerts_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipment` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='价格提醒表';
+```
+
+### 10. 用户设备表 (user_devices)
 
 ```sql
 CREATE TABLE `user_devices` (
@@ -981,14 +1222,57 @@ echo "Slow queries: $SLOW_QUERIES"
 
 ---
 
+## 📚 相关文档
+
+### 项目文档
+- [项目总览](../README.md) - 项目整体介绍和架构
+- [前端文档](../vue-cycling-app/README.md) - Vue3前端应用文档
+- [Java后端文档](../java-backend/README.md) - Spring Boot后端服务文档
+- [Python后端文档](../python-backend/README.md) - Flask爬虫服务文档
+
+### 数据库相关
+- [数据库设置指南](../vue-cycling-app/DATABASE_SETUP.md) - 数据库安装和配置指南
+- [API接口文档](../vue-cycling-app/API_ENDPOINTS.md) - 数据库相关API接口
+- [完整初始化脚本](../database/complete_init.sql) - 数据库完整建表脚本
+- [测试数据脚本](../database/test_data.sql) - 测试数据插入脚本
+
+### 技术文档
+- [架构设计文档](./ARCHITECTURE.md) - 系统架构设计
+- [开发指南](./DEVELOPMENT.md) - 开发环境搭建和规范
+- [部署文档](./DEPLOYMENT.md) - 生产环境部署指南
+- [安全文档](./SECURITY.md) - 安全策略和最佳实践
+
+### 外部资源
+- [MySQL官方文档](https://dev.mysql.com/doc/) - MySQL数据库官方文档
+- [Spring Data JPA文档](https://spring.io/projects/spring-data-jpa) - Java后端ORM框架
+- [SQLAlchemy文档](https://docs.sqlalchemy.org/) - Python后端ORM框架
+
+---
+
 ## 📞 技术支持
 
 如需数据库相关技术支持，请联系：
 
 - **数据库管理员**：dba@ljxz.com
 - **开发团队**：dev@ljxz.com
-- **紧急联系**：+86 138-0013-8000
+- **项目仓库**：[GitHub Repository](https://github.com/ljxz/cycling-app)
 
 ---
 
-*最后更新：2025年1月*
+## 📝 更新日志
+
+### v2.1.0 (2025年6月)
+- 完善装备相关表结构设计
+- 添加价格历史和用户收藏功能
+- 优化索引设计和查询性能
+- 更新文档结构和相关链接
+
+### v2.0.0 (2025年5月)
+- 重构数据库架构设计
+- 添加装备管理相关表
+- 完善用户系统和权限管理
+- 优化表结构和字段设计
+
+---
+
+*本文档最后更新时间：2025年6月*

@@ -1,6 +1,8 @@
--- 灵境行者 - 完整数据库初始化脚本
+-- 灵境行者数据库完整初始化脚本
 -- 创建时间：2025年1月
--- 版本：v2.0.0
+-- 版本：v2.1.0
+-- 更新时间：2025年1月
+-- 描述：包含用户系统、骑行路线、装备管理等完整功能的数据库结构
 
 -- 创建数据库
 CREATE DATABASE IF NOT EXISTS ljxz CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
