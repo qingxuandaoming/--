@@ -30,12 +30,12 @@ class EquipmentService:
             logger.error(f"获取装备分类失败: {str(e)}")
             raise
     
-    def search_equipment(self, keyword='', category_id=None, min_price=None, 
-                        max_price=None, platform='', page=1, per_page=20):
-        """搜索装备"""
+    def search_equipment(self, keyword='', category_id=None, min_price=None,
+                         max_price=None, platform='', page=1, per_page=20, sort_by='rating'):
+        """搜索装备，支持关键词、分类、价格、平台筛选以及多种排序方式"""
         try:
             query = self.Equipment.query.filter(self.Equipment.is_active == True)
-            
+
             # 关键词搜索
             if keyword:
                 keyword_filter = or_(
@@ -44,37 +44,80 @@ class EquipmentService:
                     self.Equipment.description.contains(keyword)
                 )
                 query = query.filter(keyword_filter)
-            
+
             # 分类筛选
             if category_id:
-                # 根据分类ID查找分类名称
                 category = self.EquipmentCategory.query.get(category_id)
                 if category:
                     query = query.filter(self.Equipment.category == category.name)
-            
-            # 价格筛选
+
+            # 价格筛选（基于 Equipment.price 字段）
             if min_price is not None:
-                query = query.filter(self.Equipment.price >= min_price)
+                try:
+                    query = query.filter(self.Equipment.price >= float(min_price))
+                except (ValueError, TypeError):
+                    pass
             if max_price is not None:
-                query = query.filter(self.Equipment.price <= max_price)
-            
-            # 排序：按评分排序
-            query = query.order_by(
-                self.Equipment.rating_avg.desc(),
-                self.Equipment.rating_count.desc(),
-                self.Equipment.created_at.desc()
-            )
-            
+                try:
+                    query = query.filter(self.Equipment.price <= float(max_price))
+                except (ValueError, TypeError):
+                    pass
+
+            # 平台筛选：通过关联的 EquipmentPrice 表过滤
+            if platform:
+                platform_subquery = self.db.session.query(
+                    self.EquipmentPrice.equipment_id
+                ).filter(
+                    self.EquipmentPrice.platform == platform,
+                    self.EquipmentPrice.is_available == True
+                ).subquery()
+                query = query.filter(self.Equipment.id.in_(platform_subquery))
+
+            # 排序
+            if sort_by == 'price_asc':
+                query = query.order_by(
+                    self.Equipment.price.asc(),
+                    self.Equipment.rating_avg.desc()
+                )
+            elif sort_by == 'price_desc':
+                query = query.order_by(
+                    self.Equipment.price.desc(),
+                    self.Equipment.rating_avg.desc()
+                )
+            elif sort_by == 'newest':
+                query = query.order_by(
+                    self.Equipment.created_at.desc()
+                )
+            else:  # 默认 rating
+                query = query.order_by(
+                    self.Equipment.rating_avg.desc(),
+                    self.Equipment.rating_count.desc(),
+                    self.Equipment.created_at.desc()
+                )
+
             # 分页
             total = query.count()
             equipment_list = query.offset((page - 1) * per_page).limit(per_page).all()
-            
-            # 获取装备数据
+
+            # 构建返回数据
             equipment_data = []
             for equipment in equipment_list:
                 equipment_dict = equipment.to_dict()
+                # 附加最新价格信息（用于卡片展示）
+                latest_price = self.EquipmentPrice.query.filter(
+                    self.EquipmentPrice.equipment_id == equipment.id,
+                    self.EquipmentPrice.is_available == True
+                ).order_by(self.EquipmentPrice.created_at.desc()).first()
+                if latest_price:
+                    equipment_dict['latest_price'] = {
+                        'price': float(latest_price.price),
+                        'platform': latest_price.platform,
+                        'url': latest_price.url
+                    }
+                else:
+                    equipment_dict['latest_price'] = None
                 equipment_data.append(equipment_dict)
-            
+
             return {
                 'items': equipment_data,
                 'total': total,

@@ -1,4 +1,4 @@
-<template>
+content = r'''<template>
   <div class="price-history-chart">
     <div class="chart-header">
       <h3>{{ title }}</h3>
@@ -146,3 +146,8 @@ export default {
 .legend-price { font-size: 14px; font-weight: 600; color: #333; }
 @media (max-width: 768px) { .chart-header { flex-direction: column; gap: 15px; align-items: flex-start; } .chart-legend { gap: 15px; } .chart-container { height: 250px; } }
 </style>
+'''
+
+with open('src/components/PriceHistoryChart.vue', 'w', encoding='utf-8') as f:
+    f.write(content)
+print('PriceHistoryChart.vue written OK')

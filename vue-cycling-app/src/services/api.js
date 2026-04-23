@@ -248,17 +248,45 @@ class ApiService {
 
   // 数据库测试相关API
   static database = {
-    // 健康检查
     healthCheck: () => api.get(API_ENDPOINTS.DATABASE.HEALTH),
-    
-    // 基本测试
     test: () => api.get(API_ENDPOINTS.DATABASE.TEST),
-    
-    // 获取表列表
     getTables: () => api.get(API_ENDPOINTS.DATABASE.TABLES),
-    
-    // 获取骑行路线数据
     getCyclingRoutes: (params = {}) => api.get(API_ENDPOINTS.DATABASE.CYCLING_ROUTES, { params })
+  };
+
+  // Python后端 - 数据分析API（供图表组件调用）
+  static analysis = {
+    // 获取装备价格趋势分析
+    getEquipmentTrends: (days = 30) =>
+      pythonApi.get(API_ENDPOINTS.ANALYSIS.TRENDS, { params: { days } }),
+
+    // 获取单个商品多平台价格历史（图表专用）
+    getPriceHistory: (equipmentId, days = 30) =>
+      pythonApi.get(API_ENDPOINTS.ANALYSIS.PRICE_HISTORY(equipmentId), { params: { days } }),
+
+    // 获取品牌市场份额（图表专用）
+    getBrandMarketShare: (category = null) =>
+      pythonApi.get(API_ENDPOINTS.ANALYSIS.BRAND_MARKET_SHARE, { params: category ? { category } : {} }),
+
+    // 获取价格分布统计（图表专用）
+    getPriceDistribution: (category = null) =>
+      pythonApi.get(API_ENDPOINTS.ANALYSIS.PRICE_DISTRIBUTION, { params: category ? { category } : {} }),
+
+    // 获取市场竞争分析
+    getMarketCompetition: (category = null) =>
+      pythonApi.get(API_ENDPOINTS.ANALYSIS.COMPETITION, { params: category ? { category } : {} }),
+
+    // 获取价格预警
+    getPriceAlerts: (threshold = 10.0) =>
+      pythonApi.get(API_ENDPOINTS.ANALYSIS.PRICE_ALERTS, { params: { threshold } }),
+
+    // 获取装备推荐
+    getRecommendations: (params = {}) =>
+      pythonApi.get(API_ENDPOINTS.ANALYSIS.RECOMMENDATIONS, { params }),
+
+    // 清除分析缓存
+    clearCache: () =>
+      pythonApi.post(API_ENDPOINTS.ANALYSIS.CLEAR_CACHE)
   };
 }
 

@@ -1,4 +1,4 @@
-<template>
+content = '''<template>
   <div class="brand-market-share-chart">
     <div class="chart-header">
       <h3>{{ title }}</h3>
@@ -165,3 +165,8 @@ export default {
 .stat-count { font-size: 11px; color: #666; }
 @media (max-width: 768px) { .chart-header { flex-direction: column; gap: 12px; align-items: flex-start; } .stats-grid { grid-template-columns: 1fr; } .chart-container { height: 250px; } }
 </style>
+'''
+
+with open('src/components/BrandMarketShareChart.vue', 'w', encoding='utf-8') as f:
+    f.write(content)
+print('BrandMarketShareChart.vue written OK')

@@ -116,7 +116,7 @@
                 :alt="equipment.name"
                 @error="handleImageError"
               >
-              <div class="equipment-badge" v-if="equipment.rating_avg >= 4.5">
+              <div class="equipment-badge" v-if="equipment.rating >= 4.5">
                 <i class="fas fa-star"></i>
                 推荐
               </div>
@@ -128,15 +128,15 @@
                 <div class="brand" v-if="equipment.brand">{{ equipment.brand }}</div>
               </div>
               
-              <div class="equipment-rating" v-if="equipment.avg_rating > 0">
+              <div class="equipment-rating" v-if="equipment.rating > 0">
                 <div class="stars">
                   <i 
                     v-for="i in 5" 
                     :key="i" 
-                    :class="['fas fa-star', { 'active': i <= Math.round(equipment.avg_rating) }]"
+                    :class="['fas fa-star', { 'active': i <= Math.round(equipment.rating) }]"
                   ></i>
                 </div>
-                <span class="rating-text">{{ equipment.avg_rating.toFixed(1) }} ({{ equipment.review_count }}评价)</span>
+                <span class="rating-text">{{ (equipment.rating || 0).toFixed(1) }} ({{ equipment.review_count || 0 }}评价)</span>
               </div>
               
               <div class="equipment-description">
@@ -213,7 +213,7 @@
             <div class="analytics-card">
               <BrandMarketShareChart 
                 title="品牌市场份额分析" 
-                :category-id="selectedCategory || 'helmet'"
+                :category-id="selectedCategory || 'all'"
               />
             </div>
             <div class="analytics-card">

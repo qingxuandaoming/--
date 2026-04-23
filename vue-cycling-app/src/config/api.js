@@ -109,6 +109,18 @@ export const API_ENDPOINTS = {
     CREATE: '/equipment',
     UPDATE: (id) => `/equipment/${id}`,
     DELETE: (id) => `/equipment/${id}`
+  },
+
+  // Python后端 - 数据分析（专为图表组件提供）
+  ANALYSIS: {
+    TRENDS: '/analysis/trends',
+    COMPETITION: '/analysis/competition',
+    PRICE_ALERTS: '/analysis/price-alerts',
+    RECOMMENDATIONS: '/analysis/recommendations',
+    PRICE_HISTORY: (equipmentId) => `/analysis/price-history/${equipmentId}`,
+    BRAND_MARKET_SHARE: '/analysis/brand-market-share',
+    PRICE_DISTRIBUTION: '/analysis/price-distribution',
+    CLEAR_CACHE: '/analysis/clear-cache'
   }
 };
 

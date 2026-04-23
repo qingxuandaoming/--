@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 from loguru import logger
 
-# 加载环境变量
+# 鍔犺浇鐜鍙橀噺
 load_dotenv()
 
 app = Flask(__name__)
@@ -21,17 +21,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
     f"{os.getenv('DB_PORT', '3306')}/"
     f"{os.getenv('DB_NAME', 'ljxz')}"
 )
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key')
 
 db = SQLAlchemy(app)
 
-# 使用工厂函数创建模型
+# 浣跨敤宸ュ巶鍑芥暟鍒涘缓妯″瀷
 from models.equipment import create_models
 EquipmentCategory, Equipment, EquipmentPrice, EquipmentReview = create_models(db)
 
-# 设置模块级别的变量
-import models.equipment
+# 璁剧疆妯″潡绾у埆鐨勫彉閲?import models.equipment
 models.equipment.EquipmentCategory = EquipmentCategory
 models.equipment.Equipment = Equipment
 models.equipment.EquipmentPrice = EquipmentPrice
@@ -47,8 +47,7 @@ from services.data_validation_service import DataValidationService
 # from services.recommendation_service import RecommendationService
 # from services.price_alert_service import PriceAlertService
 
-# 初始化服务
-crawler_service = CrawlerService()
+# 鍒濆鍖栨湇鍔?crawler_service = CrawlerService()
 advanced_crawler_service = AdvancedCrawlerService()
 equipment_service = EquipmentService()
 data_analysis_service = DataAnalysisService()
@@ -61,7 +60,7 @@ data_validation_service = DataValidationService()
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    """健康检查接口"""
+    """鍋ュ悍妫€鏌ユ帴鍙?""
     return jsonify({
         'status': 'healthy',
         'timestamp': datetime.now().isoformat(),
@@ -70,7 +69,7 @@ def health_check():
 
 @app.route('/api/equipment/categories', methods=['GET'])
 def get_categories():
-    """获取装备分类"""
+    """鑾峰彇瑁呭鍒嗙被"""
     try:
         from services.equipment_service import EquipmentService
         equipment_service = EquipmentService(
@@ -86,15 +85,15 @@ def get_categories():
             'data': categories
         })
     except Exception as e:
-        logger.error(f"获取分类失败: {str(e)}")
+        logger.error(f"鑾峰彇鍒嗙被澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': '获取分类失败'
+            'message': '鑾峰彇鍒嗙被澶辫触'
         }), 500
 
 @app.route('/api/equipment/search', methods=['GET'])
 def search_equipment():
-    """搜索装备"""
+    """鎼滅储瑁呭"""
     try:
         from services.equipment_service import EquipmentService
         equipment_service = EquipmentService(
@@ -105,17 +104,16 @@ def search_equipment():
             review_model=EquipmentReview
         )
         
-        # 获取查询参数
+        # 鑾峰彇鏌ヨ鍙傛暟
         keyword = request.args.get('keyword', '')
         category_id = request.args.get('category_id')
         min_price = request.args.get('min_price')
         max_price = request.args.get('max_price')
+        platform = request.args.get('platform', '')
         sort_by = request.args.get('sort_by', 'rating')
         page = int(request.args.get('page', 1))
         per_page = int(request.args.get('per_page', 20))
         
-        platform = request.args.get('platform', '')
-
         results = equipment_service.search_equipment(
             keyword=keyword,
             category_id=category_id,
@@ -132,15 +130,15 @@ def search_equipment():
             'data': results
         })
     except Exception as e:
-        logger.error(f"搜索装备失败: {str(e)}")
+        logger.error(f"鎼滅储瑁呭澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': '搜索装备失败'
+            'message': '鎼滅储瑁呭澶辫触'
         }), 500
 
 @app.route('/api/equipment/<int:equipment_id>', methods=['GET'])
 def get_equipment_detail(equipment_id):
-    """获取装备详情"""
+    """鑾峰彇瑁呭璇︽儏"""
     try:
         from services.equipment_service import EquipmentService
         equipment_service = EquipmentService(
@@ -155,7 +153,7 @@ def get_equipment_detail(equipment_id):
         if not equipment:
             return jsonify({
                 'success': False,
-                'message': '装备不存在'
+                'message': '瑁呭涓嶅瓨鍦?
             }), 404
             
         return jsonify({
@@ -163,15 +161,15 @@ def get_equipment_detail(equipment_id):
             'data': equipment
         })
     except Exception as e:
-        logger.error(f"获取装备详情失败: {str(e)}")
+        logger.error(f"鑾峰彇瑁呭璇︽儏澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': '获取装备详情失败'
+            'message': '鑾峰彇瑁呭璇︽儏澶辫触'
         }), 500
 
 @app.route('/api/equipment', methods=['GET'])
 def get_equipment_list():
-    """获取装备列表"""
+    """鑾峰彇瑁呭鍒楄〃"""
     try:
         from services.equipment_service import EquipmentService
         equipment_service = EquipmentService(
@@ -182,7 +180,7 @@ def get_equipment_list():
             review_model=EquipmentReview
         )
         
-        # 获取查询参数
+        # 鑾峰彇鏌ヨ鍙傛暟
         category_id = request.args.get('category_id', type=int)
         sort_by = request.args.get('sort_by', 'rating')
         page = request.args.get('page', 1, type=int)
@@ -200,15 +198,15 @@ def get_equipment_list():
             'data': results
         })
     except Exception as e:
-        logger.error(f"获取装备列表失败: {str(e)}")
+        logger.error(f"鑾峰彇瑁呭鍒楄〃澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': '获取装备列表失败'
+            'message': '鑾峰彇瑁呭鍒楄〃澶辫触'
         }), 500
 
 @app.route('/api/equipment/<int:equipment_id>/prices', methods=['GET'])
 def get_equipment_prices(equipment_id):
-    """获取装备价格历史"""
+    """鑾峰彇瑁呭浠锋牸鍘嗗彶"""
     try:
         from services.equipment_service import EquipmentService
         equipment_service = EquipmentService(
@@ -227,15 +225,15 @@ def get_equipment_prices(equipment_id):
             'data': prices
         })
     except Exception as e:
-        logger.error(f"获取价格历史失败: {str(e)}")
+        logger.error(f"鑾峰彇浠锋牸鍘嗗彶澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': '获取价格历史失败'
+            'message': '鑾峰彇浠锋牸鍘嗗彶澶辫触'
         }), 500
 
 @app.route('/api/equipment/<int:equipment_id>/recommendations', methods=['GET'])
 def get_equipment_recommendations(equipment_id):
-    """获取装备推荐"""
+    """鑾峰彇瑁呭鎺ㄨ崘"""
     try:
         from services.equipment_service import EquipmentService
         equipment_service = EquipmentService(
@@ -253,38 +251,38 @@ def get_equipment_recommendations(equipment_id):
             'data': recommendations
         })
     except Exception as e:
-        logger.error(f"获取推荐失败: {str(e)}")
+        logger.error(f"鑾峰彇鎺ㄨ崘澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': '获取推荐失败'
+            'message': '鑾峰彇鎺ㄨ崘澶辫触'
         }), 500
 
 @app.route('/api/equipment/crawl', methods=['POST'])
 def crawl_equipment():
-    """手动触发爬虫"""
+    """鎵嬪姩瑙﹀彂鐖櫕"""
     try:
         data = request.get_json()
         platform = data.get('platform', 'all')
         category = data.get('category', 'all')
         
-        # 异步执行爬虫任务
+        # 寮傛鎵ц鐖櫕浠诲姟
         task_id = crawler_service.start_crawl_task(platform, category)
         
         return jsonify({
             'success': True,
-            'message': '爬虫任务已启动',
+            'message': '鐖櫕浠诲姟宸插惎鍔?,
             'task_id': task_id
         })
     except Exception as e:
-        logger.error(f"启动爬虫失败: {str(e)}")
+        logger.error(f"鍚姩鐖櫕澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': '启动爬虫失败'
+            'message': '鍚姩鐖櫕澶辫触'
         }), 500
 
 @app.route('/api/equipment/crawl/status/<task_id>', methods=['GET'])
 def get_crawl_status(task_id):
-    """获取爬虫任务状态"""
+    """鑾峰彇鐖櫕浠诲姟鐘舵€?""
     try:
         status = crawler_service.get_task_status(task_id)
         return jsonify({
@@ -292,16 +290,16 @@ def get_crawl_status(task_id):
             'data': status
         })
     except Exception as e:
-        logger.error(f"获取任务状态失败: {str(e)}")
+        logger.error(f"鑾峰彇浠诲姟鐘舵€佸け璐? {str(e)}")
         return jsonify({
             'success': False,
-            'message': '获取任务状态失败'
+            'message': '鑾峰彇浠诲姟鐘舵€佸け璐?
         }), 500
 
-# 高级爬虫API
+# 楂樼骇鐖櫕API
 @app.route('/api/advanced-crawler/start', methods=['POST'])
 def start_advanced_crawl():
-    """启动高级爬虫任务"""
+    """鍚姩楂樼骇鐖櫕浠诲姟"""
     try:
         data = request.get_json() or {}
         
@@ -319,19 +317,19 @@ def start_advanced_crawl():
         
         return jsonify({
             'success': True,
-            'message': '高级爬虫任务已启动',
+            'message': '楂樼骇鐖櫕浠诲姟宸插惎鍔?,
             'task_id': task_id
         })
     except Exception as e:
-        logger.error(f"启动高级爬虫任务失败: {str(e)}")
+        logger.error(f"鍚姩楂樼骇鐖櫕浠诲姟澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'启动失败: {str(e)}'
+            'message': f'鍚姩澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/advanced-crawler/status/<task_id>', methods=['GET'])
 def get_advanced_crawl_status(task_id):
-    """获取高级爬虫任务状态"""
+    """鑾峰彇楂樼骇鐖櫕浠诲姟鐘舵€?""
     try:
         status = advanced_crawler_service.get_task_status(task_id)
         return jsonify({
@@ -344,15 +342,15 @@ def get_advanced_crawl_status(task_id):
             'message': str(e)
         }), 404
     except Exception as e:
-        logger.error(f"获取高级爬虫任务状态失败: {str(e)}")
+        logger.error(f"鑾峰彇楂樼骇鐖櫕浠诲姟鐘舵€佸け璐? {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取状态失败: {str(e)}'
+            'message': f'鑾峰彇鐘舵€佸け璐? {str(e)}'
         }), 500
 
 @app.route('/api/advanced-crawler/tasks', methods=['GET'])
 def get_all_advanced_crawl_tasks():
-    """获取所有高级爬虫任务"""
+    """鑾峰彇鎵€鏈夐珮绾х埇铏换鍔?""
     try:
         tasks = advanced_crawler_service.get_all_tasks()
         return jsonify({
@@ -360,16 +358,16 @@ def get_all_advanced_crawl_tasks():
             'data': tasks
         })
     except Exception as e:
-        logger.error(f"获取高级爬虫任务列表失败: {str(e)}")
+        logger.error(f"鑾峰彇楂樼骇鐖櫕浠诲姟鍒楄〃澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取任务列表失败: {str(e)}'
+            'message': f'鑾峰彇浠诲姟鍒楄〃澶辫触: {str(e)}'
         }), 500
 
-# 数据分析API
+# 鏁版嵁鍒嗘瀽API
 @app.route('/api/analysis/trends', methods=['GET'])
 def get_equipment_trends():
-    """获取装备价格趋势分析"""
+    """鑾峰彇瑁呭浠锋牸瓒嬪娍鍒嗘瀽"""
     try:
         days = request.args.get('days', 30, type=int)
         analysis = data_analysis_service.analyze_equipment_trends(days)
@@ -379,15 +377,15 @@ def get_equipment_trends():
             'data': analysis
         })
     except Exception as e:
-        logger.error(f"获取装备趋势分析失败: {str(e)}")
+        logger.error(f"鑾峰彇瑁呭瓒嬪娍鍒嗘瀽澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'分析失败: {str(e)}'
+            'message': f'鍒嗘瀽澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/analysis/competition', methods=['GET'])
 def get_market_competition():
-    """获取市场竞争分析"""
+    """鑾峰彇甯傚満绔炰簤鍒嗘瀽"""
     try:
         category = request.args.get('category')
         analysis = data_analysis_service.analyze_market_competition(category)
@@ -397,15 +395,15 @@ def get_market_competition():
             'data': analysis
         })
     except Exception as e:
-        logger.error(f"获取市场竞争分析失败: {str(e)}")
+        logger.error(f"鑾峰彇甯傚満绔炰簤鍒嗘瀽澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'分析失败: {str(e)}'
+            'message': f'鍒嗘瀽澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/analysis/price-alerts', methods=['GET'])
 def get_price_alerts():
-    """获取价格预警"""
+    """鑾峰彇浠锋牸棰勮"""
     try:
         threshold = request.args.get('threshold', 10.0, type=float)
         alerts = data_analysis_service.generate_price_alerts(threshold)
@@ -415,15 +413,15 @@ def get_price_alerts():
             'data': alerts
         })
     except Exception as e:
-        logger.error(f"获取价格预警失败: {str(e)}")
+        logger.error(f"鑾峰彇浠锋牸棰勮澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取预警失败: {str(e)}'
+            'message': f'鑾峰彇棰勮澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/analysis/recommendations', methods=['GET'])
 def get_analysis_recommendations():
-    """获取装备推荐"""
+    """鑾峰彇瑁呭鎺ㄨ崘"""
     try:
         category = request.args.get('category')
         platform = request.args.get('platform')
@@ -447,32 +445,32 @@ def get_analysis_recommendations():
             'data': recommendations
         })
     except Exception as e:
-        logger.error(f"获取装备推荐失败: {str(e)}")
+        logger.error(f"鑾峰彇瑁呭鎺ㄨ崘澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取推荐失败: {str(e)}'
+            'message': f'鑾峰彇鎺ㄨ崘澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/analysis/clear-cache', methods=['POST'])
 def clear_analysis_cache():
-    """清理分析缓存"""
+    """娓呯悊鍒嗘瀽缂撳瓨"""
     try:
         data_analysis_service.clear_cache()
         return jsonify({
             'success': True,
-            'message': '分析缓存已清理'
+            'message': '鍒嗘瀽缂撳瓨宸叉竻鐞?
         })
     except Exception as e:
-        logger.error(f"清理分析缓存失败: {str(e)}")
+        logger.error(f"娓呯悊鍒嗘瀽缂撳瓨澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'清理缓存失败: {str(e)}'
+            'message': f'娓呯悊缂撳瓨澶辫触: {str(e)}'
         }), 500
 
-# 爬虫配置管理API
+# 鐖櫕閰嶇疆绠＄悊API
 @app.route('/api/config/crawler', methods=['GET'])
 def get_crawler_config():
-    """获取爬虫配置"""
+    """鑾峰彇鐖櫕閰嶇疆"""
     try:
         key_path = request.args.get('key')
         config = crawler_config_service.get_config(key_path)
@@ -482,15 +480,15 @@ def get_crawler_config():
             'data': config
         })
     except Exception as e:
-        logger.error(f"获取爬虫配置失败: {str(e)}")
+        logger.error(f"鑾峰彇鐖櫕閰嶇疆澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取配置失败: {str(e)}'
+            'message': f'鑾峰彇閰嶇疆澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/config/crawler', methods=['PUT'])
 def update_crawler_config():
-    """更新爬虫配置"""
+    """鏇存柊鐖櫕閰嶇疆"""
     try:
         data = request.get_json()
         key_path = data.get('key')
@@ -499,7 +497,7 @@ def update_crawler_config():
         if not key_path:
             return jsonify({
                 'success': False,
-                'message': '缺少配置键路径'
+                'message': '缂哄皯閰嶇疆閿矾寰?
             }), 400
         
         success = crawler_config_service.set_config(key_path, value)
@@ -507,24 +505,24 @@ def update_crawler_config():
         if success:
             return jsonify({
                 'success': True,
-                'message': '配置更新成功'
+                'message': '閰嶇疆鏇存柊鎴愬姛'
             })
         else:
             return jsonify({
                 'success': False,
-                'message': '配置更新失败'
+                'message': '閰嶇疆鏇存柊澶辫触'
             }), 500
     
     except Exception as e:
-        logger.error(f"更新爬虫配置失败: {str(e)}")
+        logger.error(f"鏇存柊鐖櫕閰嶇疆澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'更新配置失败: {str(e)}'
+            'message': f'鏇存柊閰嶇疆澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/config/crawler/summary', methods=['GET'])
 def get_crawler_config_summary():
-    """获取爬虫配置摘要"""
+    """鑾峰彇鐖櫕閰嶇疆鎽樿"""
     try:
         summary = crawler_config_service.get_config_summary()
         return jsonify({
@@ -532,15 +530,15 @@ def get_crawler_config_summary():
             'data': summary
         })
     except Exception as e:
-        logger.error(f"获取爬虫配置摘要失败: {str(e)}")
+        logger.error(f"鑾峰彇鐖櫕閰嶇疆鎽樿澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取配置摘要失败: {str(e)}'
+            'message': f'鑾峰彇閰嶇疆鎽樿澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/config/crawler/platforms', methods=['GET'])
 def get_enabled_platforms():
-    """获取启用的平台列表"""
+    """鑾峰彇鍚敤鐨勫钩鍙板垪琛?""
     try:
         platforms = crawler_config_service.get_enabled_platforms()
         return jsonify({
@@ -548,15 +546,15 @@ def get_enabled_platforms():
             'data': platforms
         })
     except Exception as e:
-        logger.error(f"获取启用平台列表失败: {str(e)}")
+        logger.error(f"鑾峰彇鍚敤骞冲彴鍒楄〃澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取平台列表失败: {str(e)}'
+            'message': f'鑾峰彇骞冲彴鍒楄〃澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/config/crawler/categories', methods=['GET'])
 def get_enabled_categories():
-    """获取启用的分类列表"""
+    """鑾峰彇鍚敤鐨勫垎绫诲垪琛?""
     try:
         categories = crawler_config_service.get_enabled_categories()
         return jsonify({
@@ -564,15 +562,15 @@ def get_enabled_categories():
             'data': categories
         })
     except Exception as e:
-        logger.error(f"获取启用分类列表失败: {str(e)}")
+        logger.error(f"鑾峰彇鍚敤鍒嗙被鍒楄〃澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取分类列表失败: {str(e)}'
+            'message': f'鑾峰彇鍒嗙被鍒楄〃澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/config/crawler/keywords/<category>', methods=['GET'])
 def get_category_keywords(category):
-    """获取分类的关键词列表"""
+    """鑾峰彇鍒嗙被鐨勫叧閿瘝鍒楄〃"""
     try:
         keywords = crawler_config_service.get_keywords_by_category(category)
         return jsonify({
@@ -580,15 +578,15 @@ def get_category_keywords(category):
             'data': keywords
         })
     except Exception as e:
-        logger.error(f"获取分类关键词失败: {str(e)}")
+        logger.error(f"鑾峰彇鍒嗙被鍏抽敭璇嶅け璐? {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取关键词失败: {str(e)}'
+            'message': f'鑾峰彇鍏抽敭璇嶅け璐? {str(e)}'
         }), 500
 
 @app.route('/api/config/crawler/keywords/<category>', methods=['POST'])
 def add_category_keywords(category):
-    """向分类添加关键词"""
+    """鍚戝垎绫绘坊鍔犲叧閿瘝"""
     try:
         data = request.get_json()
         keywords = data.get('keywords', [])
@@ -596,7 +594,7 @@ def add_category_keywords(category):
         if not keywords:
             return jsonify({
                 'success': False,
-                'message': '关键词列表不能为空'
+                'message': '鍏抽敭璇嶅垪琛ㄤ笉鑳戒负绌?
             }), 400
         
         success = crawler_config_service.add_keywords_to_category(category, keywords)
@@ -604,24 +602,24 @@ def add_category_keywords(category):
         if success:
             return jsonify({
                 'success': True,
-                'message': f'成功添加 {len(keywords)} 个关键词到分类 {category}'
+                'message': f'鎴愬姛娣诲姞 {len(keywords)} 涓叧閿瘝鍒板垎绫?{category}'
             })
         else:
             return jsonify({
                 'success': False,
-                'message': '添加关键词失败'
+                'message': '娣诲姞鍏抽敭璇嶅け璐?
             }), 500
     
     except Exception as e:
-        logger.error(f"添加分类关键词失败: {str(e)}")
+        logger.error(f"娣诲姞鍒嗙被鍏抽敭璇嶅け璐? {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'添加关键词失败: {str(e)}'
+            'message': f'娣诲姞鍏抽敭璇嶅け璐? {str(e)}'
         }), 500
 
 @app.route('/api/config/crawler/keywords/<category>', methods=['DELETE'])
 def remove_category_keywords(category):
-    """从分类移除关键词"""
+    """浠庡垎绫荤Щ闄ゅ叧閿瘝"""
     try:
         data = request.get_json()
         keywords = data.get('keywords', [])
@@ -629,7 +627,7 @@ def remove_category_keywords(category):
         if not keywords:
             return jsonify({
                 'success': False,
-                'message': '关键词列表不能为空'
+                'message': '鍏抽敭璇嶅垪琛ㄤ笉鑳戒负绌?
             }), 400
         
         success = crawler_config_service.remove_keywords_from_category(category, keywords)
@@ -637,24 +635,24 @@ def remove_category_keywords(category):
         if success:
             return jsonify({
                 'success': True,
-                'message': f'成功从分类 {category} 移除 {len(keywords)} 个关键词'
+                'message': f'鎴愬姛浠庡垎绫?{category} 绉婚櫎 {len(keywords)} 涓叧閿瘝'
             })
         else:
             return jsonify({
                 'success': False,
-                'message': '移除关键词失败'
+                'message': '绉婚櫎鍏抽敭璇嶅け璐?
             }), 500
     
     except Exception as e:
-        logger.error(f"移除分类关键词失败: {str(e)}")
+        logger.error(f"绉婚櫎鍒嗙被鍏抽敭璇嶅け璐? {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'移除关键词失败: {str(e)}'
+            'message': f'绉婚櫎鍏抽敭璇嶅け璐? {str(e)}'
         }), 500
 
 @app.route('/api/config/crawler/platform/<platform>/status', methods=['PUT'])
 def update_platform_status(platform):
-    """更新平台启用状态"""
+    """鏇存柊骞冲彴鍚敤鐘舵€?""
     try:
         data = request.get_json()
         enabled = data.get('enabled', False)
@@ -662,27 +660,27 @@ def update_platform_status(platform):
         success = crawler_config_service.update_platform_status(platform, enabled)
         
         if success:
-            status = '启用' if enabled else '禁用'
+            status = '鍚敤' if enabled else '绂佺敤'
             return jsonify({
                 'success': True,
-                'message': f'平台 {platform} 已{status}'
+                'message': f'骞冲彴 {platform} 宸瞷status}'
             })
         else:
             return jsonify({
                 'success': False,
-                'message': '更新平台状态失败'
+                'message': '鏇存柊骞冲彴鐘舵€佸け璐?
             }), 500
     
     except Exception as e:
-        logger.error(f"更新平台状态失败: {str(e)}")
+        logger.error(f"鏇存柊骞冲彴鐘舵€佸け璐? {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'更新平台状态失败: {str(e)}'
+            'message': f'鏇存柊骞冲彴鐘舵€佸け璐? {str(e)}'
         }), 500
 
 @app.route('/api/config/crawler/category/<category>/status', methods=['PUT'])
 def update_category_status(category):
-    """更新分类启用状态"""
+    """鏇存柊鍒嗙被鍚敤鐘舵€?""
     try:
         data = request.get_json()
         enabled = data.get('enabled', False)
@@ -690,51 +688,51 @@ def update_category_status(category):
         success = crawler_config_service.update_category_status(category, enabled)
         
         if success:
-            status = '启用' if enabled else '禁用'
+            status = '鍚敤' if enabled else '绂佺敤'
             return jsonify({
                 'success': True,
-                'message': f'分类 {category} 已{status}'
+                'message': f'鍒嗙被 {category} 宸瞷status}'
             })
         else:
             return jsonify({
                 'success': False,
-                'message': '更新分类状态失败'
+                'message': '鏇存柊鍒嗙被鐘舵€佸け璐?
             }), 500
     
     except Exception as e:
-        logger.error(f"更新分类状态失败: {str(e)}")
+        logger.error(f"鏇存柊鍒嗙被鐘舵€佸け璐? {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'更新分类状态失败: {str(e)}'
+            'message': f'鏇存柊鍒嗙被鐘舵€佸け璐? {str(e)}'
         }), 500
 
 @app.route('/api/config/crawler/reset', methods=['POST'])
 def reset_crawler_config():
-    """重置爬虫配置为默认值"""
+    """閲嶇疆鐖櫕閰嶇疆涓洪粯璁ゅ€?""
     try:
         success = crawler_config_service.reset_to_default()
         
         if success:
             return jsonify({
                 'success': True,
-                'message': '爬虫配置已重置为默认值'
+                'message': '鐖櫕閰嶇疆宸查噸缃负榛樿鍊?
             })
         else:
             return jsonify({
                 'success': False,
-                'message': '重置配置失败'
+                'message': '閲嶇疆閰嶇疆澶辫触'
             }), 500
     
     except Exception as e:
-        logger.error(f"重置爬虫配置失败: {str(e)}")
+        logger.error(f"閲嶇疆鐖櫕閰嶇疆澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'重置配置失败: {str(e)}'
+            'message': f'閲嶇疆閰嶇疆澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/config/crawler/export', methods=['GET'])
 def export_crawler_config():
-    """导出爬虫配置"""
+    """瀵煎嚭鐖櫕閰嶇疆"""
     try:
         config = crawler_config_service.get_config()
         
@@ -745,48 +743,48 @@ def export_crawler_config():
         })
     
     except Exception as e:
-        logger.error(f"导出爬虫配置失败: {str(e)}")
+        logger.error(f"瀵煎嚭鐖櫕閰嶇疆澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'导出配置失败: {str(e)}'
+            'message': f'瀵煎嚭閰嶇疆澶辫触: {str(e)}'
         }), 500
 
-# 爬虫监控API
+# 鐖櫕鐩戞帶API
 @app.route('/api/monitor/start', methods=['POST'])
 def start_monitoring():
-    """启动监控服务"""
+    """鍚姩鐩戞帶鏈嶅姟"""
     try:
         crawler_monitor_service.start_monitoring()
         return jsonify({
             'success': True,
-            'message': '监控服务已启动'
+            'message': '鐩戞帶鏈嶅姟宸插惎鍔?
         })
     except Exception as e:
-        logger.error(f"启动监控服务失败: {str(e)}")
+        logger.error(f"鍚姩鐩戞帶鏈嶅姟澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'启动监控失败: {str(e)}'
+            'message': f'鍚姩鐩戞帶澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/monitor/stop', methods=['POST'])
 def stop_monitoring():
-    """停止监控服务"""
+    """鍋滄鐩戞帶鏈嶅姟"""
     try:
         crawler_monitor_service.stop_monitoring()
         return jsonify({
             'success': True,
-            'message': '监控服务已停止'
+            'message': '鐩戞帶鏈嶅姟宸插仠姝?
         })
     except Exception as e:
-        logger.error(f"停止监控服务失败: {str(e)}")
+        logger.error(f"鍋滄鐩戞帶鏈嶅姟澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'停止监控失败: {str(e)}'
+            'message': f'鍋滄鐩戞帶澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/monitor/stats/current', methods=['GET'])
 def get_current_crawler_stats():
-    """获取当前爬虫统计"""
+    """鑾峰彇褰撳墠鐖櫕缁熻"""
     try:
         stats = crawler_monitor_service.get_current_stats()
         return jsonify({
@@ -794,15 +792,15 @@ def get_current_crawler_stats():
             'data': stats
         })
     except Exception as e:
-        logger.error(f"获取当前统计失败: {str(e)}")
+        logger.error(f"鑾峰彇褰撳墠缁熻澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取统计失败: {str(e)}'
+            'message': f'鑾峰彇缁熻澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/monitor/stats/history', methods=['GET'])
 def get_crawler_stats_history():
-    """获取爬虫统计历史"""
+    """鑾峰彇鐖櫕缁熻鍘嗗彶"""
     try:
         limit = request.args.get('limit', 100, type=int)
         history = crawler_monitor_service.get_stats_history(limit)
@@ -811,15 +809,15 @@ def get_crawler_stats_history():
             'data': history
         })
     except Exception as e:
-        logger.error(f"获取统计历史失败: {str(e)}")
+        logger.error(f"鑾峰彇缁熻鍘嗗彶澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取统计历史失败: {str(e)}'
+            'message': f'鑾峰彇缁熻鍘嗗彶澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/monitor/metrics/current', methods=['GET'])
 def get_current_system_metrics():
-    """获取当前系统指标"""
+    """鑾峰彇褰撳墠绯荤粺鎸囨爣"""
     try:
         metrics = crawler_monitor_service.get_system_metrics()
         return jsonify({
@@ -827,15 +825,15 @@ def get_current_system_metrics():
             'data': metrics
         })
     except Exception as e:
-        logger.error(f"获取系统指标失败: {str(e)}")
+        logger.error(f"鑾峰彇绯荤粺鎸囨爣澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取系统指标失败: {str(e)}'
+            'message': f'鑾峰彇绯荤粺鎸囨爣澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/monitor/metrics/history', methods=['GET'])
 def get_system_metrics_history():
-    """获取系统指标历史"""
+    """鑾峰彇绯荤粺鎸囨爣鍘嗗彶"""
     try:
         limit = request.args.get('limit', 100, type=int)
         history = crawler_monitor_service.get_metrics_history(limit)
@@ -844,15 +842,15 @@ def get_system_metrics_history():
             'data': history
         })
     except Exception as e:
-        logger.error(f"获取系统指标历史失败: {str(e)}")
+        logger.error(f"鑾峰彇绯荤粺鎸囨爣鍘嗗彶澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取系统指标历史失败: {str(e)}'
+            'message': f'鑾峰彇绯荤粺鎸囨爣鍘嗗彶澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/monitor/errors', methods=['GET'])
 def get_error_summary():
-    """获取错误摘要"""
+    """鑾峰彇閿欒鎽樿"""
     try:
         errors = crawler_monitor_service.get_error_summary()
         return jsonify({
@@ -860,15 +858,15 @@ def get_error_summary():
             'data': errors
         })
     except Exception as e:
-        logger.error(f"获取错误摘要失败: {str(e)}")
+        logger.error(f"鑾峰彇閿欒鎽樿澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取错误摘要失败: {str(e)}'
+            'message': f'鑾峰彇閿欒鎽樿澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/monitor/performance', methods=['GET'])
 def get_performance_summary():
-    """获取性能摘要"""
+    """鑾峰彇鎬ц兘鎽樿"""
     try:
         performance = crawler_monitor_service.get_performance_summary()
         return jsonify({
@@ -876,15 +874,15 @@ def get_performance_summary():
             'data': performance
         })
     except Exception as e:
-        logger.error(f"获取性能摘要失败: {str(e)}")
+        logger.error(f"鑾峰彇鎬ц兘鎽樿澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取性能摘要失败: {str(e)}'
+            'message': f'鑾峰彇鎬ц兘鎽樿澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/monitor/database', methods=['GET'])
 def get_database_stats():
-    """获取数据库统计"""
+    """鑾峰彇鏁版嵁搴撶粺璁?""
     try:
         stats = crawler_monitor_service.get_database_stats()
         return jsonify({
@@ -892,15 +890,15 @@ def get_database_stats():
             'data': stats
         })
     except Exception as e:
-        logger.error(f"获取数据库统计失败: {str(e)}")
+        logger.error(f"鑾峰彇鏁版嵁搴撶粺璁″け璐? {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取数据库统计失败: {str(e)}'
+            'message': f'鑾峰彇鏁版嵁搴撶粺璁″け璐? {str(e)}'
         }), 500
 
 @app.route('/api/monitor/report', methods=['GET'])
 def get_comprehensive_report():
-    """获取综合监控报告"""
+    """鑾峰彇缁煎悎鐩戞帶鎶ュ憡"""
     try:
         report = crawler_monitor_service.get_comprehensive_report()
         return jsonify({
@@ -908,15 +906,15 @@ def get_comprehensive_report():
             'data': report
         })
     except Exception as e:
-        logger.error(f"获取综合报告失败: {str(e)}")
+        logger.error(f"鑾峰彇缁煎悎鎶ュ憡澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取综合报告失败: {str(e)}'
+            'message': f'鑾峰彇缁煎悎鎶ュ憡澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/monitor/clear-history', methods=['POST'])
 def clear_monitor_history():
-    """清理监控历史数据"""
+    """娓呯悊鐩戞帶鍘嗗彶鏁版嵁"""
     try:
         data = request.get_json() or {}
         days = data.get('days', 30)
@@ -925,66 +923,65 @@ def clear_monitor_history():
         
         return jsonify({
             'success': True,
-            'message': f'已清理 {days} 天前的历史数据'
+            'message': f'宸叉竻鐞?{days} 澶╁墠鐨勫巻鍙叉暟鎹?
         })
     except Exception as e:
-        logger.error(f"清理历史数据失败: {str(e)}")
+        logger.error(f"娓呯悊鍘嗗彶鏁版嵁澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'清理历史数据失败: {str(e)}'
+            'message': f'娓呯悊鍘嗗彶鏁版嵁澶辫触: {str(e)}'
         }), 500
 
-# 爬虫队列管理API
+# 鐖櫕闃熷垪绠＄悊API
 @app.route('/api/queue/start', methods=['POST'])
 def start_queue_service():
-    """启动队列服务"""
+    """鍚姩闃熷垪鏈嶅姟"""
     try:
         crawler_queue_service.start()
         return jsonify({
             'success': True,
-            'message': '队列服务已启动'
+            'message': '闃熷垪鏈嶅姟宸插惎鍔?
         })
     except Exception as e:
-        logger.error(f"启动队列服务失败: {str(e)}")
+        logger.error(f"鍚姩闃熷垪鏈嶅姟澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'启动队列服务失败: {str(e)}'
+            'message': f'鍚姩闃熷垪鏈嶅姟澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/queue/stop', methods=['POST'])
 def stop_queue_service():
-    """停止队列服务"""
+    """鍋滄闃熷垪鏈嶅姟"""
     try:
         crawler_queue_service.stop()
         return jsonify({
             'success': True,
-            'message': '队列服务已停止'
+            'message': '闃熷垪鏈嶅姟宸插仠姝?
         })
     except Exception as e:
-        logger.error(f"停止队列服务失败: {str(e)}")
+        logger.error(f"鍋滄闃熷垪鏈嶅姟澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'停止队列服务失败: {str(e)}'
+            'message': f'鍋滄闃熷垪鏈嶅姟澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/queue/tasks', methods=['POST'])
 def create_crawler_task():
-    """创建爬虫任务"""
+    """鍒涘缓鐖櫕浠诲姟"""
     try:
         data = request.get_json()
         
-        # 验证必需参数
+        # 楠岃瘉蹇呴渶鍙傛暟
         task_type = data.get('task_type')
         platform = data.get('platform')
         
         if not task_type or not platform:
             return jsonify({
                 'success': False,
-                'message': '缺少必需参数: task_type, platform'
+                'message': '缂哄皯蹇呴渶鍙傛暟: task_type, platform'
             }), 400
         
-        # 可选参数
-        category = data.get('category', '')
+        # 鍙€夊弬鏁?        category = data.get('category', '')
         keywords = data.get('keywords', [])
         max_items = data.get('max_items', 100)
         priority = data.get('priority', 'NORMAL')
@@ -993,16 +990,15 @@ def create_crawler_task():
         dependencies = data.get('dependencies', [])
         metadata = data.get('metadata', {})
         
-        # 转换优先级
-        try:
+        # 杞崲浼樺厛绾?        try:
             priority_enum = TaskPriority[priority.upper()]
         except KeyError:
             return jsonify({
                 'success': False,
-                'message': f'无效的优先级: {priority}'
+                'message': f'鏃犳晥鐨勪紭鍏堢骇: {priority}'
             }), 400
         
-        # 创建任务
+        # 鍒涘缓浠诲姟
         task_id = crawler_queue_service.create_task(
             task_type=task_type,
             platform=platform,
@@ -1021,38 +1017,37 @@ def create_crawler_task():
             'data': {
                 'task_id': task_id
             },
-            'message': '任务创建成功'
+            'message': '浠诲姟鍒涘缓鎴愬姛'
         })
         
     except Exception as e:
-        logger.error(f"创建爬虫任务失败: {str(e)}")
+        logger.error(f"鍒涘缓鐖櫕浠诲姟澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'创建任务失败: {str(e)}'
+            'message': f'鍒涘缓浠诲姟澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/queue/tasks', methods=['GET'])
 def get_crawler_tasks():
-    """获取爬虫任务列表"""
+    """鑾峰彇鐖櫕浠诲姟鍒楄〃"""
     try:
-        # 查询参数
+        # 鏌ヨ鍙傛暟
         status = request.args.get('status')
         task_type = request.args.get('task_type')
         platform = request.args.get('platform')
         limit = request.args.get('limit', 100, type=int)
         
-        # 转换状态
-        status_enum = None
+        # 杞崲鐘舵€?        status_enum = None
         if status:
             try:
                 status_enum = TaskStatus[status.upper()]
             except KeyError:
                 return jsonify({
                     'success': False,
-                    'message': f'无效的任务状态: {status}'
+                    'message': f'鏃犳晥鐨勪换鍔＄姸鎬? {status}'
                 }), 400
         
-        # 获取任务列表
+        # 鑾峰彇浠诲姟鍒楄〃
         tasks = crawler_queue_service.get_tasks(
             status=status_enum,
             task_type=task_type,
@@ -1060,8 +1055,7 @@ def get_crawler_tasks():
             limit=limit
         )
         
-        # 转换为字典格式
-        tasks_data = [task.to_dict() for task in tasks]
+        # 杞崲涓哄瓧鍏告牸寮?        tasks_data = [task.to_dict() for task in tasks]
         
         return jsonify({
             'success': True,
@@ -1069,22 +1063,22 @@ def get_crawler_tasks():
         })
         
     except Exception as e:
-        logger.error(f"获取爬虫任务列表失败: {str(e)}")
+        logger.error(f"鑾峰彇鐖櫕浠诲姟鍒楄〃澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取任务列表失败: {str(e)}'
+            'message': f'鑾峰彇浠诲姟鍒楄〃澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/queue/tasks/<task_id>', methods=['GET'])
 def get_crawler_task(task_id):
-    """获取单个爬虫任务"""
+    """鑾峰彇鍗曚釜鐖櫕浠诲姟"""
     try:
         task = crawler_queue_service.get_task(task_id)
         
         if not task:
             return jsonify({
                 'success': False,
-                'message': '任务不存在'
+                'message': '浠诲姟涓嶅瓨鍦?
             }), 404
         
         return jsonify({
@@ -1093,111 +1087,111 @@ def get_crawler_task(task_id):
         })
         
     except Exception as e:
-        logger.error(f"获取爬虫任务失败: {str(e)}")
+        logger.error(f"鑾峰彇鐖櫕浠诲姟澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取任务失败: {str(e)}'
+            'message': f'鑾峰彇浠诲姟澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/queue/tasks/<task_id>/cancel', methods=['POST'])
 def cancel_crawler_task(task_id):
-    """取消爬虫任务"""
+    """鍙栨秷鐖櫕浠诲姟"""
     try:
         success = crawler_queue_service.cancel_task(task_id)
         
         if success:
             return jsonify({
                 'success': True,
-                'message': '任务已取消'
+                'message': '浠诲姟宸插彇娑?
             })
         else:
             return jsonify({
                 'success': False,
-                'message': '任务取消失败或任务不存在'
+                'message': '浠诲姟鍙栨秷澶辫触鎴栦换鍔′笉瀛樺湪'
             }), 400
             
     except Exception as e:
-        logger.error(f"取消爬虫任务失败: {str(e)}")
+        logger.error(f"鍙栨秷鐖櫕浠诲姟澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'取消任务失败: {str(e)}'
+            'message': f'鍙栨秷浠诲姟澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/queue/tasks/<task_id>/pause', methods=['POST'])
 def pause_crawler_task(task_id):
-    """暂停爬虫任务"""
+    """鏆傚仠鐖櫕浠诲姟"""
     try:
         success = crawler_queue_service.pause_task(task_id)
         
         if success:
             return jsonify({
                 'success': True,
-                'message': '任务已暂停'
+                'message': '浠诲姟宸叉殏鍋?
             })
         else:
             return jsonify({
                 'success': False,
-                'message': '任务暂停失败或任务不存在'
+                'message': '浠诲姟鏆傚仠澶辫触鎴栦换鍔′笉瀛樺湪'
             }), 400
             
     except Exception as e:
-        logger.error(f"暂停爬虫任务失败: {str(e)}")
+        logger.error(f"鏆傚仠鐖櫕浠诲姟澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'暂停任务失败: {str(e)}'
+            'message': f'鏆傚仠浠诲姟澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/queue/tasks/<task_id>/resume', methods=['POST'])
 def resume_crawler_task(task_id):
-    """恢复爬虫任务"""
+    """鎭㈠鐖櫕浠诲姟"""
     try:
         success = crawler_queue_service.resume_task(task_id)
         
         if success:
             return jsonify({
                 'success': True,
-                'message': '任务已恢复'
+                'message': '浠诲姟宸叉仮澶?
             })
         else:
             return jsonify({
                 'success': False,
-                'message': '任务恢复失败或任务不存在'
+                'message': '浠诲姟鎭㈠澶辫触鎴栦换鍔′笉瀛樺湪'
             }), 400
             
     except Exception as e:
-        logger.error(f"恢复爬虫任务失败: {str(e)}")
+        logger.error(f"鎭㈠鐖櫕浠诲姟澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'恢复任务失败: {str(e)}'
+            'message': f'鎭㈠浠诲姟澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/queue/tasks/<task_id>/retry', methods=['POST'])
 def retry_crawler_task(task_id):
-    """重试爬虫任务"""
+    """閲嶈瘯鐖櫕浠诲姟"""
     try:
         success = crawler_queue_service.retry_task(task_id)
         
         if success:
             return jsonify({
                 'success': True,
-                'message': '任务已重试'
+                'message': '浠诲姟宸查噸璇?
             })
         else:
             return jsonify({
                 'success': False,
-                'message': '任务重试失败或任务不存在'
+                'message': '浠诲姟閲嶈瘯澶辫触鎴栦换鍔′笉瀛樺湪'
             }), 400
             
     except Exception as e:
-        logger.error(f"重试爬虫任务失败: {str(e)}")
+        logger.error(f"閲嶈瘯鐖櫕浠诲姟澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'重试任务失败: {str(e)}'
+            'message': f'閲嶈瘯浠诲姟澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/queue/status', methods=['GET'])
 def get_queue_status():
-    """获取队列状态"""
+    """鑾峰彇闃熷垪鐘舵€?""
     try:
         status = crawler_queue_service.get_queue_status()
         return jsonify({
@@ -1205,15 +1199,15 @@ def get_queue_status():
             'data': status
         })
     except Exception as e:
-        logger.error(f"获取队列状态失败: {str(e)}")
+        logger.error(f"鑾峰彇闃熷垪鐘舵€佸け璐? {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取队列状态失败: {str(e)}'
+            'message': f'鑾峰彇闃熷垪鐘舵€佸け璐? {str(e)}'
         }), 500
 
 @app.route('/api/queue/cleanup', methods=['POST'])
 def cleanup_completed_tasks():
-    """清理已完成的任务"""
+    """娓呯悊宸插畬鎴愮殑浠诲姟"""
     try:
         data = request.get_json() or {}
         days = data.get('days', 7)
@@ -1225,20 +1219,20 @@ def cleanup_completed_tasks():
             'data': {
                 'cleaned_count': cleaned_count
             },
-            'message': f'已清理 {cleaned_count} 个已完成的任务'
+            'message': f'宸叉竻鐞?{cleaned_count} 涓凡瀹屾垚鐨勪换鍔?
         })
         
     except Exception as e:
-        logger.error(f"清理已完成任务失败: {str(e)}")
+        logger.error(f"娓呯悊宸插畬鎴愪换鍔″け璐? {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'清理任务失败: {str(e)}'
+            'message': f'娓呯悊浠诲姟澶辫触: {str(e)}'
         }), 500
 
-# 数据验证API
+# 鏁版嵁楠岃瘉API
 @app.route('/api/validation/validate', methods=['POST'])
 def validate_equipment_data():
-    """验证装备数据"""
+    """楠岃瘉瑁呭鏁版嵁"""
     try:
         data = request.get_json()
         equipment_data = data.get('equipment_data')
@@ -1246,7 +1240,7 @@ def validate_equipment_data():
         if not equipment_data:
             return jsonify({
                 'success': False,
-                'message': '缺少装备数据'
+                'message': '缂哄皯瑁呭鏁版嵁'
             }), 400
         
         validation_result = data_validation_service.validate_equipment_data(equipment_data)
@@ -1257,15 +1251,15 @@ def validate_equipment_data():
         })
         
     except Exception as e:
-        logger.error(f"验证装备数据失败: {str(e)}")
+        logger.error(f"楠岃瘉瑁呭鏁版嵁澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'验证失败: {str(e)}'
+            'message': f'楠岃瘉澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/validation/batch', methods=['POST'])
 def validate_batch_equipment_data():
-    """批量验证装备数据"""
+    """鎵归噺楠岃瘉瑁呭鏁版嵁"""
     try:
         data = request.get_json()
         equipment_list = data.get('equipment_list', [])
@@ -1273,7 +1267,7 @@ def validate_batch_equipment_data():
         if not equipment_list:
             return jsonify({
                 'success': False,
-                'message': '缺少装备数据列表'
+                'message': '缂哄皯瑁呭鏁版嵁鍒楄〃'
             }), 400
         
         validation_results = data_validation_service.validate_batch_equipment_data(equipment_list)
@@ -1284,15 +1278,15 @@ def validate_batch_equipment_data():
         })
         
     except Exception as e:
-        logger.error(f"批量验证装备数据失败: {str(e)}")
+        logger.error(f"鎵归噺楠岃瘉瑁呭鏁版嵁澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'批量验证失败: {str(e)}'
+            'message': f'鎵归噺楠岃瘉澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/validation/summary', methods=['GET'])
 def get_validation_summary():
-    """获取验证摘要"""
+    """鑾峰彇楠岃瘉鎽樿"""
     try:
         summary = data_validation_service.get_validation_summary()
         
@@ -1302,16 +1296,16 @@ def get_validation_summary():
         })
         
     except Exception as e:
-        logger.error(f"获取验证摘要失败: {str(e)}")
+        logger.error(f"鑾峰彇楠岃瘉鎽樿澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取摘要失败: {str(e)}'
+            'message': f'鑾峰彇鎽樿澶辫触: {str(e)}'
         }), 500
 
-# 推荐服务API (暂时注释掉，需要安装scikit-learn)
+# 鎺ㄨ崘鏈嶅姟API (鏆傛椂娉ㄩ噴鎺夛紝闇€瑕佸畨瑁卻cikit-learn)
 # @app.route('/api/recommendations/equipment/<int:equipment_id>', methods=['GET'])
 # def get_equipment_recommendations_by_id(equipment_id):
-#     """根据装备ID获取推荐"""
+#     """鏍规嵁瑁呭ID鑾峰彇鎺ㄨ崘"""
 #     try:
 #         limit = request.args.get('limit', 10, type=int)
 #         recommendations = recommendation_service.get_equipment_recommendations(equipment_id, limit)
@@ -1322,15 +1316,15 @@ def get_validation_summary():
 #         })
 #         
 #     except Exception as e:
-#         logger.error(f"获取装备推荐失败: {str(e)}")
+#         logger.error(f"鑾峰彇瑁呭鎺ㄨ崘澶辫触: {str(e)}")
 #         return jsonify({
 #             'success': False,
-#             'message': f'获取推荐失败: {str(e)}'
+#             'message': f'鑾峰彇鎺ㄨ崘澶辫触: {str(e)}'
 #         }), 500
 
 # @app.route('/api/recommendations/category/<category>', methods=['GET'])
 # def get_category_recommendations(category):
-#     """获取分类推荐"""
+#     """鑾峰彇鍒嗙被鎺ㄨ崘"""
 #     try:
 #         limit = request.args.get('limit', 10, type=int)
 #         recommendations = recommendation_service.get_category_recommendations(category, limit)
@@ -1341,15 +1335,15 @@ def get_validation_summary():
 #         })
 #         
 #     except Exception as e:
-#         logger.error(f"获取分类推荐失败: {str(e)}")
+#         logger.error(f"鑾峰彇鍒嗙被鎺ㄨ崘澶辫触: {str(e)}")
 #         return jsonify({
 #             'success': False,
-#             'message': f'获取分类推荐失败: {str(e)}'
+#             'message': f'鑾峰彇鍒嗙被鎺ㄨ崘澶辫触: {str(e)}'
 #         }), 500
 
 @app.route('/api/recommendations/price-range', methods=['GET'])
 def get_price_range_recommendations():
-    """获取价格区间推荐"""
+    """鑾峰彇浠锋牸鍖洪棿鎺ㄨ崘"""
     try:
         min_price = request.args.get('min_price', type=float)
         max_price = request.args.get('max_price', type=float)
@@ -1359,189 +1353,104 @@ def get_price_range_recommendations():
         if min_price is None or max_price is None:
             return jsonify({
                 'success': False,
-                'message': '缺少价格区间参数'
+                'message': '缂哄皯浠锋牸鍖洪棿鍙傛暟'
             }), 400
         
-        raise NotImplementedError("recommendation_service not initialized")
+        recommendations = recommendation_service.get_price_range_recommendations(
+            min_price, max_price, category, limit
+        )
+        
+        return jsonify({
+            'success': True,
+            'data': recommendations
+        })
         
     except Exception as e:
-        logger.error(f"获取价格区间推荐失败: {str(e)}")
+        logger.error(f"鑾峰彇浠锋牸鍖洪棿鎺ㄨ崘澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取价格区间推荐失败: {str(e)}'
+            'message': f'鑾峰彇浠锋牸鍖洪棿鎺ㄨ崘澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/recommendations/trending', methods=['GET'])
 def get_trending_recommendations():
-    """获取热门推荐"""
+    """鑾峰彇鐑棬鎺ㄨ崘"""
     try:
         days = request.args.get('days', 7, type=int)
         limit = request.args.get('limit', 10, type=int)
         
-        raise NotImplementedError("recommendation_service not initialized")
+        recommendations = recommendation_service.get_trending_recommendations(days, limit)
+        
+        return jsonify({
+            'success': True,
+            'data': recommendations
+        })
         
     except Exception as e:
-        logger.error(f"获取热门推荐失败: {str(e)}")
+        logger.error(f"鑾峰彇鐑棬鎺ㄨ崘澶辫触: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'获取热门推荐失败: {str(e)}'
+            'message': f'鑾峰彇鐑棬鎺ㄨ崘澶辫触: {str(e)}'
         }), 500
 
 @app.route('/api/recommendations/stats', methods=['GET'])
 def get_recommendation_stats():
-    """获取推荐统计"""
+    """鑾峰彇鎺ㄨ崘缁熻锛堜娇鐢ㄦ暟鎹垎鏋愭湇鍔″疄鐜帮級"""
     try:
         analysis = data_analysis_service.analyze_equipment_trends(days=30)
-        stats = {'total_records': analysis.get('total_records', 0) if isinstance(analysis, dict) else 0, 'status': 'active'}
+        stats = {
+            'total_records': analysis.get('total_records', 0) if isinstance(analysis, dict) else 0,
+            'status': 'active'
+        }
         return jsonify({'success': True, 'data': stats})
-        
     except Exception as e:
-        logger.error(f"获取推荐统计失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'获取推荐统计失败: {str(e)}'
-        }), 500
+        logger.error(f"鑾峰彇鎺ㄨ崘缁熻澶辫触: {str(e)}")
+        return jsonify({'success': False, 'message': f'鑾峰彇澶辫触: {str(e)}'}), 500
 
-# 价格预警API
+
+# 浠锋牸棰勮API锛堟湇鍔℃湭鍚敤锛岃繑鍥炲崰浣嶅搷搴旓級
 @app.route('/api/alerts', methods=['POST'])
 def create_price_alert():
-    """创建价格预警"""
-    try:
-        data = request.get_json()
-        
-        required_fields = ['equipment_id', 'alert_type', 'threshold_value']
-        for field in required_fields:
-            if field not in data:
-                return jsonify({
-                    'success': False,
-                    'message': f'缺少必需字段: {field}'
-                }), 400
-        
-        return jsonify({'success': False, 'message': '价格预警服务暂未启用'}), 503
-        
-    except Exception as e:
-        logger.error(f"创建价格预警失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'创建预警失败: {str(e)}'
-        }), 500
+    return jsonify({'success': False, 'message': '浠锋牸棰勮鏈嶅姟鏆傛湭鍚敤'}), 503
 
 @app.route('/api/alerts/<int:alert_id>', methods=['GET'])
 def get_price_alert(alert_id):
-    """获取价格预警详情"""
-    try:
-        return jsonify({'success': False, 'message': '价格预警服务暂未启用'}), 503
-        
-    except Exception as e:
-        logger.error(f"获取价格预警失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'获取预警失败: {str(e)}'
-        }), 500
+    return jsonify({'success': False, 'message': '浠锋牸棰勮鏈嶅姟鏆傛湭鍚敤'}), 503
 
 @app.route('/api/alerts/<int:alert_id>', methods=['PUT'])
 def update_price_alert(alert_id):
-    """更新价格预警"""
-    try:
-        data = request.get_json()
-        
-        return jsonify({'success': False, 'message': '价格预警服务暂未启用'}), 503
-        
-    except Exception as e:
-        logger.error(f"更新价格预警失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'更新预警失败: {str(e)}'
-        }), 500
+    return jsonify({'success': False, 'message': '浠锋牸棰勮鏈嶅姟鏆傛湭鍚敤'}), 503
 
 @app.route('/api/alerts/<int:alert_id>', methods=['DELETE'])
 def delete_price_alert(alert_id):
-    """删除价格预警"""
-    try:
-        return jsonify({'success': False, 'message': '价格预警服务暂未启用'}), 503
-        
-    except Exception as e:
-        logger.error(f"删除价格预警失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'删除预警失败: {str(e)}'
-        }), 500
+    return jsonify({'success': False, 'message': '浠锋牸棰勮鏈嶅姟鏆傛湭鍚敤'}), 503
 
 @app.route('/api/alerts/user/<user_id>', methods=['GET'])
 def get_user_alerts(user_id):
-    """获取用户的价格预警"""
-    try:
-        return jsonify({'success': True, 'data': []})
-        
-    except Exception as e:
-        logger.error(f"获取用户价格预警失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'获取用户预警失败: {str(e)}'
-        }), 500
+    return jsonify({'success': True, 'data': []})
 
 @app.route('/api/alerts/history', methods=['GET'])
 def get_alert_history():
-    """获取预警历史"""
-    try:
-        alert_id = request.args.get('alert_id', type=int)
-        user_id = request.args.get('user_id')
-        days = request.args.get('days', 30, type=int)
-        
-        return jsonify({'success': True, 'data': []})
-        
-    except Exception as e:
-        logger.error(f"获取预警历史失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'获取预警历史失败: {str(e)}'
-        }), 500
+    return jsonify({'success': True, 'data': []})
 
 @app.route('/api/alerts/stats', methods=['GET'])
 def get_alert_stats():
-    """获取预警统计"""
-    try:
-        return jsonify({'success': True, 'data': {'total': 0, 'active': 0}})
-        
-    except Exception as e:
-        logger.error(f"获取预警统计失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'获取预警统计失败: {str(e)}'
-        }), 500
+    return jsonify({'success': True, 'data': {'total': 0, 'active': 0}})
 
 @app.route('/api/alerts/start-monitoring', methods=['POST'])
 def start_alert_monitoring():
-    """启动价格监控"""
-    try:
-        return jsonify({'success': False, 'message': '价格预警服务暂未启用'}), 503
-        
-    except Exception as e:
-        logger.error(f"启动价格监控失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'启动监控失败: {str(e)}'
-        }), 500
+    return jsonify({'success': False, 'message': '浠锋牸棰勮鏈嶅姟鏆傛湭鍚敤'}), 503
 
 @app.route('/api/alerts/stop-monitoring', methods=['POST'])
 def stop_alert_monitoring():
-    """停止价格监控"""
-    try:
-        return jsonify({'success': False, 'message': '价格预警服务暂未启用'}), 503
-        
-    except Exception as e:
-        logger.error(f"停止价格监控失败: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f'停止监控失败: {str(e)}'
-        }), 500
+    return jsonify({'success': False, 'message': '浠锋牸棰勮鏈嶅姟鏆傛湭鍚敤'}), 503
 
 
-# ===== Chart Data APIs =====
+# ===== 鍥捐〃鏁版嵁API - 涓撲负鍓嶇鍙鍖栫粍浠舵彁渚涙牸寮忓寲鏁版嵁 =====
 
 @app.route('/api/analysis/price-history/<equipment_id>', methods=['GET'])
 def get_price_history_chart(equipment_id):
-    """Get multi-platform price history for a product."""
+    """鑾峰彇鍗曚釜鍟嗗搧鐨勫骞冲彴浠锋牸鍘嗗彶锛岃繑鍥炲浘琛ㄦ墍闇€鏍煎紡"""
     try:
         days = request.args.get('days', 30, type=int)
         from services.equipment_service import EquipmentService
@@ -1551,7 +1460,7 @@ def get_price_history_chart(equipment_id):
         )
         history = svc.get_price_history(equipment_id, days)
         platform_prices = history.get('platform_prices', {})
-        all_dates = set()
+        # 鏀堕泦鎵€鏈夋棩鏈?        all_dates = set()
         for p_data in platform_prices.values():
             for rec in p_data:
                 date_str = rec.get('created_at', rec.get('recorded_at', ''))
@@ -1566,15 +1475,22 @@ def get_price_history_chart(equipment_id):
                 if ds and rec.get('price'):
                     date_price[ds] = float(rec['price'])
             datasets[platform] = [date_price.get(d) for d in sorted_dates]
-        return jsonify({'success': True, 'data': {'labels': sorted_dates, 'datasets': datasets}})
+        return jsonify({
+            'success': True,
+            'data': {
+                'labels': sorted_dates,
+                'datasets': datasets,
+                'price_trend': history.get('price_trend', {})
+            }
+        })
     except Exception as e:
-        logger.error(f"get_price_history_chart failed: {str(e)}")
+        logger.error(f"鑾峰彇浠锋牸鍘嗗彶鍥捐〃鏁版嵁澶辫触: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
 @app.route('/api/analysis/brand-market-share', methods=['GET'])
 def get_brand_market_share():
-    """Get brand market share for chart."""
+    """鑾峰彇鍝佺墝甯傚満浠介锛岃繑鍥炲浘琛ㄦ墍闇€鏍煎紡"""
     try:
         category = request.args.get('category')
         analysis = data_analysis_service.analyze_market_competition(category)
@@ -1584,17 +1500,21 @@ def get_brand_market_share():
         colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6B6B', '#4ECDC4']
         brands = []
         for i, (brand, info) in enumerate(list(brand_data.items())[:8]):
-            brands.append({'name': brand, 'percentage': round(info.get('market_share', 0), 1),
-                           'count': info.get('product_count', 0), 'color': colors[i % len(colors)]})
+            brands.append({
+                'name': brand,
+                'percentage': round(info.get('market_share', 0), 1),
+                'count': info.get('product_count', 0),
+                'color': colors[i % len(colors)]
+            })
         return jsonify({'success': True, 'data': {'brands': brands}})
     except Exception as e:
-        logger.error(f"get_brand_market_share failed: {str(e)}")
+        logger.error(f"鑾峰彇鍝佺墝甯傚満浠介澶辫触: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
 @app.route('/api/analysis/price-distribution', methods=['GET'])
 def get_price_distribution_chart():
-    """Get price distribution data for chart."""
+    """鑾峰彇浠锋牸鍒嗗竷鏁版嵁锛岃繑鍥炲浘琛ㄦ墍闇€鏍煎紡"""
     try:
         analysis = data_analysis_service.analyze_equipment_trends(days=90)
         if 'error' in analysis:
@@ -1602,23 +1522,34 @@ def get_price_distribution_chart():
         ranges_raw = analysis.get('price_ranges', {})
         total = sum(v.get('count', 0) for v in ranges_raw.values())
         range_order = ['0-100', '100-500', '500-1000', '1000-2000', '2000-5000', '5000+']
-        ranges = [{'label': r, 'count': ranges_raw.get(r, {}).get('count', 0),
-                   'percentage': ranges_raw.get(r, {}).get('percentage', 0)} for r in range_order]
+        ranges = []
+        for r in range_order:
+            info = ranges_raw.get(r, {'count': 0, 'percentage': 0})
+            ranges.append({'label': r, 'count': info['count'], 'percentage': info['percentage']})
         avg_price = analysis.get('summary', {}).get('avg_price', 0)
-        return jsonify({'success': True, 'data': {'ranges': ranges, 'averagePrice': avg_price, 'totalProducts': total}})
+        return jsonify({
+            'success': True,
+            'data': {'ranges': ranges, 'averagePrice': avg_price, 'totalProducts': total}
+        })
     except Exception as e:
-        logger.error(f"get_price_distribution_chart failed: {str(e)}")
+        logger.error(f"鑾峰彇浠锋牸鍒嗗竷澶辫触: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
+
 
 if __name__ == '__main__':
     with app.app_context():
-        # 创建数据库表
         db.create_all()
-        logger.info("数据库表创建完成")
-    
-    # 启动应用
+        logger.info("鏁版嵁搴撹〃鍒涘缓瀹屾垚")
     app.run(
         host=os.getenv('HOST', '0.0.0.0'),
         port=int(os.getenv('PORT', 5000)),
         debug=os.getenv('DEBUG', 'True').lower() == 'true'
     )
+
+            if field not in data:
+                return jsonify({
+                    'success': False,
+                    'message': f'缂哄皯蹇呴渶瀛楁: {field}'
+                }), 400
+        
+        alert_id = price_alert_service.create_alert(

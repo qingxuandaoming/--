@@ -60,6 +60,7 @@ import {
 } from 'chart.js'
 import { Radar } from 'vue-chartjs'
 import { ref, computed, onMounted, watch } from 'vue'
+import ApiService from '@/services/api.js'
 
 ChartJS.register(
   RadialLinearScale,
@@ -188,12 +189,9 @@ export default {
     const activeBrands = computed(() => {
       return selectedBrands.value.map(brandId => {
         const brand = availableBrands.find(b => b.id === brandId)
-        const scores = mockBrandScores[brandId]
-        return {
-          ...brand,
-          ...scores
-        }
-      })
+        const scores = getBrandScores ? getBrandScores(brandId) : mockBrandScores[brandId]
+        return { ...brand, ...(scores || {}) }
+      }).filter(b => b.quality !== undefined)
     })
     
     const chartData = computed(() => {
@@ -266,10 +264,46 @@ export default {
       chartKey.value++
     }
     
+    const loading = ref(false)
+    const liveBrandScores = ref({})
+
     const loadBrandScores = async () => {
-      // 实际项目中这里应该调用API获取真实数据
-      // const response = await ApiService.equipment.getBrandScores(props.category, selectedBrands.value)
-      // brandScores.value = response.data
+      loading.value = true
+      try {
+        const res = await ApiService.analysis.getMarketCompetition(props.category)
+        if (res && res.success && res.data && res.data.brand_competition) {
+          const brandDetails = res.data.brand_competition.brand_details || {}
+          const liveBrands = {}
+          Object.entries(brandDetails).forEach(([brandName, info]) => {
+            // 将市场数据映射到雷达图5个维度（用价格和热度推算其他维度）
+            const avgPrice = info.avg_price || 0
+            const maxPrice = info.max_price || 1
+            const priceNorm = Math.min(avgPrice / maxPrice, 1)
+            const share = Math.min(info.market_share / 30, 1)  // 归一化到5
+            liveBrands[brandName.toLowerCase().replace(' ', '_')] = {
+              quality: parseFloat((3.5 + share * 1.5).toFixed(1)),
+              design: parseFloat((3.0 + priceNorm * 2.0).toFixed(1)),
+              comfort: parseFloat((3.5 + share * 1.0).toFixed(1)),
+              performance: parseFloat((3.0 + share * 2.0).toFixed(1)),
+              value: parseFloat((5.0 - priceNorm * 2.0).toFixed(1)),
+              service: parseFloat((3.5 + share * 1.0).toFixed(1)),
+              overallScore: parseFloat((3.5 + share * 0.8).toFixed(1)),
+              _originalName: brandName
+            }
+          })
+          liveBrandScores.value = liveBrands
+        }
+      } catch {
+        liveBrandScores.value = {}
+      } finally {
+        loading.value = false
+        chartKey.value++
+      }
+    }
+
+    const getBrandScores = (brandId) => {
+      if (liveBrandScores.value[brandId]) return liveBrandScores.value[brandId]
+      return mockBrandScores[brandId] || null
     }
     
     onMounted(() => {
@@ -288,6 +322,7 @@ export default {
       availableBrands,
       activeBrands,
       dimensions,
+      loading,
       updateChart
     }
   }
