@@ -112,7 +112,7 @@ class EquipmentService:
                     equipment_dict['latest_price'] = {
                         'price': float(latest_price.price),
                         'platform': latest_price.platform,
-                        'url': latest_price.url
+                        'url': latest_price.platform_url
                     }
                 else:
                     equipment_dict['latest_price'] = None
@@ -223,7 +223,7 @@ class EquipmentService:
                 'current_price': {
                     'price': float(latest_price.price) if latest_price else None,
                     'platform': latest_price.platform if latest_price else None,
-                    'url': latest_price.url if latest_price else None,
+                    'url': latest_price.platform_url if latest_price else None,
                     'updated_at': latest_price.created_at.isoformat() if latest_price else None
                 } if latest_price else None,
                 'created_at': equipment.created_at.isoformat(),

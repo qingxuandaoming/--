@@ -11,14 +11,19 @@ import re
 class DataAnalysisService:
     """数据分析服务类"""
     
-    def __init__(self):
+    def __init__(self, db=None, equipment_model=None, price_model=None):
+        self.db = db
+        self.Equipment = equipment_model
+        self.EquipmentPrice = price_model
         self.analysis_cache = {}  # 分析结果缓存
         self.cache_timeout = 3600  # 缓存超时时间（秒）
     
     def analyze_equipment_trends(self, days: int = 30) -> Dict:
         """分析装备价格趋势"""
         try:
-            from app import db, Equipment, EquipmentPrice
+            db = self.db
+            Equipment = self.Equipment
+            EquipmentPrice = self.EquipmentPrice
             
             # 获取指定天数内的价格数据
             start_date = datetime.now() - timedelta(days=days)
@@ -29,11 +34,11 @@ class DataAnalysisService:
                 Equipment.category,
                 EquipmentPrice.platform,
                 EquipmentPrice.price,
-                EquipmentPrice.recorded_at
+                EquipmentPrice.created_at
             ).join(
                 Equipment, EquipmentPrice.equipment_id == Equipment.id
             ).filter(
-                EquipmentPrice.recorded_at >= start_date,
+                EquipmentPrice.created_at >= start_date,
                 EquipmentPrice.is_available == True
             ).all()
             
@@ -48,7 +53,7 @@ class DataAnalysisService:
                     'category': row.category,
                     'platform': row.platform,
                     'price': float(row.price),
-                    'date': row.recorded_at.date()
+                    'date': str(row.created_at)[:10]
                 }
                 for row in price_data
             ])
@@ -174,7 +179,7 @@ class DataAnalysisService:
         daily_trends = []
         for date in daily_stats.index:
             daily_trends.append({
-                'date': date.isoformat(),
+                'date': str(date),
                 'record_count': int(daily_stats.loc[date, ('price', 'count')]),
                 'avg_price': float(daily_stats.loc[date, ('price', 'mean')]),
                 'unique_equipment': int(daily_stats.loc[date, ('equipment_id', 'nunique')])
@@ -195,7 +200,7 @@ class DataAnalysisService:
         # 价格变化趋势（简单的线性回归）
         if len(df) > 1:
             df_sorted = df.sort_values('date')
-            df_sorted['date_num'] = pd.to_numeric(df_sorted['date'])
+            df_sorted['date_num'] = pd.to_datetime(df_sorted['date']).astype('int64') / 10**9
             correlation = np.corrcoef(df_sorted['date_num'], df_sorted['price'])[0, 1]
             
             if correlation > 0.1:
@@ -219,7 +224,9 @@ class DataAnalysisService:
     def analyze_market_competition(self, category: str = None) -> Dict:
         """分析市场竞争情况"""
         try:
-            from app import db, Equipment, EquipmentPrice
+            db = self.db
+            Equipment = self.Equipment
+            EquipmentPrice = self.EquipmentPrice
             
             # 构建查询
             query = db.session.query(
@@ -229,7 +236,7 @@ class DataAnalysisService:
                 Equipment.category,
                 EquipmentPrice.platform,
                 EquipmentPrice.price,
-                EquipmentPrice.shop_name
+                EquipmentPrice.seller_name
             ).join(
                 EquipmentPrice, Equipment.id == EquipmentPrice.equipment_id
             ).filter(
@@ -253,7 +260,7 @@ class DataAnalysisService:
                     'category': row.category,
                     'platform': row.platform,
                     'price': float(row.price),
-                    'shop_name': row.shop_name or ''
+                    'shop_name': row.seller_name or ''
                 }
                 for row in data
             ])
@@ -383,7 +390,9 @@ class DataAnalysisService:
     def generate_price_alerts(self, price_change_threshold: float = 10.0) -> List[Dict]:
         """生成价格预警"""
         try:
-            from app import db, Equipment, EquipmentPrice
+            db = self.db
+            Equipment = self.Equipment
+            EquipmentPrice = self.EquipmentPrice
             
             # 获取最近7天的价格数据
             recent_date = datetime.now() - timedelta(days=7)
@@ -395,11 +404,11 @@ class DataAnalysisService:
                 Equipment.name,
                 EquipmentPrice.platform,
                 EquipmentPrice.price,
-                EquipmentPrice.recorded_at
+                EquipmentPrice.created_at
             ).join(
                 Equipment, EquipmentPrice.equipment_id == Equipment.id
             ).filter(
-                EquipmentPrice.recorded_at >= recent_date,
+                EquipmentPrice.created_at >= recent_date,
                 EquipmentPrice.is_available == True
             ).all()
             
@@ -409,12 +418,12 @@ class DataAnalysisService:
                 Equipment.name,
                 EquipmentPrice.platform,
                 EquipmentPrice.price,
-                EquipmentPrice.recorded_at
+                EquipmentPrice.created_at
             ).join(
                 Equipment, EquipmentPrice.equipment_id == Equipment.id
             ).filter(
-                EquipmentPrice.recorded_at >= older_date,
-                EquipmentPrice.recorded_at < recent_date,
+                EquipmentPrice.created_at >= older_date,
+                EquipmentPrice.created_at < recent_date,
                 EquipmentPrice.is_available == True
             ).all()
             
@@ -472,7 +481,9 @@ class DataAnalysisService:
                                    platform: str = None, limit: int = 10) -> List[Dict]:
         """获取装备推荐"""
         try:
-            from app import db, Equipment, EquipmentPrice
+            db = self.db
+            Equipment = self.Equipment
+            EquipmentPrice = self.EquipmentPrice
             
             # 构建查询
             query = db.session.query(
@@ -480,11 +491,11 @@ class DataAnalysisService:
                 Equipment.name,
                 Equipment.brand,
                 Equipment.category,
-                Equipment.rating,
+                Equipment.rating_avg,
                 Equipment.rating_count,
                 EquipmentPrice.platform,
                 EquipmentPrice.price,
-                EquipmentPrice.shop_name
+                EquipmentPrice.seller_name
             ).join(
                 EquipmentPrice, Equipment.id == EquipmentPrice.equipment_id
             ).filter(
@@ -516,11 +527,11 @@ class DataAnalysisService:
                     'name': row.name,
                     'brand': row.brand or '未知品牌',
                     'category': row.category,
-                    'rating': float(row.rating or 0),
+                    'rating': float(row.rating_avg or 0),
                     'rating_count': int(row.rating_count or 0),
                     'platform': row.platform,
                     'price': float(row.price),
-                    'shop_name': row.shop_name or ''
+                    'shop_name': row.seller_name or ''
                 }
                 for row in data
             ])
@@ -543,7 +554,7 @@ class DataAnalysisService:
                     'rating_count': row['rating_count'],
                     'platform': row['platform'],
                     'price': row['price'],
-                    'shop_name': row['shop_name'],
+                    'seller_name': row['seller_name'],
                     'recommendation_score': round(row['recommendation_score'], 2)
                 })
             

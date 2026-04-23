@@ -104,4 +104,69 @@ const faqs = [
     items: [
       {
         question: '如何注册新账户？',
-        answer: '点击网站右上角的"注册
+        answer: '点击网站右上角的"注册"按钮，填写必要信息即可。'
+      }
+    ]
+  }
+];
+
+const filteredFaqs = computed(() => {
+  if (activeCategory.value === '所有问题') return faqs;
+  return faqs.filter(f => f.category === activeCategory.value);
+});
+
+const toggleQuestion = (id) => {
+  activeQuestion.value = activeQuestion.value === id ? null : id;
+};
+</script>
+
+<style scoped>
+.help-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+.help-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.faq-categories {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+.category-tab {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  background: #f0f0f0;
+}
+.category-tab.active {
+  background: var(--primary-color, #4facfe);
+  color: white;
+}
+.faq-item {
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.faq-question {
+  padding: 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
+.faq-answer {
+  padding: 0 1rem;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.faq-answer.active {
+  padding: 1rem;
+  max-height: 500px;
+  border-top: 1px solid #ddd;
+}
+</style>

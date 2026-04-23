@@ -14,13 +14,13 @@ app = Flask(__name__)
 CORS(app)
 
 # 数据库配置
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    f"mysql+pymysql://{os.getenv('DB_USER', 'root')}:"
-    f"{os.getenv('DB_PASSWORD', '123456')}@"
-    f"{os.getenv('DB_HOST', 'localhost')}:"
-    f"{os.getenv('DB_PORT', '3306')}/"
-    f"{os.getenv('DB_NAME', 'ljxz')}"
-)
+db_url = os.getenv('DATABASE_URL')
+if db_url:
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+else:
+    import pathlib
+    db_path = pathlib.Path(__file__).parent / 'app.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key')
 
@@ -51,7 +51,7 @@ from services.data_validation_service import DataValidationService
 crawler_service = CrawlerService()
 advanced_crawler_service = AdvancedCrawlerService()
 equipment_service = EquipmentService()
-data_analysis_service = DataAnalysisService()
+data_analysis_service = DataAnalysisService(db=db, equipment_model=Equipment, price_model=EquipmentPrice)
 crawler_config_service = CrawlerConfigService()
 crawler_monitor_service = CrawlerMonitorService()
 crawler_queue_service = CrawlerQueueService()
