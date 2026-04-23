@@ -7,6 +7,7 @@ echo.
 docker --version >nul 2>&1
 if %ERRORLEVEL% neq 0 (
     echo [ERROR] Docker is not installed or not running.
+    echo Please make sure Docker Desktop is OPEN and RUNNING in your system tray.
     echo Download: https://www.docker.com/products/docker-desktop/
     pause
     exit /b 1
@@ -27,7 +28,7 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo [INFO] Building and starting all services...
-%COMPOSE_CMD% up -d --build
+%COMPOSE_CMD% -p cycling_system up -d --build
 
 echo.
 echo =======================================================
@@ -40,7 +41,7 @@ echo Python Backend: http://localhost:5000/api/health
 echo.
 echo Default Admin: root / 123456
 echo.
-echo Logs: %COMPOSE_CMD% logs -f
-echo Stop: %COMPOSE_CMD% down
+echo Logs: %COMPOSE_CMD% -p cycling_system logs -f
+echo Stop: %COMPOSE_CMD% -p cycling_system down
 echo =======================================================
 pause
