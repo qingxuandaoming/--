@@ -362,6 +362,7 @@ CREATE TABLE IF NOT EXISTS `feedback` (
 
 -- 插入管理员用户
 INSERT INTO `users` (`email`, `username`, `password_hash`, `nickname`, `phone`, `status`) VALUES
+('root@ljxz.com', 'root', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIvi', '超级管理员', '13800138000', 1),
 ('admin@ljxz.com', 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '系统管理员', '13800138000', 1),
 ('test@ljxz.com', 'testuser', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '测试用户', '13900139000', 1),
 ('demo@ljxz.com', 'demo', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '演示用户', '13700137000', 1);

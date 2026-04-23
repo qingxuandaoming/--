@@ -129,18 +129,37 @@
 | MySQL | 8.0+ | 主数据库 |
 | Chrome | 最新版 | 爬虫WebDriver |
 
-### ⚡ 一键启动
+### ⚡ 一键启动 (推荐: Docker Compose)
+
+最简单的运行方式是使用我们提供的 Docker 一键启动脚本。只需确保您的系统上安装了 [Docker Desktop](https://www.docker.com/products/docker-desktop/)：
 
 ```bash
 # 1. 克隆项目
 git clone <repository-url>
 cd site
 
-# 2. 数据库初始化
-mysql -u root -p -e "CREATE DATABASE ljxz CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -u root -p ljxz < vue-cycling-app/database/init.sql
+# 2. 双击运行启动脚本 (Windows)
+# 找到项目根目录下的 start_docker.bat 并双击运行。
+# 脚本会自动拉取所需的镜像、初始化数据库，并分别在 80、5000 和 8080 端口启动各个服务。
 
-# 3. 启动所有服务（推荐使用多个终端窗口）
+# 或者使用命令行手动运行 (Linux/Mac)
+docker-compose up -d --build
+```
+
+**初始系统管理员账号：**
+- 用户名：`root`
+- 密码：`123456`
+
+### 💻 手动分步启动
+
+如果您不使用 Docker，也可以按照以下步骤分别启动：
+
+```bash
+# 1. 数据库初始化
+mysql -u root -p -e "CREATE DATABASE ljxz CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p ljxz < database/complete_init.sql
+
+# 2. 启动所有服务（推荐使用多个终端窗口）
 # 终端1: Java后端
 cd java-backend && mvn spring-boot:run
 

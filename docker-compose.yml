@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cycling_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: ljxz
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # 将初始化脚本挂载到 docker-entrypoint-initdb.d 目录下，容器首次启动会自动执行
+      - ./database/complete_init.sql:/docker-entrypoint-initdb.d/complete_init.sql
+      # 也可以加上 test_data.sql 如果你需要更多测试数据
+      # - ./database/test_data.sql:/docker-entrypoint-initdb.d/test_data.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  java-backend:
+    build: 
+      context: ./java-backend
+      dockerfile: Dockerfile
+    container_name: cycling_java_backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ljxz?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=123456
+      - TZ=Asia/Shanghai
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  python-backend:
+    build:
+      context: ./python-backend
+      dockerfile: Dockerfile
+    container_name: cycling_python_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=mysql+pymysql://root:123456@mysql:3306/ljxz
+      - TZ=Asia/Shanghai
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  vue-frontend:
+    build:
+      context: ./vue-cycling-app
+      dockerfile: Dockerfile
+    container_name: cycling_vue_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - java-backend
+      - python-backend
+
+volumes:
+  mysql_data:

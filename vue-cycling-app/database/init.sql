@@ -105,6 +105,7 @@ CREATE INDEX idx_feedback_created_at ON feedback(created_at);
 -- 插入示例数据
 -- 插入管理员账户（密码：123456，已使用BCrypt加密）
 INSERT INTO users (username, email, password_hash, full_name, is_active) VALUES
+('root', 'root@ljxz.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye.IjdJrjrdHxdF6ufHZ6jO0OMKaaezIm', '超级管理员', TRUE),
 ('admin', 'admin@ljxz.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye.IjdJrjrdHxdF6ufHZ6jO0OMKaaezIm', '系统管理员', TRUE);
 
 INSERT INTO cycling_routes (name, description, start_location, end_location, distance, difficulty_level, estimated_time, elevation_gain) VALUES
