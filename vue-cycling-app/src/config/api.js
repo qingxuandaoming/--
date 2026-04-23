@@ -9,21 +9,21 @@ const isProd = import.meta.env.PROD;
 export const API_CONFIG = {
   // Java后端服务 (主要API服务)
   JAVA_BACKEND: {
-    baseURL: isDev ? '/api' : 'https://your-production-domain.com/api',
+    baseURL: '/api',
     timeout: 10000,
     description: 'Java后端 - 主要API服务、用户认证、路线规划等'
   },
   
   // Python后端服务 (爬虫服务)
   PYTHON_BACKEND: {
-    baseURL: isDev ? 'http://localhost:5000/api' : 'https://your-python-backend.com/api',
+    baseURL: 'http://localhost:5000/api',
     timeout: 15000,
     description: 'Python后端 - 爬虫服务、设备管理等'
   },
   
   // 路线规划服务 (Java后端的特定配置)
   ROUTE_PLANNING: {
-    baseURL: isDev ? '/api' : 'https://your-production-domain.com/api',
+    baseURL: '/api',
     timeout: 30000, // 路线规划可能需要更长时间
     description: 'Java后端 - 路线规划专用配置'
   }

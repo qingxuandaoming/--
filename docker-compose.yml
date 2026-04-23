@@ -10,7 +10,7 @@ services:
       MYSQL_DATABASE: ljxz
       TZ: Asia/Shanghai
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       # 将初始化脚本挂载到 docker-entrypoint-initdb.d 目录下，容器首次启动会自动执行
@@ -50,6 +50,11 @@ services:
       - "5000:5000"
     environment:
       - DATABASE_URL=mysql+pymysql://root:123456@mysql:3306/ljxz
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=123456
+      - DB_NAME=ljxz
       - TZ=Asia/Shanghai
     depends_on:
       mysql:

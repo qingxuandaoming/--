@@ -1,5 +1,6 @@
 from datetime import datetime
 from sqlalchemy import Index, DECIMAL
+from sqlalchemy.dialects.mysql import BIGINT
 from decimal import Decimal
 
 def create_models(db):
@@ -38,7 +39,7 @@ def create_models(db):
         """装备表"""
         __tablename__ = 'equipment'
         
-        id = db.Column(db.Integer, primary_key=True)
+        id = db.Column(BIGINT(unsigned=True), primary_key=True)
         name = db.Column(db.String(200), nullable=False, comment='装备名称')
         brand = db.Column(db.String(100), comment='品牌')
         model = db.Column(db.String(100), comment='型号')
@@ -95,8 +96,8 @@ def create_models(db):
         """装备价格表"""
         __tablename__ = 'equipment_prices'
         
-        id = db.Column(db.Integer, primary_key=True)
-        equipment_id = db.Column(db.Integer, db.ForeignKey('equipment.id'), nullable=False)
+        id = db.Column(BIGINT(unsigned=True), primary_key=True)
+        equipment_id = db.Column(BIGINT(unsigned=True), db.ForeignKey('equipment.id'), nullable=False)
         platform = db.Column(db.String(50), nullable=False, comment='平台名称')
         platform_url = db.Column(db.String(500), comment='商品链接')
         platform_id = db.Column(db.String(100), comment='平台商品ID')
@@ -144,8 +145,8 @@ def create_models(db):
         """装备评价表"""
         __tablename__ = 'equipment_reviews'
         
-        id = db.Column(db.Integer, primary_key=True)
-        equipment_id = db.Column(db.Integer, db.ForeignKey('equipment.id'), nullable=False)
+        id = db.Column(BIGINT(unsigned=True), primary_key=True)
+        equipment_id = db.Column(BIGINT(unsigned=True), db.ForeignKey('equipment.id'), nullable=False)
         platform = db.Column(db.String(50), nullable=False, comment='平台名称')
         platform_review_id = db.Column(db.String(100), comment='平台评价ID')
         user_name = db.Column(db.String(100), comment='用户名')

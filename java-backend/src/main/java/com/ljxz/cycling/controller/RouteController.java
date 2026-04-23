@@ -36,7 +36,7 @@ public class RouteController {
      * @param request 路径规划请求
      * @return 路径规划响应
      */
-    @PostMapping("/plan")
+    @PostMapping("/route/plan")
     public ResponseEntity<RouteResponse> planRoute(@Valid @RequestBody RouteRequest request) {
         log.info("收到路径规划请求: origin={}, destination={}, transportMode={}", 
                 request.getOrigin(), request.getDestination(), request.getTransportMode());
@@ -59,7 +59,7 @@ public class RouteController {
      * @param city 城市（可选）
      * @return 路径规划响应
      */
-    @GetMapping("/quick-plan")
+    @GetMapping("/route/quick-plan")
     public ResponseEntity<RouteResponse> quickPlanRoute(
             @RequestParam @NotBlank(message = "起点不能为空") @Size(max = 200) String origin,
             @RequestParam @NotBlank(message = "终点不能为空") @Size(max = 200) String destination,
@@ -94,7 +94,7 @@ public class RouteController {
      * @param city 城市（可选）
      * @return 坐标响应
      */
-    @GetMapping("/geocode")
+    @GetMapping("/route/geocode")
     public ResponseEntity<RouteResponse> geocode(
             @RequestParam @NotBlank(message = "地址不能为空") @Size(max = 200) String address,
             @RequestParam(required = false) String city) {
@@ -117,7 +117,7 @@ public class RouteController {
      * @param latitude 纬度
      * @return 地址响应
      */
-    @GetMapping("/reverse-geocode")
+    @GetMapping("/route/reverse-geocode")
     public ResponseEntity<RouteResponse> reverseGeocode(
             @RequestParam @DecimalMin(value = "-180.0", message = "经度必须在-180到180之间") 
                          @DecimalMax(value = "180.0", message = "经度必须在-180到180之间") Double longitude,
@@ -140,7 +140,7 @@ public class RouteController {
      * 
      * @return 交通方式列表
      */
-    @GetMapping("/transport-modes")
+    @GetMapping("/route/transport-modes")
     public ResponseEntity<?> getTransportModes() {
         return ResponseEntity.ok(new Object() {
             public final String[] transportModes = {"driving", "walking", "transit", "riding"};
@@ -205,7 +205,7 @@ public class RouteController {
      * 
      * @return 策略说明
      */
-    @GetMapping("/strategies")
+    @GetMapping("/route/strategies")
     public ResponseEntity<?> getStrategies() {
         return ResponseEntity.ok(new Object() {
             public final Object[] strategies = {
@@ -288,7 +288,7 @@ public class RouteController {
      * 
      * @return 服务状态
      */
-    @GetMapping("/health")
+    @GetMapping({"/health", "/route/health"})
     public ResponseEntity<?> health() {
         return ResponseEntity.ok(new Object() {
             public final String status = "UP";
