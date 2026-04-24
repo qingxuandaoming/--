@@ -6,10 +6,12 @@ const isDev = import.meta.env.DEV;
 const isProd = import.meta.env.PROD;
 
 // 后端服务配置
+// 开发模式：Java 用 /api （由 Vite proxy 转发）
+// 生产模式：Java 用绝对 URL（Flask serve 静态文件时相对路径会进 Python 后端）
 export const API_CONFIG = {
   // Java后端服务 (主要API服务)
   JAVA_BACKEND: {
-    baseURL: '/api',
+    baseURL: isDev ? '/api' : 'http://localhost:8080/api',
     timeout: 10000,
     description: 'Java后端 - 主要API服务、用户认证、路线规划等'
   },
@@ -23,7 +25,7 @@ export const API_CONFIG = {
   
   // 路线规划服务 (Java后端的特定配置)
   ROUTE_PLANNING: {
-    baseURL: '/api',
+    baseURL: isDev ? '/api' : 'http://localhost:8080/api',
     timeout: 30000, // 路线规划可能需要更长时间
     description: 'Java后端 - 路线规划专用配置'
   }

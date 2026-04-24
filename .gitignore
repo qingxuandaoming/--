@@ -1,0 +1,195 @@
+# ============================================================
+# 骑行装备数据分析系统 - .gitignore
+# 覆盖范围: Vue 前端 / Python 后端 / Java 后端 / 打包产物
+# ============================================================
+
+
+# ─── 操作系统 ────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+
+# ─── 编辑器 / IDE ────────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.kate-swp
+*.sublime-workspace
+
+
+# ─── Vue / Node.js 前端 ──────────────────────────────────────
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# npm / pnpm / yarn 日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Vite 缓存
+.vite/
+vue-cycling-app/.vite/
+
+
+# ─── Python 后端 ─────────────────────────────────────────────
+# 虚拟环境
+.venv/
+venv/
+env/
+ENV/
+__pypackages__/
+
+# 字节码 / 缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# 分发 / 打包
+*.egg
+*.egg-info/
+build/
+develop-eggs/
+eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.whl
+MANIFEST
+
+# PyInstaller 产物
+python-backend/dist/
+python-backend/build/
+launcher/dist/
+launcher/build/
+*.spec.bak
+
+# 测试 / 覆盖率
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# 日志文件
+*.log
+logs/
+crawler_test.log
+
+# SQLite 数据库
+*.db
+*.sqlite3
+
+# 环境变量（含密钥，不入库）
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# mypy / pyright
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyright/
+pyrightconfig.json
+
+
+# ─── Java / Spring Boot 后端 ─────────────────────────────────
+# Maven 构建产物
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Maven Wrapper
+.mvn/
+mvnw
+mvnw.cmd
+
+# 编译输出
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# STS / Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# IntelliJ IDEA
+*.iws
+*.iml
+*.ipr
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# 日志文件
+java_logs.txt
+logs/
+
+
+# ─── 打包 / 分发产物 ─────────────────────────────────────────
+# 最终发布目录（体积巨大，不应入库）
+dist/
+build_cache/
+build_tools/
+
+# 启动器编译中间产物
+launcher/__pycache__/
+launcher/build/
+launcher/dist/
+
+
+# ─── 数据库数据文件 ──────────────────────────────────────────
+# MariaDB / MySQL 数据目录（运行时生成）
+data/
+*.pid
+*.err
+
+
+# ─── 测试 / 临时文件 ─────────────────────────────────────────
+# 临时调试脚本（入库意义不大）
+python-backend/test_*.py
+python-backend/simple_*.py
+python-backend/direct_*.py
+python-backend/debug_*.py
+python-backend/fix_*.py
+python-backend/patch_*.py
+python-backend/*.bak
+
+# 测试 / 调试 JSON
+req.json
+req_login.json
+test_api.ps1
+
+# 爬虫测试日志
+crawler_test.log
+java_logs.txt

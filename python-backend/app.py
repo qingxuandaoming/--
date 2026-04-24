@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -10,7 +10,13 @@ from loguru import logger
 # 加载环境变量
 load_dotenv()
 
-app = Flask(__name__)
+# 静态文件目录（打包模式下 serve Vue dist）
+_VUE_DIST = os.getenv('VUE_DIST_DIR', '')
+
+if _VUE_DIST and os.path.isdir(_VUE_DIST):
+    app = Flask(__name__, static_folder=_VUE_DIST, static_url_path='')
+else:
+    app = Flask(__name__)
 CORS(app)
 
 # 数据库配置
@@ -1609,6 +1615,19 @@ def get_price_distribution_chart():
     except Exception as e:
         logger.error(f"get_price_distribution_chart failed: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
+
+# ─── Vue SPA 静态文件服务（仅在打包模式下启用）────────────────
+if _VUE_DIST and os.path.isdir(_VUE_DIST):
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def serve_vue(path):
+        """Serve Vue SPA static files"""
+        # API 路由由上面的蓝图处理，这里只 fallback 到静态文件
+        full = os.path.join(_VUE_DIST, path)
+        if path and os.path.exists(full) and os.path.isfile(full):
+            return send_from_directory(_VUE_DIST, path)
+        return send_from_directory(_VUE_DIST, 'index.html')
+
 
 if __name__ == '__main__':
     with app.app_context():
