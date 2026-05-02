@@ -1,4 +1,4 @@
-# 使用 Python 3.9 slim 镜像（基于 Debian Bookworm）
+# 使用 Python 3.9 slim 镜像（基于 Debian）
 FROM python:3.9-slim
 
 WORKDIR /app
@@ -12,44 +12,19 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 # 安装系统依赖与 Chromium（含自动匹配版本的 chromedriver）
 # 合并为单个 RUN 以减少镜像层数，并在最后清理 apt 缓存
+# 注意：不要在 RUN 的 \ 继续行中插入 Dockerfile 注释，会中断命令
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget \
-    curl \
-    gnupg \
-    unzip \
-    xvfb \
-    # Chromium 浏览器与驱动（Debian 官方仓库保证版本一致）
-    chromium \
-    chromium-driver \
-    # Chromium headless 运行所需的共享库
-    libglib2.0-0 \
-    libnss3 \
-    libgconf-2-4 \
-    libfontconfig1 \
-    libxrender1 \
-    libxtst6 \
-    libxi6 \
-    libxss1 \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdbus-1-3 \
-    libdrm2 \
-    libgbm1 \
-    libgtk-3-0 \
-    libnspr4 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxfixes3 \
-    libxkbcommon0 \
-    libxrandr2 \
-    # 健康检查工具
+    wget curl gnupg unzip xvfb \
+    chromium chromium-driver \
+    libglib2.0-0 libnss3 libfontconfig1 libxrender1 \
+    libxtst6 libxi6 libxss1 libasound2 \
+    libatk-bridge2.0-0 libatk1.0-0 libcups2 \
+    libdbus-1-3 libdrm2 libgbm1 libgtk-3-0 \
+    libnspr4 libxcomposite1 libxdamage1 \
+    libxfixes3 libxkbcommon0 libxrandr2 \
     && rm -rf /var/lib/apt/lists/* \
-    # 创建兼容性符号链接，使 Selenium 能找到可执行文件
     && ln -sf /usr/bin/chromium /usr/bin/google-chrome \
     && ln -sf /usr/bin/chromedriver /usr/local/bin/chromedriver \
-    # 构建时验证：若版本输出失败则中断构建，保证镜像可用性
     && echo "=== Chromium ===" && chromium --version \
     && echo "=== ChromeDriver ===" && chromedriver --version
 
