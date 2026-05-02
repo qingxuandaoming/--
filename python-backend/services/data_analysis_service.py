@@ -28,15 +28,18 @@ class DataAnalysisService:
             # 获取指定天数内的价格数据
             start_date = datetime.now() - timedelta(days=days)
             
+            from app import EquipmentCategory
             price_data = db.session.query(
                 EquipmentPrice.equipment_id,
                 Equipment.name,
-                Equipment.category,
+                EquipmentCategory.name.label('category'),
                 EquipmentPrice.platform,
                 EquipmentPrice.price,
                 EquipmentPrice.created_at
             ).join(
                 Equipment, EquipmentPrice.equipment_id == Equipment.id
+            ).outerjoin(
+                EquipmentCategory, Equipment.category_id == EquipmentCategory.id
             ).filter(
                 EquipmentPrice.created_at >= start_date,
                 EquipmentPrice.is_available == True
@@ -229,22 +232,25 @@ class DataAnalysisService:
             EquipmentPrice = self.EquipmentPrice
             
             # 构建查询
+            from app import EquipmentCategory
             query = db.session.query(
                 Equipment.id,
                 Equipment.name,
                 Equipment.brand,
-                Equipment.category,
+                EquipmentCategory.name.label('category'),
                 EquipmentPrice.platform,
                 EquipmentPrice.price,
                 EquipmentPrice.seller_name
             ).join(
                 EquipmentPrice, Equipment.id == EquipmentPrice.equipment_id
+            ).outerjoin(
+                EquipmentCategory, Equipment.category_id == EquipmentCategory.id
             ).filter(
                 EquipmentPrice.is_available == True
             )
             
             if category:
-                query = query.filter(Equipment.category == category)
+                query = query.filter(EquipmentCategory.name == category)
             
             data = query.all()
             
@@ -486,24 +492,27 @@ class DataAnalysisService:
             EquipmentPrice = self.EquipmentPrice
             
             # 构建查询
+            from app import EquipmentCategory
             query = db.session.query(
                 Equipment.id,
                 Equipment.name,
                 Equipment.brand,
-                Equipment.category,
-                Equipment.rating_avg,
-                Equipment.rating_count,
+                EquipmentCategory.name.label('category'),
+                Equipment.rating,
+                Equipment.review_count,
                 EquipmentPrice.platform,
                 EquipmentPrice.price,
                 EquipmentPrice.seller_name
             ).join(
                 EquipmentPrice, Equipment.id == EquipmentPrice.equipment_id
+            ).outerjoin(
+                EquipmentCategory, Equipment.category_id == EquipmentCategory.id
             ).filter(
                 EquipmentPrice.is_available == True
             )
             
             if category:
-                query = query.filter(Equipment.category == category)
+                query = query.filter(EquipmentCategory.name == category)
             
             if platform:
                 query = query.filter(EquipmentPrice.platform == platform)

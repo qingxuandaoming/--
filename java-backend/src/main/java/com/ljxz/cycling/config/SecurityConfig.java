@@ -42,6 +42,7 @@ public class SecurityConfig {
     public static class SecurityProperties {
         private List<String> permitAll = Arrays.asList(
             "/auth/**",
+            "/api/auth/**",
             "/public/**",
             "/health",
             "/route/health",

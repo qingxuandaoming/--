@@ -9,6 +9,108 @@
     </section>
 
     <main class="container">
+      <!-- 骑行装备推荐 -->
+      <section class="featured-section">
+        <div class="featured-section-header">
+          <div class="featured-badge">
+            <i class="fas fa-crown"></i>
+            <span>骑行精选</span>
+          </div>
+          <h2>骑行装备推荐</h2>
+          <p class="featured-subtitle">前沿科技装备，重新定义骑行体验</p>
+        </div>
+        
+        <div class="featured-grid">
+          <!-- 头盔产品 -->
+          <div class="featured-card">
+            <div class="featured-card-header">
+              <div class="featured-icon helmet-icon">
+                <i class="fas fa-hard-hat"></i>
+              </div>
+              <div class="featured-title-area">
+                <h3>混天AI骑行头盔</h3>
+                <div class="featured-tags">
+                  <span class="featured-tag tag-radar">77GHz雷达</span>
+                  <span class="featured-tag tag-ai">端侧AI</span>
+                  <span class="featured-tag tag-ar">AR显示</span>
+                  <span class="featured-tag tag-npu">10T NPU</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="featured-images">
+              <div class="featured-img-wrapper">
+                <img src="/source/头盔爆炸图.png" alt="混天AI骑行头盔-爆炸图">
+                <div class="img-caption">结构爆炸图</div>
+              </div>
+              <div class="featured-img-wrapper">
+                <img src="/source/带字头盔爆炸图.png" alt="混天AI骑行头盔-详解图">
+                <div class="img-caption">技术详解图</div>
+              </div>
+            </div>
+            
+            <div class="featured-content">
+              <div class="feature-block">
+                <h4><i class="fas fa-radar"></i> 全域感知预警</h4>
+                <p>内嵌 <strong>77GHz 毫米波雷达</strong>，150 米后方追踪，端侧 AI 预判超车意图，精准区分同向超车与交叉风险。6 麦克风阵列 + 骨传导，不做普通听歌，而是<strong>重建空间声场</strong>——夯土号子如哪吒混天绫般缠绕方位，戏曲混响随位置漂移，HRTF 头部传输函数让声音具备空间锚定。</p>
+              </div>
+              <div class="feature-block">
+                <h4><i class="fas fa-microchip"></i> 端侧算力引擎</h4>
+                <p>高通 QCC / BES 系列 NPU，<strong>10T 算力全部本地运行</strong>，山区无信号照常预警，隐私数据不出盔。</p>
+              </div>
+              <div class="feature-block">
+                <h4><i class="fas fa-eye"></i> 天眼视界考古透镜</h4>
+                <p>双目衍射光波导 + 全彩 MicroLED，<strong>3000 尼特户外可用</strong>。镜片左半边是残垣断壁，右半边 AI 实时叠加完整古建——如同姜子牙元神法相，让消逝的历史在眼前重构。SLAM + 3DGS 端侧跑通，虚实光照一致。显示区域锁死镜片下方 20%，路口自动降亮度。<strong>瞳孔追踪</strong>实现看一眼即操作，双手不离把。</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 眼镜产品 -->
+          <div class="featured-card">
+            <div class="featured-card-header">
+              <div class="featured-icon glasses-icon">
+                <i class="fas fa-glasses"></i>
+              </div>
+              <div class="featured-title-area">
+                <h3>骑行智能骑行眼镜</h3>
+                <div class="featured-tags">
+                  <span class="featured-tag tag-hud">HUD显示</span>
+                  <span class="featured-tag tag-lens">光致变色</span>
+                  <span class="featured-tag tag-nav">智能导航</span>
+                  <span class="featured-tag tag-audio">定向音频</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="featured-images">
+              <div class="featured-img-wrapper">
+                <img src="/source/眼镜.webp" alt="骑行智能骑行眼镜-外观">
+                <div class="img-caption">全景外观</div>
+              </div>
+              <div class="featured-img-wrapper">
+                <img src="/source/眼镜2.webp" alt="骑行智能骑行眼镜-细节">
+                <div class="img-caption">细节特写</div>
+              </div>
+            </div>
+            
+            <div class="featured-content">
+              <div class="feature-block">
+                <h4><i class="fas fa-tachometer-alt"></i> HUD抬头显示</h4>
+                <p>轻量化钛合金镜架，搭配<strong>光致变色镜片</strong>，全天候自适应光线变化。内置微型 HUD 投影系统，实时显示速度、踏频、心率与导航路径，<strong>视线无需离开路面</strong>，安全与信息兼得。</p>
+              </div>
+              <div class="feature-block">
+                <h4><i class="fas fa-bluetooth-b"></i> 智能互联生态</h4>
+                <p>蓝牙 5.3 双模连接，支持多设备协同。开放式<strong>定向音频</strong>设计，环境感知与音乐享受兼得，骑行中既能聆听节拍，又不隔绝外界警示。</p>
+              </div>
+              <div class="feature-block">
+                <h4><i class="fas fa-battery-full"></i> 全天候耐久</h4>
+                <p><strong>IPX7 级防水</strong>，暴雨骑行无惧挑战。超长续航 18 小时，长途骑行一镜到底。磁吸快充电极，1 小时回血 80%，告别电量焦虑。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- 搜索和筛选区域 -->
       <section class="search-section">
         <div class="search-bar">

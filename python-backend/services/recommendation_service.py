@@ -89,9 +89,14 @@ class RecommendationService:
                 return self.recommendation_cache[cache_key]['data']
             
             # 获取分类下的装备
-            equipment_list = Equipment.query.filter(
-                Equipment.category == category
-            ).all()
+            from app import EquipmentCategory
+            category_obj = EquipmentCategory.query.filter_by(name=category).first()
+            if category_obj:
+                equipment_list = Equipment.query.filter(
+                    Equipment.category_id == category_obj.id
+                ).all()
+            else:
+                equipment_list = []
             
             if not equipment_list:
                 return []
@@ -143,7 +148,10 @@ class RecommendationService:
             )
             
             if category:
-                query = query.filter(Equipment.category == category)
+                from app import EquipmentCategory
+                category_obj = EquipmentCategory.query.filter_by(name=category).first()
+                if category_obj:
+                    query = query.filter(Equipment.category_id == category_obj.id)
             
             equipment_list = query.all()
             
@@ -274,7 +282,7 @@ class RecommendationService:
             
             # 获取同分类的装备
             similar_equipment = Equipment.query.filter(
-                Equipment.category == target_equipment.category,
+                Equipment.category_id == target_equipment.category_id,
                 Equipment.id != equipment_id
             ).all()
             
@@ -480,12 +488,15 @@ class RecommendationService:
             from app import db, Equipment
             
             # 统计各分类的装备数量
+            from app import EquipmentCategory
             category_stats = db.session.query(
-                Equipment.category,
+                EquipmentCategory.name.label('category'),
                 db.func.count(Equipment.id).label('count'),
                 db.func.avg(Equipment.price).label('avg_price'),
                 db.func.avg(Equipment.rating).label('avg_rating')
-            ).group_by(Equipment.category).all()
+            ).join(
+                EquipmentCategory, Equipment.category_id == EquipmentCategory.id
+            ).group_by(EquipmentCategory.name).all()
             
             stats = {
                 'total_equipment': Equipment.query.count(),
