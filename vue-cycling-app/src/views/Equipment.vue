@@ -9,14 +9,14 @@
     </section>
 
     <main class="container">
-      <!-- 启星装备推荐 -->
+      <!-- 骑行装备推荐 -->
       <section class="featured-section">
         <div class="featured-section-header">
           <div class="featured-badge">
             <i class="fas fa-crown"></i>
-            <span>启星精选</span>
+            <span>骑行精选</span>
           </div>
-          <h2>启星装备推荐</h2>
+          <h2>骑行装备推荐</h2>
           <p class="featured-subtitle">前沿科技装备，重新定义骑行体验</p>
         </div>
         
@@ -72,7 +72,7 @@
                 <i class="fas fa-glasses"></i>
               </div>
               <div class="featured-title-area">
-                <h3>启星智能骑行眼镜</h3>
+                <h3>智能骑行眼镜</h3>
                 <div class="featured-tags">
                   <span class="featured-tag tag-hud">HUD显示</span>
                   <span class="featured-tag tag-lens">光致变色</span>
@@ -84,11 +84,11 @@
             
             <div class="featured-images">
               <div class="featured-img-wrapper">
-                <img src="/source/眼镜.webp" alt="启星智能骑行眼镜-外观">
+                <img src="/source/眼镜.webp" alt="智能骑行眼镜-外观">
                 <div class="img-caption">全景外观</div>
               </div>
               <div class="featured-img-wrapper">
-                <img src="/source/眼镜2.webp" alt="启星智能骑行眼镜-细节">
+                <img src="/source/眼镜2.webp" alt="智能骑行眼镜-细节">
                 <div class="img-caption">细节特写</div>
               </div>
             </div>
@@ -660,6 +660,208 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 40px 20px;
+}
+
+/* 骑行装备推荐区域 */
+.featured-section {
+  margin-bottom: 40px;
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+.featured-section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.featured-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.featured-section-header h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 12px;
+}
+
+.featured-subtitle {
+  color: #6c757d;
+  font-size: 1.1rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+  gap: 30px;
+}
+
+.featured-card {
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  border-radius: 16px;
+  padding: 30px;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.featured-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+  border-color: #667eea;
+}
+
+.featured-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f1f3f4;
+}
+
+.featured-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.helmet-icon {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.glasses-icon {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+.featured-title-area h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.featured-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.featured-tag {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.tag-radar { background: #e3f2fd; color: #1976d2; }
+.tag-ai { background: #f3e5f5; color: #7b1fa2; }
+.tag-ar { background: #e8f5e9; color: #388e3c; }
+.tag-npu { background: #fff3e0; color: #f57c00; }
+.tag-hud { background: #e0f7fa; color: #00838f; }
+.tag-lens { background: #e8eaf6; color: #303f9f; }
+.tag-nav { background: #fce4ec; color: #c2185b; }
+.tag-audio { background: #f1f8e9; color: #558b2f; }
+
+.featured-images {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.featured-img-wrapper {
+  background: #f8f9fa;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+  position: relative;
+  height: 380px;
+}
+
+.featured-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  padding: 12px;
+}
+
+.featured-img-wrapper:hover img {
+  transform: scale(1.03);
+}
+
+.img-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: white;
+  padding: 20px 12px 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.featured-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feature-block {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  border-left: 4px solid #667eea;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.feature-block h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feature-block h4 i {
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+.feature-block p {
+  color: #495057;
+  line-height: 1.7;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.feature-block strong {
+  color: #667eea;
 }
 
 /* 搜索和筛选区域 */
@@ -1297,6 +1499,27 @@ export default {
   .search-section,
   .equipment-section {
     padding: 20px;
+  }
+  
+  .featured-section {
+    padding: 24px 16px;
+  }
+  
+  .featured-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .featured-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .featured-images {
+    grid-template-columns: 1fr;
+  }
+  
+  .featured-section-header h2 {
+    font-size: 1.6rem;
   }
   
   .filters {

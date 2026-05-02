@@ -471,3 +471,5 @@ org.springframework.web.servlet.resource.NoResourceFoundException: No static res
 2026-05-02 17:42:54 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
 2026-05-02 17:42:54 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
 2026-05-02 17:42:54 [http-nio-8080-exec-2] INFO  c.l.c.controller.RouteController - 获取数据库表列表
+2026-05-02 18:20:50 [http-nio-8080-exec-5] INFO  c.l.c.controller.RouteController - 获取数据库表列表
+2026-05-02 18:23:25 [http-nio-8080-exec-8] INFO  c.l.c.controller.RouteController - 获取数据库表列表
