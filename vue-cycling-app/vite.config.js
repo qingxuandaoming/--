@@ -22,6 +22,7 @@ export default defineConfig({
     }
   },
   server: {
+    host: '127.0.0.1',
     proxy: {
       // Python后端 - 装备和爬虫相关API
       '/api/equipment': {

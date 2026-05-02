@@ -1,6 +1,9 @@
 @echo off
-set JAVA_HOME=C:\PROGRA~1\Java\jdk-23
+set JAVA_HOME=E:\project\灵境行者\src\dist\骑行装备数据分析系统\runtime\jre
 set PATH=%JAVA_HOME%\bin;%PATH%
+echo Java Version:
+java -version
+echo.
 echo Starting Spring Boot application...
-mvn spring-boot:run
+java -jar target\cycling-route-backend-1.0.0.jar
 pause

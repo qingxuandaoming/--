@@ -43,10 +43,14 @@ JAVA_JAR       = os.path.join(BASE_DIR, "java-backend", "app.jar")
 
 PYTHON_BACKEND = os.path.join(BASE_DIR, "python-backend", "python_backend.exe")
 VUE_DIST       = os.path.join(BASE_DIR, "vue-dist")
-SQL_INIT       = os.path.join(BASE_DIR, "database", "complete_init.sql")
+# SQL 文件：打包后在 BASE_DIR/database/，开发时在上级目录 database/
+_sql_candidate = os.path.join(BASE_DIR, "database", "complete_init.sql")
+if not os.path.exists(_sql_candidate):
+    _sql_candidate = os.path.join(os.path.dirname(BASE_DIR), "database", "complete_init.sql")
+SQL_INIT = _sql_candidate
 
 DB_HOST   = "127.0.0.1"
-DB_PORT   = 3306
+DB_PORT   = 33306       # 捆绑 MariaDB 端口；若用系统 MySQL 则动态切换为 3306
 JAVA_PORT = 8080
 PY_PORT   = 5000
 WEB_PORT  = 5000  # Python 同时 serve 前端静态文件
@@ -54,6 +58,9 @@ WEB_PORT  = 5000  # Python 同时 serve 前端静态文件
 DB_USER = "root"
 DB_PASS = "Cycling2024!"
 DB_NAME = "ljxz"
+
+# 系统 MySQL/MariaDB 常见端口（探测顺序）
+SYSTEM_DB_PORTS = [3306, 3307]
 
 # ─────────────────────────────────────────────
 # 全局进程列表（退出时统一清理）
@@ -73,8 +80,9 @@ def cleanup():
     # 停止 MariaDB
     if os.path.exists(MARIADB_ADMIN):
         try:
+            my_cnf = os.path.join(BASE_DIR, "runtime", "mariadb", "my.ini")
             subprocess.run(
-                [MARIADB_ADMIN, "-u", DB_USER, f"-p{DB_PASS}",
+                [MARIADB_ADMIN, f"--defaults-file={my_cnf}", "-u", DB_USER, f"-p{DB_PASS}",
                  "-P", str(DB_PORT), "-h", DB_HOST, "shutdown"],
                 timeout=10, capture_output=True
             )
@@ -98,53 +106,128 @@ def wait_for_port(host, port, timeout=120, label="服务"):
 # ─────────────────────────────────────────────
 # 启动 MariaDB
 # ─────────────────────────────────────────────
+def _detect_system_mysql(log_cb):
+    """探测系统已安装的 MySQL/MariaDB，返回 (host, port) 或 None"""
+    import socket as _sock
+    for port in SYSTEM_DB_PORTS:
+        try:
+            with _sock.create_connection((DB_HOST, port), timeout=1):
+                log_cb(f"  ↳ 检测到系统 MySQL/MariaDB 运行在端口 {port}")
+                return (DB_HOST, port)
+        except OSError:
+            pass
+    return None
+
+
 def start_mariadb(log_cb):
+    global DB_PORT, MARIADB_CLIENT, MARIADB_ADMIN
     log_cb("▶ 正在初始化数据库目录...")
+
+    # ── 优先探测系统已运行的 MySQL/MariaDB ──────────────────
+    sys_db = _detect_system_mysql(log_cb)
+    if sys_db:
+        DB_PORT = sys_db[1]
+        # 同步更新 client/admin 路径到系统 MySQL（若存在）
+        import glob as _glob
+        for candidate in [
+            r"C:\Program Files\MySQL\MySQL Server 9.7\bin",
+            r"C:\Program Files\MySQL\MySQL Server 8.0\bin",
+            r"C:\Program Files\MariaDB 10.11\bin",
+            r"C:\Program Files\MariaDB 10.6\bin",
+        ]:
+            if os.path.exists(os.path.join(candidate, "mysql.exe")):
+                MARIADB_CLIENT = os.path.join(candidate, "mysql.exe")
+                MARIADB_ADMIN  = os.path.join(candidate, "mysqladmin.exe")
+                log_cb(f"  ↳ 使用系统 MySQL 客户端: {candidate}")
+                break
+        log_cb(f"✔ 复用系统数据库 (端口 {DB_PORT})，跳过捆绑 MariaDB 启动")
+        log_cb("  ↳ 初始化数据库账号和数据...")
+        _init_db(log_cb)
+        log_cb("✔ 数据库已就绪")
+        return True
+
+    # ── 无系统数据库，尝试启动捆绑 MariaDB ──────────────────
+    if not os.path.exists(MARIADB_BIN):
+        log_cb(f"✗ 找不到捆绑 MariaDB: {MARIADB_BIN}")
+        log_cb("  请安装 MySQL/MariaDB 或将 MariaDB 放入 runtime/mariadb 目录")
+        return False
+
+    log_dir = os.path.join(BASE_DIR, "logs")
+    os.makedirs(log_dir, exist_ok=True)
+    mariadb_log_path = os.path.join(log_dir, "mariadb.log")
+    my_cnf = os.path.join(BASE_DIR, "runtime", "mariadb", "my.ini")
+    _write_my_cnf(my_cnf, mariadb_log_path)
 
     # 首次运行：初始化数据目录
     if not os.path.isdir(os.path.join(MARIADB_DATA, "mysql")):
         os.makedirs(MARIADB_DATA, exist_ok=True)
-        log_cb("  ↳ 首次运行，执行 mysql_install_db ...")
+        log_cb("  ↳ 首次运行，正在初始化数据库（约需 1~2 分钟）...")
         install_db = os.path.join(MARIADB_DIR, "bin", "mysql_install_db.exe")
         if not os.path.exists(install_db):
-            # MariaDB 10.x 使用 mysqld --initialize-insecure
+            # MariaDB 10.4+ 使用 mysqld --initialize-insecure
             r = subprocess.run(
                 [MARIADB_BIN,
-                 f"--datadir={MARIADB_DATA}",
+                 f"--defaults-file={my_cnf}",
                  "--initialize-insecure",
-                 f"--basedir={MARIADB_DIR}"],
-                capture_output=True, text=True, timeout=120
+                 "--skip-test-db"],
+                capture_output=True, timeout=180,
+                creationflags=subprocess.CREATE_NO_WINDOW
             )
-            log_cb(r.stdout[-500:] if r.stdout else "")
-            log_cb(r.stderr[-500:] if r.stderr else "")
         else:
             r = subprocess.run(
                 [install_db,
+                 f"--defaults-file={my_cnf}",
                  f"--datadir={MARIADB_DATA}",
-                 f"--basedir={MARIADB_DIR}"],
-                capture_output=True, text=True, timeout=120
+                 f"--basedir={MARIADB_DIR}",
+                 "--skip-test-db"],
+                capture_output=True, timeout=180,
+                creationflags=subprocess.CREATE_NO_WINDOW
             )
-            log_cb(r.stdout[-500:] if r.stdout else "")
+        out = r.stdout.decode("utf-8", errors="ignore") if r.stdout else ""
+        err = r.stderr.decode("utf-8", errors="ignore") if r.stderr else ""
+        if out.strip(): log_cb(f"  [init] {out[-400:]}")
+        if err.strip(): log_cb(f"  [init] {err[-400:]}")
+        if r.returncode != 0:
+            log_cb(f"  ⚠ 初始化返回码 {r.returncode}，若数据目录已存在可忽略")
 
-    my_cnf = os.path.join(BASE_DIR, "runtime", "mariadb", "my.ini")
-    _write_my_cnf(my_cnf)
-
-    log_cb("▶ 正在启动 MariaDB...")
+    log_cb("▶ 正在启动捆绑 MariaDB...")
+    log_cb(f"  ↳ 日志文件: {mariadb_log_path}")
+    mariadb_log_fh = open(mariadb_log_path, "w", encoding="utf-8", errors="ignore")
     p = subprocess.Popen(
         [MARIADB_BIN,
-         f"--defaults-file={my_cnf}",
-         f"--datadir={MARIADB_DATA}",
-         f"--port={DB_PORT}",
-         "--console"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+         f"--defaults-file={my_cnf}"],
+        stdout=mariadb_log_fh,
+        stderr=mariadb_log_fh,
+        stdin=subprocess.DEVNULL,
         creationflags=subprocess.CREATE_NO_WINDOW
     )
     _procs.append(p)
 
-    log_cb("  ↳ 等待数据库端口就绪...")
-    if not wait_for_port(DB_HOST, DB_PORT, timeout=60, label="MariaDB"):
-        log_cb("✗ 数据库启动超时！")
+    log_cb("  ↳ 等待数据库端口就绪（最多 120 秒）...")
+    deadline = time.time() + 120
+    started = False
+    while time.time() < deadline:
+        if p.poll() is not None:   # 进程已退出 = 崩溃
+            log_cb(f"  ✗ MariaDB 进程意外退出 (code={p.returncode})")
+            break
+        try:
+            with socket.create_connection((DB_HOST, DB_PORT), timeout=1):
+                started = True
+                break
+        except OSError:
+            time.sleep(1)
+
+    if not started:
+        log_cb("✗ 数据库启动超时！错误日志：")
+        try:
+            mariadb_log_fh.flush()
+            with open(mariadb_log_path, encoding="utf-8", errors="ignore") as f:
+                lines = [l.rstrip() for l in f if l.strip()]
+            for line in (lines[-20:] if len(lines) > 20 else lines):
+                log_cb(f"    {line}")
+        except Exception:
+            pass
+        log_cb(f"  完整日志: {mariadb_log_path}")
         return False
 
     log_cb("  ↳ 初始化数据库账号和数据...")
@@ -152,7 +235,11 @@ def start_mariadb(log_cb):
     log_cb("✔ 数据库已就绪")
     return True
 
-def _write_my_cnf(path):
+def _write_my_cnf(path, log_error_path=None):
+    log_error_line = (
+        f"log-error={log_error_path.replace(os.sep, '/')}"
+        if log_error_path else "log-error=mariadb.err"
+    )
     content = f"""[mysqld]
 basedir={MARIADB_DIR.replace(os.sep, '/')}
 datadir={MARIADB_DATA.replace(os.sep, '/')}
@@ -163,6 +250,7 @@ skip-networking=0
 bind-address=127.0.0.1
 max_connections=100
 innodb_buffer_pool_size=64M
+{log_error_line}
 
 [client]
 port={DB_PORT}
@@ -174,43 +262,68 @@ default-character-set=utf8mb4
 
 def _init_db(log_cb):
     """创建数据库、用户，导入初始数据（幂等）"""
-    cmds = [
-        f"ALTER USER 'root'@'localhost' IDENTIFIED BY '{DB_PASS}';",
-        f"CREATE DATABASE IF NOT EXISTS `{DB_NAME}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
-        f"GRANT ALL PRIVILEGES ON `{DB_NAME}`.* TO 'root'@'%' IDENTIFIED BY '{DB_PASS}';",
-        "FLUSH PRIVILEGES;",
-    ]
-    for cmd in cmds:
-        _run_mysql_cmd(cmd, log_cb, use_auth=False)
+    # 探测连接方式：优先试配置密码（系统 MySQL 已有密码），再试无密码（MariaDB 首次初始化）
+    check_with_pass = _run_mysql_cmd("SELECT 1;", log_cb=None, use_auth=True, capture=True)
+    if check_with_pass.strip():
+        # 用配置密码可以连接（系统 MySQL 已设密码，或捆绑 MariaDB 已初始化）
+        needs_pass = True
+        log_cb("  ↳ 数据库连接验证成功（使用配置密码）")
+    else:
+        # 配置密码失败，试无密码（MariaDB --initialize-insecure 首次）
+        check_no_pass = _run_mysql_cmd("SELECT 1;", log_cb=None, use_auth=False, capture=True)
+        needs_pass = False if check_no_pass.strip() else True
+        if not check_no_pass.strip():
+            log_cb("  ↳ 警告：无法连接到数据库，请检查密码配置")
 
-    # 导入 SQL 文件（只在表不存在时）
+    # MySQL 8+/9+ 不支持 PASSWORD() 函数，改用 ALTER USER
+    # MariaDB 10.x 兼容 ALTER USER 语法
+    init_sql = f"""
+        CREATE DATABASE IF NOT EXISTS `{DB_NAME}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '{DB_PASS}';
+        GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+        ALTER USER 'root'@'localhost' IDENTIFIED BY '{DB_PASS}';
+        FLUSH PRIVILEGES;
+    """
+    _run_mysql_cmd(init_sql, log_cb, use_auth=needs_pass)
+
+    # 导入 SQL 文件：检查目标表是否存在（用新密码连接）
     check = _run_mysql_cmd(
         f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='{DB_NAME}';",
-        log_cb, capture=True
+        log_cb, capture=True, use_auth=True
     )
-    if check and "0" in check:
+    # check 为空或包含 '0' → 表不存在，需要导入
+    table_count = "".join(c for c in check if c.isdigit())
+    if not table_count or table_count == "0":
         log_cb("  ↳ 导入初始数据...")
         _import_sql(SQL_INIT, log_cb)
     else:
-        log_cb("  ↳ 数据库已存在，跳过导入")
+        log_cb(f"  ↳ 数据库已存在（{table_count} 张表），跳过导入")
 
 def _run_mysql_cmd(cmd, log_cb=None, use_auth=True, capture=False):
-    args = [MARIADB_CLIENT,
-            "-h", DB_HOST, "-P", str(DB_PORT),
-            "-u", "root"]
+    my_cnf = os.path.join(BASE_DIR, "runtime", "mariadb", "my.ini")
+    args = [MARIADB_CLIENT]
+    # 仅当捆绑 MariaDB 的 my.ini 实际存在时才加载（系统 MySQL 不需要此选项）
+    if os.path.exists(my_cnf):
+        args.append(f"--defaults-file={my_cnf}")
+    args += ["-h", DB_HOST, "-P", str(DB_PORT), "-u", "root"]
     if use_auth:
         args += [f"-p{DB_PASS}"]
-    else:
-        # 初始化时 root 无密码
-        args += ["--connect-expired-password"]
     args += ["-e", cmd]
     try:
-        r = subprocess.run(args, capture_output=True, text=True, timeout=30,
-                           creationflags=subprocess.CREATE_NO_WINDOW)
+        # 使用 bytes 模式避免 Windows 编码导致 text=True 时 stderr=None
+        r = subprocess.run(
+            args,
+            capture_output=True,
+            stdin=subprocess.DEVNULL,   # PyInstaller 无控制台模式必须显式设置
+            timeout=30,
+            creationflags=subprocess.CREATE_NO_WINDOW
+        )
+        stdout = r.stdout.decode('utf-8', errors='ignore') if r.stdout else ""
+        stderr = r.stderr.decode('utf-8', errors='ignore') if r.stderr else ""
         if capture:
-            return r.stdout
-        if r.returncode != 0 and log_cb:
-            log_cb(f"  [db] {r.stderr[:200]}")
+            return stdout
+        if r.returncode != 0 and log_cb and stderr:
+            log_cb(f"  [db] {stderr[:300]}")
     except Exception as e:
         if log_cb:
             log_cb(f"  [db err] {e}")
@@ -222,7 +335,9 @@ def _import_sql(sql_file, log_cb):
         return
     with open(sql_file, "rb") as f:
         data = f.read()
+    my_cnf = os.path.join(BASE_DIR, "runtime", "mariadb", "my.ini")
     args = [MARIADB_CLIENT,
+            f"--defaults-file={my_cnf}",
             "-h", DB_HOST, "-P", str(DB_PORT),
             "-u", "root", f"-p{DB_PASS}",
             DB_NAME]
@@ -254,23 +369,45 @@ def start_java(log_cb):
     env["SPRING_DATASOURCE_USERNAME"] = DB_USER
     env["SPRING_DATASOURCE_PASSWORD"] = DB_PASS
 
+    # 将 Java 日志写到文件，方便排查启动失败原因
+    log_dir = os.path.join(BASE_DIR, "logs")
+    os.makedirs(log_dir, exist_ok=True)
+    java_log = open(os.path.join(log_dir, "java.log"), "w", encoding="utf-8", errors="ignore")
+
     p = subprocess.Popen(
-        [JAVA_EXE, "-jar", JAVA_JAR,
+        [JAVA_EXE,
+         "-Xms128m", "-Xmx512m",      # 限制堆内存，启动更快
+         "-jar", JAVA_JAR,
          f"--spring.datasource.url={db_url}",
          f"--spring.datasource.username={DB_USER}",
          f"--spring.datasource.password={DB_PASS}",
          "--server.port=8080",
-         "--spring.jpa.hibernate.ddl-auto=update"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+         "--spring.jpa.hibernate.ddl-auto=update",
+         "--logging.level.root=WARN",    # 减少日志量，加快启动
+         "--logging.level.com.ljxz=INFO"],
+        stdout=java_log,
+        stderr=java_log,
+        stdin=subprocess.DEVNULL,
         env=env,
         creationflags=subprocess.CREATE_NO_WINDOW
     )
     _procs.append(p)
 
-    log_cb("  ↳ 等待 Java 后端端口就绪 (最多 90 秒)...")
-    if not wait_for_port(DB_HOST, JAVA_PORT, timeout=90, label="Java"):
-        log_cb("✗ Java 后端启动超时！")
+    log_cb("  ↳ 等待 Java 后端端口就绪 (最多 120 秒)...")
+    if not wait_for_port(DB_HOST, JAVA_PORT, timeout=120, label="Java"):
+        # 读取日志尾部帮助诊断
+        try:
+            java_log.flush()
+            log_path = os.path.join(log_dir, "java.log")
+            with open(log_path, encoding="utf-8", errors="ignore") as f:
+                tail = f.readlines()
+            last = [l.strip() for l in tail if l.strip()][-10:]
+            log_cb("✗ Java 后端启动失败，最后 10 行日志:")
+            for line in last:
+                log_cb(f"  {line}")
+            log_cb(f"  完整日志: {log_path}")
+        except Exception:
+            log_cb("✗ Java 后端启动超时！")
         return False
     log_cb("✔ Java 后端已就绪 (http://localhost:8080)")
     return True
@@ -297,10 +434,13 @@ def start_python(log_cb):
     env["FLASK_DEBUG"]  = "0"
     env["VUE_DIST_DIR"] = VUE_DIST  # 让 Python 后端 serve 前端
 
+    py_log = open(os.path.join(BASE_DIR, "logs", "python.log"), "w",
+                  encoding="utf-8", errors="ignore")
     p = subprocess.Popen(
         [PYTHON_BACKEND],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=py_log,
+        stderr=py_log,
+        stdin=subprocess.DEVNULL,
         env=env,
         creationflags=subprocess.CREATE_NO_WINDOW
     )
