@@ -1,0 +1,26 @@
+2026-05-03 00:58:55.294 | INFO     | __main__:main:166 - ==================================================
+2026-05-03 00:58:55.295 | INFO     | __main__:main:167 - 灵境行者 Python后端服务启动
+2026-05-03 00:58:55.295 | INFO     | __main__:main:168 - ==================================================
+2026-05-03 00:58:55.295 | INFO     | __main__:check_dependencies:59 - 检查系统依赖...
+2026-05-03 00:58:55.961 | INFO     | __main__:check_dependencies:103 - 依赖检查完成
+2026-05-03 00:58:55.993 | INFO     | __main__:check_database_connection:127 - 数据库连接正常
+2026-05-03 00:58:57.035 | INFO     | __main__:initialize_database:146 - 数据库表创建/更新完成
+2026-05-03 00:58:57.056 | INFO     | __main__:initialize_database:153 - 检测到空数据库，建议运行数据初始化脚本
+2026-05-03 00:58:57.056 | INFO     | __main__:initialize_database:154 - 运行命令: python init_data.py
+2026-05-03 00:58:57.056 | INFO     | __main__:main:183 - 启动服务...
+2026-05-03 00:58:57.057 | INFO     | __main__:start_flask_app:27 - 启动Flask应用: http://0.0.0.0:5000
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.15:5000
+Press CTRL+C to quit
+2026-05-03 00:59:02.192 | INFO     | scheduler:start:233 - 任务调度器已启动
+2026-05-03 00:59:02.194 | INFO     | scheduler:start:237 - 已注册 5 个定时任务:
+2026-05-03 00:59:02.194 | INFO     | scheduler:start:239 -   - 检查价格提醒 (ID: check_price_alerts)
+2026-05-03 00:59:02.194 | INFO     | scheduler:start:239 -   - 清理过期任务 (ID: cleanup_tasks)
+2026-05-03 00:59:02.194 | INFO     | scheduler:start:239 -   - 每日全量爬虫 (ID: daily_full_crawl)
+2026-05-03 00:59:02.194 | INFO     | scheduler:start:239 -   - 更新装备评分 (ID: update_equipment_ratings)
+2026-05-03 00:59:02.195 | INFO     | scheduler:start:239 -   - 热门商品价格更新 (ID: update_popular_prices)
+2026-05-03 00:59:02.195 | INFO     | __main__:start_scheduler:44 - 任务调度器已启动

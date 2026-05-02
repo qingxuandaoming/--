@@ -1,6 +1,10 @@
 # Set JAVA_HOME
-$env:JAVA_HOME = "C:\Program Files\Java\jdk-23"
-$env:PATH = "C:\Program Files\Java\jdk-23\bin;" + $env:PATH
+if (-not $env:JAVA_HOME) {
+    $env:JAVA_HOME = "C:\Program Files\Java\jdk-23"
+}
+$env:PATH = "$env:JAVA_HOME\bin;" + $env:PATH
+
+Set-Location -Path $PSScriptRoot
 
 Write-Host "Starting Route Planning Backend Service..."
 Write-Host "JAVA_HOME: $env:JAVA_HOME"

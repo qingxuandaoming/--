@@ -1,6 +1,10 @@
 # Set Java environment
-$env:JAVA_HOME = 'C:\PROGRA~1\Java\jdk-23'
+if (-not $env:JAVA_HOME) {
+    $env:JAVA_HOME = 'C:\PROGRA~1\Java\jdk-23'
+}
 $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
+
+Set-Location -Path $PSScriptRoot
 
 # Display Java version
 Write-Host "Java Home: $env:JAVA_HOME"
