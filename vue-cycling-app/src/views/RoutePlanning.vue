@@ -183,28 +183,28 @@
           <h3><i class="fas fa-thumbs-up"></i> 推荐路线</h3>
           <div class="recommended-routes">
             <div class="mini-route-card">
-              <img src="/source/湖滨休闲道.jpg" alt="湖滨休闲道">
+              <img src="/media/2.jpg" alt="太行水镇非遗体验线">
               <div class="mini-route-info">
-                <h4>湖滨休闲道</h4>
-                <p>12公里 · 初级</p>
+                <h4>太行水镇非遗体验线</h4>
+                <p>18公里 · 初级 · 非遗民俗</p>
               </div>
             </div>
             <div class="mini-route-card">
-              <img src="/source/森林山地线.jpg" alt="森林山地线">
+              <img src="/media/17.jpg" alt="碛口古镇晋商文化线">
               <div class="mini-route-info">
-                <h4>森林山地线</h4>
-                <p>25公里 · 中级</p>
+                <h4>碛口古镇晋商文化线</h4>
+                <p>32公里 · 中级 · 晋商文化</p>
               </div>
             </div>
             <div class="mini-route-card">
-              <img src="/source/海岸风景道.jpg" alt="海岸风景道">
+              <img src="/media/14.jpg" alt="易水湖环湖栈道线">
               <div class="mini-route-info">
-                <h4>海岸风景道</h4>
-                <p>40公里 · 高级</p>
+                <h4>易水湖环湖栈道线</h4>
+                <p>15公里 · 初级 · 山水风光</p>
               </div>
             </div>
             <div class="mini-route-card heritage-card-link" @click="goToHeritageMap">
-              <img src="/media/2.jpg" alt="非遗骑行">
+              <img src="/media/26.jpg" alt="非遗骑行">
               <div class="mini-route-info">
                 <h4><i class="fas fa-map-marked-alt"></i> 非遗骑行地图</h4>
                 <p>10个非遗乡村 · 点击查看</p>

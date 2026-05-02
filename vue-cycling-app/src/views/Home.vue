@@ -22,97 +22,127 @@
   <main class="container">
     <section id="routes">
       <h2 class="section-title">精选骑行路线</h2>
+      <p class="section-subtitle">精选非遗文化与自然风光融合的骑行体验，每条路线都有独特的故事</p>
 
       <div class="route-container">
-        <div class="route-card">
+        <div class="route-card" v-for="(route, index) in featuredRoutes" :key="index">
           <div class="route-image">
-            <img src="/source/湖滨休闲道.jpg" alt="湖滨休闲道景色" @load="imageLoaded($event)">
+            <img :src="route.image" :alt="route.name" @load="imageLoaded($event)">
           </div>
           <div class="route-content">
-            <span class="difficulty easy">初级</span>
-            <h3>湖滨休闲道</h3>
-            <p>沿湖岸骑行的平缓路线，景色宜人，适合家庭和初学者的轻松骑行体验...</p>
+            <div class="route-header-row">
+              <span :class="['difficulty', route.difficultyClass]">{{ route.difficulty }}</span>
+              <span class="route-tag" v-if="route.tag"><i :class="route.tagIcon"></i> {{ route.tag }}</span>
+            </div>
+            <h3>{{ route.name }}</h3>
+            <p>{{ route.description }}</p>
             <div class="route-stats">
               <div class="stat-item">
                 <i class="fas fa-route"></i>
                 <h4>距离</h4>
-                <p>12 公里</p>
+                <p>{{ route.distance }}</p>
               </div>
               <div class="stat-item">
                 <i class="far fa-clock"></i>
                 <h4>时间</h4>
-                <p>1-2 小时</p>
+                <p>{{ route.time }}</p>
               </div>
               <div class="stat-item">
                 <i class="fas fa-mountain"></i>
                 <h4>海拔</h4>
-                <p>50m</p>
+                <p>{{ route.elevation }}</p>
               </div>
             </div>
-            <router-link to="/route-planning" class="btn btn-full">查看详情</router-link>
+            <div class="route-actions">
+              <button class="btn btn-outline" @click="openRouteDetail(route)">
+                <i class="fas fa-book-open"></i> 路线详情
+              </button>
+              <router-link to="/route-planning" class="btn btn-primary">
+                <i class="fas fa-map-marked-alt"></i> 地图规划
+              </router-link>
+            </div>
           </div>
         </div>
 
-        <div class="route-card">
-          <div class="route-image">
-            <img src="/source/森林山地线.jpg" alt="森林山地线景色" @load="imageLoaded($event)">
-          </div>
-          <div class="route-content">
-            <span class="difficulty moderate">中级</span>
-            <h3>森林山地线</h3>
-            <p>穿越茂密森林的山地路线，起伏多变，带来刺激的骑行体验和清新的森林空气...</p>
-            <div class="route-stats">
-              <div class="stat-item">
-                <i class="fas fa-route"></i>
-                <h4>距离</h4>
-                <p>25 公里</p>
-              </div>
-              <div class="stat-item">
-                <i class="far fa-clock"></i>
-                <h4>时间</h4>
-                <p>3-4 小时</p>
-              </div>
-              <div class="stat-item">
-                <i class="fas fa-mountain"></i>
-                <h4>海拔</h4>
-                <p>320m</p>
-              </div>
+        <!-- 探索更多卡片 -->
+        <router-link to="/intangible-heritage-map" class="route-card more-routes-card">
+          <div class="more-routes-content">
+            <div class="more-icon">
+              <i class="fas fa-landmark"></i>
             </div>
-            <router-link to="/route-planning" class="btn btn-full">查看详情</router-link>
-          </div>
-        </div>
-
-        <div class="route-card">
-          <div class="route-image">
-            <img src="/source/海岸风景道.jpg" alt="海岸风景道景色" @load="imageLoaded($event)">
-          </div>
-          <div class="route-content">
-            <span class="difficulty challenging">高级</span>
-            <h3>海岸风景道</h3>
-            <p>沿海岸线蜿蜒的挑战性路线，壮观的海洋景色与身体挑战并存，极致骑行体验...</p>
-            <div class="route-stats">
-              <div class="stat-item">
-                <i class="fas fa-route"></i>
-                <h4>距离</h4>
-                <p>40 公里</p>
-              </div>
-              <div class="stat-item">
-                <i class="far fa-clock"></i>
-                <h4>时间</h4>
-                <p>5-6 小时</p>
-              </div>
-              <div class="stat-item">
-                <i class="fas fa-mountain"></i>
-                <h4>海拔</h4>
-                <p>580m</p>
-              </div>
+            <h3>探索更多路线</h3>
+            <p>发现10+非遗乡村骑行线路，从太行水镇到碛口古镇，每条路线都承载着独特的文化记忆。</p>
+            <div class="more-stats">
+              <span><strong>10</strong>个非遗乡村</span>
+              <span><strong>3</strong>条主题路线</span>
+              <span><strong>1</strong>场文化之旅</span>
             </div>
-            <router-link to="/route-planning" class="btn btn-full">查看详情</router-link>
+            <span class="btn btn-full">
+              进入非遗骑行地图 <i class="fas fa-arrow-right"></i>
+            </span>
           </div>
-        </div>
+        </router-link>
       </div>
     </section>
   </main>
+
+  <!-- 路线详情弹窗（非地图入口） -->
+  <div v-if="selectedRoute" class="modal-overlay" @click.self="selectedRoute = null">
+    <div class="modal-content route-detail-modal">
+      <div class="modal-header">
+        <img :src="selectedRoute.image" :alt="selectedRoute.name">
+        <button class="modal-close" @click="selectedRoute = null">
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="modal-header-info">
+          <span :class="['difficulty', selectedRoute.difficultyClass]">{{ selectedRoute.difficulty }}</span>
+          <h2>{{ selectedRoute.name }}</h2>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="detail-stats-bar">
+          <div class="detail-stat">
+            <i class="fas fa-route"></i>
+            <span>{{ selectedRoute.distance }}</span>
+          </div>
+          <div class="detail-stat">
+            <i class="far fa-clock"></i>
+            <span>{{ selectedRoute.time }}</span>
+          </div>
+          <div class="detail-stat">
+            <i class="fas fa-mountain"></i>
+            <span>{{ selectedRoute.elevation }}</span>
+          </div>
+          <div class="detail-stat">
+            <i class="fas fa-star"></i>
+            <span>{{ selectedRoute.rating }}</span>
+          </div>
+        </div>
+        <div class="detail-section">
+          <h4><i class="fas fa-align-left"></i> 路线简介</h4>
+          <p>{{ selectedRoute.fullDescription }}</p>
+        </div>
+        <div class="detail-section">
+          <h4><i class="fas fa-bullseye"></i> 沿途亮点</h4>
+          <ul>
+            <li v-for="(highlight, idx) in selectedRoute.highlights" :key="idx">
+              <i class="fas fa-check-circle"></i> {{ highlight }}
+            </li>
+          </ul>
+        </div>
+        <div class="detail-section">
+          <h4><i class="fas fa-lightbulb"></i> 骑行贴士</h4>
+          <p class="tips-box">{{ selectedRoute.tips }}</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" @click="selectedRoute = null">关闭</button>
+        <router-link to="/route-planning" class="btn btn-primary" @click="selectedRoute = null">
+          <i class="fas fa-location-arrow"></i> 去地图规划此路线
+        </router-link>
+      </div>
+    </div>
+  </div>
 
   <!-- 平台数据统计 -->
   <section class="stats-showcase">
@@ -247,6 +277,79 @@ import { ref } from 'vue'
 const imageLoaded = (event) => {
   event.target.parentElement.classList.add('loaded');
 };
+
+const selectedRoute = ref(null)
+
+const openRouteDetail = (route) => {
+  selectedRoute.value = route
+}
+
+const featuredRoutes = ref([
+  {
+    name: '太行水镇非遗体验线',
+    difficulty: '初级',
+    difficultyClass: 'easy',
+    tag: '非遗民俗',
+    tagIcon: 'fas fa-landmark',
+    image: '/media/2.jpg',
+    description: '串联太行水镇、恋乡古村与老磨坊，体验河北民俗文化与农耕非遗...',
+    distance: '18 公里',
+    time: '2-3 小时',
+    elevation: '80m',
+    rating: '★★★★★',
+    fullDescription: '太行水镇非遗体验线是一条融合自然风光与传统文化的热门骑行路线。从太行水镇出发，途经保存完好的恋乡古村，最终抵达传统老磨坊。全程路况平缓，沿易水河畔骑行，既能欣赏太行山水，又能深度体验河北民俗文化、传统民居建筑与农耕非遗项目。适合家庭出游和骑行初学者。',
+    highlights: ['漫步太行水镇古街，品尝地方特色美食', '参观恋乡古村石板路与石头房建筑', '亲手体验老磨坊传统石磨研磨', '沿易水河畔骑行，欣赏山水画卷'],
+    tips: '建议清晨8-9点出发，可先在水镇内享用早餐后再开始骑行。全程设有多个休息点，记得携带水壶和防晒用品。'
+  },
+  {
+    name: '碛口古镇晋商文化线',
+    difficulty: '中级',
+    difficultyClass: 'moderate',
+    tag: '晋商文化',
+    tagIcon: 'fas fa-history',
+    image: '/media/17.jpg',
+    description: '穿越碛口古镇、黑龙庙与黄土窑洞群，感受晋商文化与黄河文明...',
+    distance: '32 公里',
+    time: '4-5 小时',
+    elevation: '320m',
+    rating: '★★★★★',
+    fullDescription: '碛口古镇晋商文化线带你穿越黄河岸边的明清古镇，感受晋商文化的厚重底蕴。路线从古镇客栈群出发，途经黑龙庙戏台，穿越黄土窑洞群，一路领略黄河文明的独特魅力。路况起伏多变，部分路段为石板路，兼具挑战性与观赏性，是文化骑行的绝佳选择。',
+    highlights: ['探访明清时期晋商古客栈与商铺', '在黑龙庙戏台聆听地方戏曲', '参观依山而建的黄土窑洞群民居', '俯瞰黄河壮丽景色'],
+    tips: '古镇内多为石板路，骑行时请注意路面状况并减速慢行。建议安排充足时间，可考虑在古镇住宿一晚体验夜景。'
+  },
+  {
+    name: '易水湖环湖栈道线',
+    difficulty: '初级',
+    difficultyClass: 'easy',
+    tag: '山水风光',
+    tagIcon: 'fas fa-water',
+    image: '/media/14.jpg',
+    description: '沿湖而建的景观骑行栈道，湖光山色尽收眼底，适合休闲骑行...',
+    distance: '15 公里',
+    time: '2 小时',
+    elevation: '30m',
+    rating: '★★★★☆',
+    fullDescription: '易水湖环湖栈道线是专为骑行和步行设计的景观道路，沿湖蜿蜒而行。骑行其间，碧波荡漾的湖水与连绵的太行山交相辉映，沿途设有多个观景平台，可了解易水文化的历史典故。全程路况优良，起伏极小，是最适合新手的休闲骑行路线。',
+    highlights: ['沿湖骑行欣赏太行山水倒影', '在湖心观景台打卡拍照', '了解荆轲刺秦的易水文化典故', '途经湿地公园观察水鸟生态'],
+    tips: '栈道部分路段临水，请注意安全。建议携带防晒用品和水壶，春夏季节风景最佳。'
+  },
+  {
+    name: '黄土窑洞民居探索线',
+    difficulty: '中级',
+    difficultyClass: 'moderate',
+    tag: '民居技艺',
+    tagIcon: 'fas fa-home',
+    image: '/media/26.jpg',
+    description: '探访依山而建的窑洞村落，体验黄土高原独特的居住智慧与民俗风情...',
+    distance: '25 公里',
+    time: '3.5 小时',
+    elevation: '280m',
+    rating: '★★★★☆',
+    fullDescription: '黄土窑洞民居探索线深入黄土高原腹地，探访保存完好的窑洞村落。窑洞作为黄土高原特有的民居形式，具有冬暖夏凉的天然优势。这条路线不仅能让你了解窑洞建造这一非遗技艺，还能亲身体验窑洞住宿，感受黄土高原人民因地制宜的生存智慧。',
+    highlights: ['参观层层叠叠的窑洞群建筑', '了解窑洞开凿与建造技艺', '体验窑洞民宿的独特居住感受', '品尝黄土高原特色农家美食'],
+    tips: '部分路段有爬坡，建议提前检查车辆变速系统。窑洞住宿体验独特但设施相对简单，建议提前了解住宿条件。'
+  }
+])
 
 const statsData = ref([
   { icon: 'fa-road', number: '86', unit: '万公里', label: '累计骑行里程' },
@@ -441,12 +544,30 @@ const statsData = ref([
   transform: none;
 }
 
+.section-subtitle {
+  text-align: center;
+  color: #666;
+  font-size: 1.1rem;
+  margin-top: -35px;
+  margin-bottom: 40px;
+}
+
 /* 路线卡片 */
 .route-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: 1fr;
   gap: 40px;
   margin-top: 60px;
+}
+
+@media (min-width: 769px) {
+  .route-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .more-routes-card {
+    grid-column: 1 / -1;
+  }
 }
 
 .route-card {
@@ -608,6 +729,155 @@ const statsData = ref([
   background: linear-gradient(135deg, #F44336, #E57373);
   color: white;
   box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+}
+
+.route-header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.route-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+  color: #E65100;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.route-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 5px;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  background: linear-gradient(135deg, #FF9800, #F57C00);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #FFB74D, #FF9800);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  background: white;
+  color: #FF9800;
+  border: 2px solid #FF9800;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+  background: linear-gradient(135deg, #FF9800, #F57C00);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+}
+
+/* 探索更多卡片 */
+.more-routes-card {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #FFF8F0 0%, #FFF3E0 100%);
+  border: 2px dashed rgba(255, 152, 0, 0.3);
+  min-height: 100%;
+}
+
+.more-routes-card:hover {
+  border-color: rgba(255, 152, 0, 0.6);
+  background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+}
+
+.more-routes-content {
+  padding: 40px 30px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: center;
+}
+
+.more-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF9800, #F57C00);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+}
+
+.more-routes-content h3 {
+  font-size: 1.5rem;
+  color: #2C3E50;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.more-routes-content p {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 25px;
+  font-size: 0.95rem;
+}
+
+.more-stats {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.more-stats span {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.more-stats strong {
+  display: block;
+  font-size: 1.6rem;
+  color: #FF9800;
+  font-weight: 700;
 }
 
 /* 数据统计区域 */
@@ -938,7 +1208,6 @@ const statsData = ref([
   }
 
   .route-container {
-    grid-template-columns: 1fr;
     gap: 30px;
     margin-top: 40px;
   }
@@ -976,6 +1245,232 @@ const statsData = ref([
 
   .route-image {
     height: 200px;
+  }
+}
+
+/* 路线详情弹窗 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.route-detail-modal {
+  background: white;
+  border-radius: 20px;
+  max-width: 650px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.modal-header img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.modal-close:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: rotate(90deg);
+}
+
+.modal-header-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 25px;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: white;
+}
+
+.modal-header-info h2 {
+  margin: 8px 0 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+.modal-body {
+  padding: 25px;
+}
+
+.detail-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+  padding: 18px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.detail-stat {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-stat i {
+  font-size: 1.2rem;
+  color: #FF9800;
+}
+
+.detail-stat span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2C3E50;
+}
+
+.detail-section {
+  margin-bottom: 22px;
+}
+
+.detail-section h4 {
+  font-size: 1.05rem;
+  color: #2C3E50;
+  margin-bottom: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-section h4 i {
+  color: #FF9800;
+}
+
+.detail-section p {
+  color: #555;
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.detail-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.detail-section li {
+  padding: 8px 0;
+  color: #555;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-section li:last-child {
+  border-bottom: none;
+}
+
+.detail-section li i {
+  color: #4CAF50;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.tips-box {
+  background: #FFF8E1;
+  border-left: 4px solid #FF9800;
+  padding: 15px;
+  border-radius: 0 8px 8px 0;
+  color: #666;
+}
+
+.modal-footer {
+  padding: 0 25px 25px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-secondary {
+  padding: 12px 24px;
+  background: #e0e0e0;
+  color: #555;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #d0d0d0;
+}
+
+@media (max-width: 600px) {
+  .route-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .modal-footer {
+    flex-direction: column;
+  }
+
+  .modal-footer .btn-primary,
+  .modal-footer .btn-secondary {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
   }
 }
 
