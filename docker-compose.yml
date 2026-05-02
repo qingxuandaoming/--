@@ -14,17 +14,22 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       # 将初始化脚本挂载到 docker-entrypoint-initdb.d 目录下，容器首次启动会自动执行
-      - ./database/complete_init.sql:/docker-entrypoint-initdb.d/complete_init.sql
-      # 也可以加上 test_data.sql 如果你需要更多测试数据
-      # - ./database/test_data.sql:/docker-entrypoint-initdb.d/test_data.sql
+      - ./database/complete_init.sql:/docker-entrypoint-initdb.d/complete_init.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
+    networks:
+      - cycling_network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
   java-backend:
-    build: 
+    build:
       context: ./java-backend
       dockerfile: Dockerfile
     container_name: cycling_java_backend
@@ -39,6 +44,17 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+    networks:
+      - cycling_network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   python-backend:
     build:
@@ -56,9 +72,22 @@ services:
       - DB_PASSWORD=123456
       - DB_NAME=ljxz
       - TZ=Asia/Shanghai
+      - CHROME_BINARY_PATH=/usr/bin/google-chrome
+      - CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
     depends_on:
       mysql:
         condition: service_healthy
+    networks:
+      - cycling_network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   vue-frontend:
     build:
@@ -71,6 +100,21 @@ services:
     depends_on:
       - java-backend
       - python-backend
+    networks:
+      - cycling_network
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   mysql_data:
+
+networks:
+  cycling_network:
+    driver: bridge

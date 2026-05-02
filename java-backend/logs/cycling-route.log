@@ -474,3 +474,6 @@ org.springframework.web.servlet.resource.NoResourceFoundException: No static res
 2026-05-02 18:20:50 [http-nio-8080-exec-5] INFO  c.l.c.controller.RouteController - 获取数据库表列表
 2026-05-02 18:23:25 [http-nio-8080-exec-8] INFO  c.l.c.controller.RouteController - 获取数据库表列表
 2026-05-02 18:31:56 [http-nio-8080-exec-1] INFO  c.l.c.controller.RouteController - 获取数据库表列表
+2026-05-02 18:35:36 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-05-02 18:35:36 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-05-02 18:35:36 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

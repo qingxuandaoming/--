@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+*.egg-info/
+dist/
+build/
+*.spec
+
+# 测试和日志
+*.log
+test_*.py
+*_test.py
+pytest.ini
+.coverage
+htmlcov/
+
+# 数据库
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 其他
+.git/
+.gitignore
+README*.md
+API_USAGE_GUIDE.md
+docker-compose.yml
+Dockerfile
+.dockerignore
