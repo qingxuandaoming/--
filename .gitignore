@@ -90,10 +90,18 @@ coverage.xml
 *.cover
 .hypothesis/
 
-# 日志文件
+# 日志文件（运行时产生，不入库）
 *.log
 logs/
-crawler_test.log
+# 各服务运行时 stdout/stderr 输出（*.txt 日志）
+java_*.txt
+python_*.txt
+vite_*.txt
+*_logs.txt
+*_err.txt
+*_test_logs.txt
+*_test_err.txt
+*_direct_test.txt
 
 # SQLite 数据库
 *.db
@@ -151,9 +159,8 @@ mvnw.cmd
 /nbdist/
 /.nb-gradle/
 
-# 日志文件
-java_logs.txt
-logs/
+# 日志文件（同上，Java 侧补充）
+*.err
 
 
 # ─── 打包 / 分发产物 ─────────────────────────────────────────
@@ -192,4 +199,3 @@ test_api.ps1
 
 # 爬虫测试日志
 crawler_test.log
-java_logs.txt
