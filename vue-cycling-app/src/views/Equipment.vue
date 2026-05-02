@@ -9,14 +9,14 @@
     </section>
 
     <main class="container">
-      <!-- 骑行装备推荐 -->
+      <!-- 启星装备推荐 -->
       <section class="featured-section">
         <div class="featured-section-header">
           <div class="featured-badge">
             <i class="fas fa-crown"></i>
-            <span>骑行精选</span>
+            <span>启星精选</span>
           </div>
-          <h2>骑行装备推荐</h2>
+          <h2>启星装备推荐</h2>
           <p class="featured-subtitle">前沿科技装备，重新定义骑行体验</p>
         </div>
         
@@ -72,7 +72,7 @@
                 <i class="fas fa-glasses"></i>
               </div>
               <div class="featured-title-area">
-                <h3>骑行智能骑行眼镜</h3>
+                <h3>启星智能骑行眼镜</h3>
                 <div class="featured-tags">
                   <span class="featured-tag tag-hud">HUD显示</span>
                   <span class="featured-tag tag-lens">光致变色</span>
@@ -84,11 +84,11 @@
             
             <div class="featured-images">
               <div class="featured-img-wrapper">
-                <img src="/source/眼镜.webp" alt="骑行智能骑行眼镜-外观">
+                <img src="/source/眼镜.webp" alt="启星智能骑行眼镜-外观">
                 <div class="img-caption">全景外观</div>
               </div>
               <div class="featured-img-wrapper">
-                <img src="/source/眼镜2.webp" alt="骑行智能骑行眼镜-细节">
+                <img src="/source/眼镜2.webp" alt="启星智能骑行眼镜-细节">
                 <div class="img-caption">细节特写</div>
               </div>
             </div>
