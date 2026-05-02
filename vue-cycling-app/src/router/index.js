@@ -76,6 +76,11 @@ const router = createRouter({
       path: '/equipment',
       name: 'Equipment',
       component: () => import('../views/Equipment.vue')
+    },
+    {
+      path: '/intangible-heritage-map',
+      name: 'IntangibleHeritageMap',
+      component: () => import('../views/IntangibleHeritageMap.vue')
     }
   ]
 })

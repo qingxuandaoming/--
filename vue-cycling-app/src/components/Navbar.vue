@@ -7,6 +7,7 @@
       <nav class="nav-links">
         <router-link to="/" exact-active-class="active">首页</router-link>
         <router-link to="/route-planning" active-class="active">路线规划</router-link>
+        <router-link to="/intangible-heritage-map" active-class="active">非遗地图</router-link>
         <router-link to="/login" active-class="active">登录</router-link>
         <router-link to="/register" active-class="active">注册</router-link>
         <router-link to="/feedback" active-class="active">建议</router-link>

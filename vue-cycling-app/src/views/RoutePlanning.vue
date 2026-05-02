@@ -203,6 +203,13 @@
                 <p>40公里 · 高级</p>
               </div>
             </div>
+            <div class="mini-route-card heritage-card-link" @click="goToHeritageMap">
+              <img src="/media/2.jpg" alt="非遗骑行">
+              <div class="mini-route-info">
+                <h4><i class="fas fa-map-marked-alt"></i> 非遗骑行地图</h4>
+                <p>10个非遗乡村 · 点击查看</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -241,6 +248,13 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const goToHeritageMap = () => {
+  router.push('/intangible-heritage-map')
+}
 
 const map = ref(null)
 const startPoint = ref('')
@@ -997,6 +1011,21 @@ onUnmounted(() => {
   margin: 0;
   font-size: 0.8rem;
   color: #666;
+}
+
+.heritage-card-link {
+  cursor: pointer;
+  border: 2px solid rgba(255, 152, 0, 0.3);
+  background: linear-gradient(135deg, rgba(255, 243, 224, 0.5), rgba(255, 224, 178, 0.3));
+}
+
+.heritage-card-link:hover {
+  border-color: rgba(255, 152, 0, 0.6);
+  background: linear-gradient(135deg, rgba(255, 243, 224, 0.8), rgba(255, 224, 178, 0.5));
+}
+
+.heritage-card-link .mini-route-info h4 {
+  color: #E65100;
 }
 
 /* 用户交互区域 */

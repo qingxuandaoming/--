@@ -131,55 +131,55 @@ class ApiService {
     search: (query) => api.get(`/routes/search?q=${encodeURIComponent(query)}`)
   };
 
-  // 创建路线规划专用axios实例（需要更长超时时间）
-  static #routePlanningApi = axios.create({
-    baseURL: API_CONFIG.ROUTE_PLANNING.baseURL,
-    timeout: API_CONFIG.ROUTE_PLANNING.timeout,
-    headers: DEFAULT_HEADERS
-  });
-
   // 路线规划相关API (Java后端)
   static routePlanning = {
+    // 创建路线规划专用axios实例（需要更长超时时间）
+    _api: axios.create({
+      baseURL: API_CONFIG.ROUTE_PLANNING.baseURL,
+      timeout: API_CONFIG.ROUTE_PLANNING.timeout,
+      headers: DEFAULT_HEADERS
+    }),
+
     // 完整路线规划
-    planRoute: (routeData) => {
-      return this.#routePlanningApi.post(API_ENDPOINTS.ROUTE_PLANNING.PLAN, routeData);
+    planRoute: function(routeData) {
+      return ApiService.routePlanning._api.post(API_ENDPOINTS.ROUTE_PLANNING.PLAN, routeData);
     },
-    
+
     // 快速路线规划
-    quickPlan: (origin, destination, transportMode, city = '石家庄') => {
+    quickPlan: function(origin, destination, transportMode, city = '石家庄') {
       const params = new URLSearchParams({
         origin,
         destination,
         transportMode,
         city
       });
-      return this.#routePlanningApi.get(`${API_ENDPOINTS.ROUTE_PLANNING.QUICK_PLAN}?${params}`);
+      return ApiService.routePlanning._api.get(`${API_ENDPOINTS.ROUTE_PLANNING.QUICK_PLAN}?${params}`);
     },
-    
+
     // 地理编码（地址转坐标）
-    geocode: (address, city = '石家庄') => {
+    geocode: function(address, city = '石家庄') {
       const params = new URLSearchParams({ address, city });
       return api.get(`${API_ENDPOINTS.ROUTE_PLANNING.GEOCODE}?${params}`);
     },
-    
+
     // 逆地理编码（坐标转地址）
-    reverseGeocode: (longitude, latitude) => {
+    reverseGeocode: function(longitude, latitude) {
       const params = new URLSearchParams({ longitude, latitude });
       return api.get(`${API_ENDPOINTS.ROUTE_PLANNING.REVERSE_GEOCODE}?${params}`);
     },
-    
+
     // 获取支持的交通方式
-    getTransportModes: () => {
+    getTransportModes: function() {
       return api.get(API_ENDPOINTS.ROUTE_PLANNING.TRANSPORT_MODES);
     },
-    
+
     // 获取路线策略
-    getStrategies: () => {
+    getStrategies: function() {
       return api.get(API_ENDPOINTS.ROUTE_PLANNING.STRATEGIES);
     },
-    
+
     // 健康检查
-    healthCheck: () => {
+    healthCheck: function() {
       return api.get(API_ENDPOINTS.ROUTE_PLANNING.HEALTH);
     }
   };

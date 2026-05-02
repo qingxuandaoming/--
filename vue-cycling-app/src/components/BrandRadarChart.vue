@@ -279,7 +279,7 @@ export default {
             const avgPrice = info.avg_price || 0
             const maxPrice = info.max_price || 1
             const priceNorm = Math.min(avgPrice / maxPrice, 1)
-            const share = Math.min(info.market_share / 30, 1)  // 归一化到5
+            const share = Math.min((info.market_share || 0) / 30, 1)  // 归一化到5
             liveBrands[brandName.toLowerCase().replace(' ', '_')] = {
               quality: parseFloat((3.5 + share * 1.5).toFixed(1)),
               design: parseFloat((3.0 + priceNorm * 2.0).toFixed(1)),

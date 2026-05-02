@@ -238,7 +238,7 @@
                     :class="['fas fa-star', { 'active': i <= Math.round(equipment.rating) }]"
                   ></i>
                 </div>
-                <span class="rating-text">{{ (equipment.rating || 0).toFixed(1) }} ({{ equipment.review_count || 0 }}评价)</span>
+                <span class="rating-text">{{ (Number(equipment.rating) || 0).toFixed(1) }} ({{ Number(equipment.review_count) || 0 }}评价)</span>
               </div>
               
               <div class="equipment-description">
@@ -353,6 +353,7 @@
               <img 
                 :src="selectedEquipment.images && selectedEquipment.images.length > 0 ? selectedEquipment.images[0] : '/source/default-equipment.jpg'" 
                 :alt="selectedEquipment.name"
+                @error="handleImageError"
               >
             </div>
             
@@ -489,8 +490,8 @@ export default {
       
       const [min, max] = priceRange.value.split('-')
       return {
-        min: min ? parseFloat(min) : null,
-        max: max ? parseFloat(max) : null
+        min: min && !isNaN(parseFloat(min)) ? parseFloat(min) : null,
+        max: max && !isNaN(parseFloat(max)) ? parseFloat(max) : null
       }
     })
     
@@ -498,11 +499,12 @@ export default {
     const loadCategories = async () => {
       try {
         const response = await ApiService.equipment.getCategories()
-        if (response.success) {
-          categories.value = response.data
+        if (response && response.success) {
+          categories.value = response.data || []
         }
       } catch (error) {
         console.error('加载分类失败:', error)
+        categories.value = []
       }
     }
     
@@ -524,7 +526,7 @@ export default {
         const response = await ApiService.equipment.search(params)
         console.log('API响应完整内容:', JSON.stringify(response, null, 2))
         
-        if (response && response.success) {
+        if (response && response.success && response.data) {
           equipmentList.value = response.data.items || []
           totalItems.value = response.data.total || 0
           totalPages.value = response.data.pages || 0

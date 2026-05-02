@@ -407,3 +407,67 @@ org.springframework.web.servlet.resource.NoResourceFoundException: No static res
 2026-05-02 17:29:35 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
 2026-05-02 17:29:35 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
 2026-05-02 17:29:35 [http-nio-8080-exec-2] INFO  c.l.c.controller.RouteController - 获取数据库表列表
+2026-05-02 17:32:45 [main] INFO  c.l.cycling.CyclingRouteApplication - Starting CyclingRouteApplication using Java 17.0.15 with PID 44024 (E:\Project\灵境行者\src\系统\java-backend\target\cycling-route-backend-1.0.0.jar started by 92534 in E:\Project\灵境行者\src\系统\java-backend)
+2026-05-02 17:32:45 [main] DEBUG c.l.cycling.CyclingRouteApplication - Running with Spring Boot v3.3.0, Spring v6.1.8
+2026-05-02 17:32:45 [main] INFO  c.l.cycling.CyclingRouteApplication - No active profile set, falling back to 1 default profile: "default"
+2026-05-02 17:32:46 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-02 17:32:47 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 63 ms. Found 1 JPA repository interface.
+2026-05-02 17:32:47 [main] WARN  o.m.s.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.ljxz.cycling]' package. Please check your configuration.
+2026-05-02 17:32:48 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-05-02 17:32:48 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-02 17:32:48 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.24]
+2026-05-02 17:32:48 [main] INFO  o.a.c.c.C.[.[localhost].[/api] - Initializing Spring embedded WebApplicationContext
+2026-05-02 17:32:48 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2764 ms
+2026-05-02 17:32:48 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-02 17:32:48 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2026-05-02 17:32:49 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-05-02 17:32:49 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-02 17:32:49 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-05-02 17:32:50 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@31693a86
+2026-05-02 17:32:50 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-05-02 17:32:50 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-05-02 17:32:50 [main] WARN  org.hibernate.orm.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2026-05-02 17:32:51 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-02 17:32:51 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-02 17:32:52 [main] DEBUG c.l.c.config.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-05-02 17:32:52 [main] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-05-02 17:32:52 [main] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used for username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider.
+2026-05-02 17:32:54 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@63f16350, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@280e4390, org.springframework.security.web.context.SecurityContextHolderFilter@3f473daf, org.springframework.security.web.header.HeaderWriterFilter@642334d6, org.springframework.web.filter.CorsFilter@21262bde, org.springframework.security.web.authentication.logout.LogoutFilter@2b30b25f, com.ljxz.cycling.config.JwtAuthenticationFilter@481c1e92, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@5bb661e0, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3c4231e5, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@3df7e309, org.springframework.security.web.session.SessionManagementFilter@42a89cef, org.springframework.security.web.access.ExceptionTranslationFilter@d03cdc7, org.springframework.security.web.access.intercept.AuthorizationFilter@427128a6]
+2026-05-02 17:32:55 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/api'
+2026-05-02 17:32:55 [main] INFO  c.l.cycling.CyclingRouteApplication - Started CyclingRouteApplication in 10.318 seconds (process running for 11.224)
+2026-05-02 17:32:56 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[.[localhost].[/api] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-02 17:32:56 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-05-02 17:32:56 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-05-02 17:32:56 [http-nio-8080-exec-2] INFO  c.l.c.controller.RouteController - 获取数据库表列表
+2026-05-02 17:42:35 [main] INFO  c.l.cycling.CyclingRouteApplication - Starting CyclingRouteApplication using Java 17.0.15 with PID 45260 (E:\Project\灵境行者\src\系统\java-backend\target\cycling-route-backend-1.0.0.jar started by 92534 in E:\Project\灵境行者\src\系统\java-backend)
+2026-05-02 17:42:35 [main] DEBUG c.l.cycling.CyclingRouteApplication - Running with Spring Boot v3.3.0, Spring v6.1.8
+2026-05-02 17:42:35 [main] INFO  c.l.cycling.CyclingRouteApplication - No active profile set, falling back to 1 default profile: "default"
+2026-05-02 17:42:36 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-02 17:42:36 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 65 ms. Found 1 JPA repository interface.
+2026-05-02 17:42:36 [main] WARN  o.m.s.mapper.ClassPathMapperScanner - No MyBatis mapper was found in '[com.ljxz.cycling]' package. Please check your configuration.
+2026-05-02 17:42:37 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-05-02 17:42:37 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-05-02 17:42:37 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.24]
+2026-05-02 17:42:37 [main] INFO  o.a.c.c.C.[.[localhost].[/api] - Initializing Spring embedded WebApplicationContext
+2026-05-02 17:42:37 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2170 ms
+2026-05-02 17:42:37 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-02 17:42:37 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2026-05-02 17:42:37 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-05-02 17:42:38 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-02 17:42:38 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-05-02 17:42:38 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@370225c7
+2026-05-02 17:42:38 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-05-02 17:42:38 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-05-02 17:42:38 [main] WARN  org.hibernate.orm.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2026-05-02 17:42:39 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-02 17:42:39 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-02 17:42:39 [main] DEBUG c.l.c.config.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-05-02 17:42:39 [main] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-05-02 17:42:39 [main] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used for username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider.
+2026-05-02 17:42:40 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@1acd2a14, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@5432be12, org.springframework.security.web.context.SecurityContextHolderFilter@420068a, org.springframework.security.web.header.HeaderWriterFilter@276eafad, org.springframework.web.filter.CorsFilter@2ee5fe1e, org.springframework.security.web.authentication.logout.LogoutFilter@6888746c, com.ljxz.cycling.config.JwtAuthenticationFilter@18139a43, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@4d4337f9, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@659565ed, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2b30b25f, org.springframework.security.web.session.SessionManagementFilter@642334d6, org.springframework.security.web.access.ExceptionTranslationFilter@7afac89a, org.springframework.security.web.access.intercept.AuthorizationFilter@7d466ef9]
+2026-05-02 17:42:41 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/api'
+2026-05-02 17:42:41 [main] INFO  c.l.cycling.CyclingRouteApplication - Started CyclingRouteApplication in 7.197 seconds (process running for 8.045)
+2026-05-02 17:42:54 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[.[localhost].[/api] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-02 17:42:54 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-05-02 17:42:54 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-05-02 17:42:54 [http-nio-8080-exec-2] INFO  c.l.c.controller.RouteController - 获取数据库表列表

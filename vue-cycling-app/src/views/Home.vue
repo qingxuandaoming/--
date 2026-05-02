@@ -1,29 +1,37 @@
 <template>
+  <!-- Hero 区域 -->
   <section class="hero">
     <div class="hero-content">
-      <h2>探索城市周边最美骑行路线</h2>
-      <p>精选三条风景各异的骑行路线，带您体验不一样的城市风光，无论您是初学者还是资深骑行爱好者，都能找到适合自己的路线</p>
-      <a href="#routes" class="cta-button">查看路线</a>
+      <h1>探索城市周边最美骑行路线</h1>
+      <p>精选风景各异的骑行路线，无论初学者还是资深骑友，都能找到属于自己的风景</p>
+      <div class="hero-actions">
+        <a href="#routes" class="cta-button">探索路线</a>
+        <router-link to="/route-planning" class="cta-button-outline">
+          <i class="fas fa-route"></i> 智能规划
+        </router-link>
+      </div>
+      <div class="hero-stats-mini">
+        <span><strong>28+</strong> 精选路线</span>
+        <span><strong>12,000+</strong> 活跃骑友</span>
+        <span><strong>86,000km</strong> 累计骑行</span>
+      </div>
     </div>
   </section>
 
+  <!-- 精选骑行路线 -->
   <main class="container">
     <section id="routes">
       <h2 class="section-title">精选骑行路线</h2>
-      
+
       <div class="route-container">
-        <!-- 路线1卡片 -->
         <div class="route-card">
-          <a href="#route-detail" class="route-link">
-            <div class="route-image">
-              <img src="/source/湖滨休闲道.jpg" alt="湖滨休闲道景色" @load="imageLoaded($event)">
-            </div>
-          </a>
+          <div class="route-image">
+            <img src="/source/湖滨休闲道.jpg" alt="湖滨休闲道景色" @load="imageLoaded($event)">
+          </div>
           <div class="route-content">
             <span class="difficulty easy">初级</span>
-            <h3><a href="#route-detail" class="text-link">湖滨休闲道</a></h3>
+            <h3>湖滨休闲道</h3>
             <p>沿湖岸骑行的平缓路线，景色宜人，适合家庭和初学者的轻松骑行体验...</p>
-            
             <div class="route-stats">
               <div class="stat-item">
                 <i class="fas fa-route"></i>
@@ -41,12 +49,10 @@
                 <p>50m</p>
               </div>
             </div>
-            
-            <a href="#route-detail-beginner" class="btn btn-full">查看详情</a>
+            <router-link to="/route-planning" class="btn btn-full">查看详情</router-link>
           </div>
         </div>
-        
-        <!-- 路线2卡片 -->
+
         <div class="route-card">
           <div class="route-image">
             <img src="/source/森林山地线.jpg" alt="森林山地线景色" @load="imageLoaded($event)">
@@ -55,7 +61,6 @@
             <span class="difficulty moderate">中级</span>
             <h3>森林山地线</h3>
             <p>穿越茂密森林的山地路线，起伏多变，带来刺激的骑行体验和清新的森林空气...</p>
-            
             <div class="route-stats">
               <div class="stat-item">
                 <i class="fas fa-route"></i>
@@ -73,23 +78,18 @@
                 <p>320m</p>
               </div>
             </div>
-            
-            <a href="#route-detail-intermediate" class="btn btn-full">查看详情</a>
+            <router-link to="/route-planning" class="btn btn-full">查看详情</router-link>
           </div>
         </div>
-        
-        <!-- 路线3卡片 -->
+
         <div class="route-card">
-          <a href="shiquwenhua.html" class="route-link">
-            <div class="route-image">
-              <img src="/source/市区文化线.jpg" alt="市区文化线景色" @load="imageLoaded($event)">
-            </div>
-          </a>
+          <div class="route-image">
+            <img src="/source/海岸风景道.jpg" alt="海岸风景道景色" @load="imageLoaded($event)">
+          </div>
           <div class="route-content">
             <span class="difficulty challenging">高级</span>
             <h3>海岸风景道</h3>
             <p>沿海岸线蜿蜒的挑战性路线，壮观的海洋景色与身体挑战并存，极致骑行体验...</p>
-            
             <div class="route-stats">
               <div class="stat-item">
                 <i class="fas fa-route"></i>
@@ -107,1172 +107,159 @@
                 <p>580m</p>
               </div>
             </div>
-            
-            <a href="#route-detail-advanced" class="btn btn-full">查看详情</a>
+            <router-link to="/route-planning" class="btn btn-full">查看详情</router-link>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- 路线详情页 - 初级路线 -->
-  <main id="route-detail-beginner" class="route-detail-container container">
-    <section class="map-section">
-      <!-- 优化后的地图容器 - 支持高德地图API -->
-      <div id="container" class="map-container">
-        <!-- 地图将通过高德地图API加载 -->
-        <!-- 需接入高德地图API -->
-      </div>
-      
-      <!-- 地图控制面板 - 支持起点终点选择 -->
-      <div class="map-controls">
-        <h3><i class="fas fa-map-marked-alt"></i> 路线规划</h3>
-        
-        <div class="control-group">
-          <label for="startPoint"><i class="fas fa-play"></i> 起点</label>
-          <input type="text" id="startPoint" placeholder="输入或点击地图选择起点">
-        </div>
-        
-        <div class="control-group">
-          <label for="endPoint"><i class="fas fa-flag-checkered"></i> 终点</label>
-          <input type="text" id="endPoint" placeholder="输入或点击地图选择终点">
-        </div>
-        
-        <button class="btn btn-full" id="calculateRoute">
-          <i class="fas fa-route"></i> 规划路线
-        </button>
-      </div>
-    </section>
-    
-    <section class="route-info-section">
-      <div class="info-main">
-        <div class="route-header">
-          <div class="header-top">
-            <span class="difficulty easy">初级</span>
-            <h1>湖滨休闲道</h1>
-          </div>
-          
-          <div class="route-stats">
-            <div class="stat-item">
-              <i class="fas fa-route"></i>
-              <h4>距离</h4>
-              <p>12 公里</p>
-            </div>
-            <div class="stat-item">
-              <i class="far fa-clock"></i>
-              <h4>时间</h4>
-              <p>1-2 小时</p>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-mountain"></i>
-              <h4>海拔</h4>
-              <p>50m</p>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-road"></i>
-              <h4>路面</h4>
-              <p>柏油路</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="route-description">
-          <!-- 文字内容来源: {{CONTENT_SOURCES}} -->
-          <p>湖滨休闲道是一条理想的休闲骑行路线，沿途风景秀丽，道路平坦。无论是晨练还是周末出游，这条路线都能带给您轻松愉快的骑行体验。全程沿湖岸线设计，可欣赏湖光山色，适合各年龄段的骑行爱好者。</p>
-        </div>
-        
-        <!-- 折叠面板 - 路线概览 -->
-        <div class="collapsible-panel">
-          <div class="panel-header">
-            <h3><i class="fas fa-info-circle"></i> 路线概览</h3>
-            <span>+</span>
-            <!-- 折叠面板需添加JS交互 -->
-          </div>
-          <div class="panel-content">
-            <!-- 文字内容来源: {{CONTENT_SOURCES}} -->
-            <p>湖滨休闲道全长约12公里，是一条环湖骑行路线。起点位于东湖公园主入口，终点回到起始位置，形成一个完整的环线。</p>
-            
-            <ul>
-              <li><strong>起点:</strong> 东湖公园主入口</li>
-              <li><strong>途经:</strong> 湖心岛、观景平台、湿地公园、休闲广场</li>
-              <li><strong>终点:</strong> 东湖公园主入口</li>
-              <li><strong>推荐骑行方向:</strong> 顺时针</li>
-            </ul>
-          </div>
-        </div>
-        
-        <!-- 折叠面板 - 海拔剖面 -->
-        <div class="collapsible-panel">
-          <div class="panel-header">
-            <h3><i class="fas fa-chart-area"></i> 海拔剖面</h3>
-            <span>+</span>
-            <!-- 折叠面板需添加JS交互 -->
-          </div>
-          <div class="panel-content">
-            <div class="elevation-profile">
-              <!-- 需接入图表API或使用SVG绘制海拔剖面图 -->
-              <!-- 数据来源: {{CONTENT_SOURCES}} -->
-              海拔剖面图将在此显示
-            </div>
-            <!-- 文字内容来源: {{CONTENT_SOURCES}} -->
-            <p>这条路线的海拔变化较小，总爬升仅有50米，坡度平缓，很少有明显的上坡路段，非常适合初学者和休闲骑行。</p>
-            <ul>
-              <li>最低点: 湖边栈道(5m)</li>
-              <li>最高点: 观景台(55m)</li>
-              <li>平均坡度: 1%</li>
-            </ul>
-          </div>
-        </div>
-        
-        <!-- 折叠面板 - 路况详情 -->
-        <div class="collapsible-panel">
-          <div class="panel-header">
-            <h3><i class="fas fa-road"></i> 路况详情</h3>
-            <span>+</span>
-            <!-- 折叠面板需添加JS交互 -->
-          </div>
-          <div class="panel-content">
-            <!-- 文字内容来源: {{CONTENT_SOURCES}} -->
-            <p>整体路况良好，以柏油路面为主，少部分路段为平整的砂石路，全程设有专门的自行车道。</p>
-            <ul>
-              <li><strong>第1-5公里:</strong> 平坦柏油路，自行车专用道宽敞，与步行道分离</li>
-              <li><strong>第6-8公里:</strong> 湿地公园区域，砂石路面，路况平整，骑行体验良好</li>
-              <li><strong>第9-12公里:</strong> 柏油路面，有部分小型缓坡，视野开阔</li>
-            </ul>
-            <p><strong>注意事项:</strong> 周末人流量较大，请注意避让行人，尤其是在靠近休闲广场区域。</p>
-          </div>
-        </div>
-        
-        <!-- 折叠面板 - 骑行小贴士 -->
-        <div class="collapsible-panel">
-          <div class="panel-header">
-            <h3><i class="fas fa-lightbulb"></i> 骑行小贴士</h3>
-            <span>+</span>
-            <!-- 折叠面板需添加JS交互 -->
-          </div>
-          <div class="panel-content">
-            <!-- 文字内容来源: {{CONTENT_SOURCES}} -->
-            <p>为了让您的骑行更加愉快，我们提供以下建议：</p>
-            <ul>
-              <li><strong>最佳骑行季节:</strong> 春季(4-5月)和秋季(9-10月)，气温适宜，景色最佳</li>
-              <li><strong>最佳骑行时段:</strong> 清晨6-9点或傍晚4-6点，避开烈日和人流高峰</li>
-              <li><strong>建议携带:</strong> 水壶、防晒霜、帽子、轻便维修工具、充电宝</li>
-              <li><strong>休息点:</strong> 沿途设有多个休息亭和观景台，可适时停留</li>
-              <li><strong>拍照推荐:</strong> 湖心岛观景台、日落时的湖面倒影、湿地公园的鸟类</li>
-            </ul>
-          </div>
+  <!-- 平台数据统计 -->
+  <section class="stats-showcase">
+    <div class="container">
+      <h2 class="section-title">骑行者社区的数据</h2>
+      <div class="stats-grid">
+        <div class="stat-card" v-for="(item, index) in statsData" :key="index">
+          <div class="stat-icon"><i :class="'fas ' + item.icon"></i></div>
+          <div class="stat-number">{{ item.number }}</div>
+          <div class="stat-unit">{{ item.unit }}</div>
+          <div class="stat-label">{{ item.label }}</div>
         </div>
       </div>
-      
-      <div class="info-sidebar">
-        <!-- 周边设施板块 -->
-        <div class="sidebar-section">
-          <h3><i class="fas fa-utensils"></i> 周边设施</h3>
-          
-          <div class="facilities-cards">
-            <!-- 餐饮设施 -->
-            <a href="#resource-detail" class="resource-link">
-              <div class="facility-card">
-                <div class="facility-icon">
-                  <i class="fas fa-coffee"></i>
-                </div>
-                <div class="facility-content">
-                  <h4>湖畔咖啡厅</h4>
-                  <!-- 文字内容来源: {{CONTENT_SOURCES}} -->
-                  <p>位于路线5公里处，提供轻食和饮料</p>
-                </div>
-              </div>
-            </a>
-            
-            <!-- 维修点 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-tools"></i>
-              </div>
-              <div class="facility-content">
-                <h4>单车维修站</h4>
-                <!-- 文字内容来源: {{CONTENT_SOURCES}} -->
-                <p>位于起点和8公里处，提供基础维修工具</p>
-              </div>
-            </div>
-            
-            <!-- 厕所 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-restroom"></i>
-              </div>
-              <div class="facility-content">
-                <h4>公共厕所</h4>
-                <!-- 文字内容来源: {{CONTENT_SOURCES}} -->
-                <p>沿途设有4处，均有洗手设施</p>
-              </div>
-            </div>
-            
-            <!-- 停车场 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-parking"></i>
-              </div>
-              <div class="facility-content">
-                <h4>停车场</h4>
-                <!-- 文字内容来源: {{CONTENT_SOURCES}} -->
-                <p>起点附近有大型免费停车场</p>
-              </div>
-            </div>
-            
-            <!-- 饮水点 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-tint"></i>
-              </div>
-              <div class="facility-content">
-                <h4>饮水点</h4>
-                <!-- 文字内容来源: {{CONTENT_SOURCES}} -->
-                <p>3处直饮水站，可填充水壶</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 天气信息 -->
-        <div class="sidebar-section">
-          <h3><i class="fas fa-cloud-sun"></i> 今日天气</h3>
-          <!-- 需对接天气API -->
-          <p>晴朗，22°C-28°C，东北风1-2级</p>
-          <p>空气质量: 优 (AQI: 45)</p>
-          <p>骑行指数: <strong style="color: #2ecc71;">非常适宜</strong></p>
-        </div>
-      </div>
-    </section>
-    
-    <section class="gallery-section">
-      <h2><i class="fas fa-image"></i> 沿途景点</h2>
-      
-      <div class="gallery-container">
-        <!-- 景点图片1 -->
-        <div class="gallery-item">
-          <!-- 图片来源: {{CONTENT_SOURCES}} -->
-          <!-- 占位符尺寸: 1440×800px -->
-          <img src="/source/湖滨休闲道.jpg" alt="湖心岛景色">
-          <div class="gallery-caption">湖心岛 - 路线2公里处</div>
-        </div>
-        
-        <!-- 景点图片2 -->
-        <div class="gallery-item">
-          <!-- 图片来源: {{CONTENT_SOURCES}} -->
-          <!-- 占位符尺寸: 1440×800px -->
-          <img src="/source/湖滨休闲道.jpg" alt="观景台">
-          <div class="gallery-caption">观景台 - 路线4.5公里处</div>
-        </div>
-        
-        <!-- 景点图片3 -->
-        <div class="gallery-item">
-          <!-- 图片来源: {{CONTENT_SOURCES}} -->
-          <!-- 占位符尺寸: 1440×800px -->
-          <img src="/source/森林山地线.jpg" alt="湿地公园">
-          <div class="gallery-caption">湿地公园 - 路线7公里处</div>
-        </div>
-        
-        <!-- 景点图片4 -->
-        <div class="gallery-item">
-          <!-- 图片来源: {{CONTENT_SOURCES}} -->
-          <!-- 占位符尺寸: 1440×800px -->
-          <img src="/source/海岸风景道.jpg" alt="季节性花海">
-          <div class="gallery-caption">季节性花海 - 路线9公里处</div>
-        </div>
-        
-        <!-- 景点图片5 -->
-        <div class="gallery-item">
-          <!-- 图片来源: {{CONTENT_SOURCES}} -->
-          <!-- 占位符尺寸: 1440×800px -->
-          <img src="/source/湖滨休闲道.jpg" alt="日落湖景">
-          <div class="gallery-caption">日落湖景 - 路线11公里处</div>
-        </div>
-      </div>
-    </section>
-    
-    <!-- 用户交互区域 -->
-    <section class="user-actions">
-      <div class="action-card">
-        <h3><i class="fas fa-star"></i> 路线评价</h3>
-        <div class="rating-stars">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="far fa-star"></i>
-        </div>
-        <p>基于126位骑行者的评价</p>
-        <button class="btn">写评价</button>
-      </div>
-      
-      <div class="action-card">
-        <h3><i class="fas fa-share-alt"></i> 分享路线</h3>
-        <p>与好友分享这条美丽路线</p>
-        <div class="share-buttons">
-          <a href="#" class="share-btn wechat"><i class="fab fa-weixin"></i></a>
-          <a href="#" class="share-btn weibo"><i class="fab fa-weibo"></i></a>
-          <a href="#" class="share-btn qq"><i class="fab fa-qq"></i></a>
-        </div>
-      </div>
-      
-      <div class="action-card" @click="goToEquipment">
-        <h3><i class="fas fa-bicycle"></i> 装备推荐</h3>
-        <p>为您推荐适合的骑行装备</p>
-        <div class="equipment-preview">
-          <div class="equipment-item">
-            <i class="fas fa-helmet-safety"></i>
-            <span>头盔</span>
-          </div>
-          <div class="equipment-item">
-            <i class="fas fa-tshirt"></i>
-            <span>骑行服</span>
-          </div>
-          <div class="equipment-item">
-            <i class="fas fa-tools"></i>
-            <span>工具</span>
-          </div>
-        </div>
-        <button class="btn">查看更多</button>
-      </div>
-    </section>
-   </main>
+    </div>
+  </section>
 
-  <!-- 中级路线详情页 - 森林山地线 -->
-  <main id="route-detail-intermediate" class="route-detail-container container">
-    
-    <section class="route-info-section">
-      <div class="info-main">
-        <div class="route-header">
-          <div class="header-top">
-            <span class="difficulty moderate">中级</span>
-            <h1>森林山地线</h1>
-          </div>
-          
-          <div class="route-stats">
-            <div class="stat-item">
-              <i class="fas fa-route"></i>
-              <h4>距离</h4>
-              <p>25 公里</p>
-            </div>
-            <div class="stat-item">
-              <i class="far fa-clock"></i>
-              <h4>时间</h4>
-              <p>3-4 小时</p>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-mountain"></i>
-              <h4>海拔</h4>
-              <p>320m</p>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-road"></i>
-              <h4>路面</h4>
-              <p>山地路</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="route-description">
-          <p>森林山地线是一条充满挑战性的中级骑行路线，穿越茂密的森林和起伏的山地。这条路线为骑行爱好者提供了绝佳的自然体验，沿途可以欣赏到原始森林的美景，呼吸清新的空气，感受大自然的魅力。</p>
-        </div>
-        
-        <!-- 折叠面板 - 路线概览 -->
-        <div class="collapsible-panel">
-          <div class="panel-header">
-            <h3><i class="fas fa-info-circle"></i> 路线概览</h3>
-            <span>+</span>
-          </div>
-          <div class="panel-content">
-            <p>森林山地线全长约25公里，是一条点对点的山地骑行路线。起点位于森林公园入口，终点为山顶观景台，海拔爬升320米。</p>
-            
-            <ul>
-              <li><strong>起点:</strong> 森林公园入口</li>
-              <li><strong>途经:</strong> 竹林小径、瀑布观景点、山腰休息站、古树群</li>
-              <li><strong>终点:</strong> 山顶观景台</li>
-              <li><strong>推荐骑行方向:</strong> 由低到高</li>
-            </ul>
-          </div>
-        </div>
-        
-        <!-- 折叠面板 - 海拔剖面 -->
-        <div class="collapsible-panel">
-          <div class="panel-header">
-            <h3><i class="fas fa-chart-area"></i> 海拔剖面</h3>
-            <span>+</span>
-          </div>
-          <div class="panel-content">
-            <div class="elevation-profile">
-              海拔剖面图将在此显示
-            </div>
-            <p>这条路线具有明显的爬升特征，总爬升320米，平均坡度约5%，部分路段坡度可达12%，对体力和技术都有一定要求。</p>
-            <ul>
-              <li>最低点: 森林公园入口(180m)</li>
-              <li>最高点: 山顶观景台(500m)</li>
-              <li>平均坡度: 5%</li>
-              <li>最大坡度: 12%</li>
-            </ul>
-          </div>
-        </div>
-        
-        <!-- 折叠面板 - 路况详情 -->
-        <div class="collapsible-panel">
-          <div class="panel-header">
-            <h3><i class="fas fa-road"></i> 路况详情</h3>
-            <span>+</span>
-          </div>
-          <div class="panel-content">
-            <p>路面以碎石路和土路为主，部分路段为石阶，需要具备一定的山地骑行技能和合适的装备。</p>
-            <ul>
-              <li><strong>第1-8公里:</strong> 碎石路面，坡度较缓，适合热身</li>
-              <li><strong>第9-18公里:</strong> 土路和石阶混合，坡度较陡，技术要求较高</li>
-              <li><strong>第19-25公里:</strong> 山地小径，路况复杂，需要推车部分路段</li>
-            </ul>
-            <p><strong>注意事项:</strong> 雨后路面湿滑，建议避免骑行。携带头盔、护具和维修工具。</p>
-          </div>
-        </div>
-        
-        <!-- 折叠面板 - 骑行小贴士 -->
-        <div class="collapsible-panel">
-          <div class="panel-header">
-            <h3><i class="fas fa-lightbulb"></i> 骑行小贴士</h3>
-            <span>+</span>
-          </div>
-          <div class="panel-content">
-            <p>森林山地线对骑行者的体力和技术都有较高要求，请做好充分准备：</p>
-            <ul>
-              <li><strong>最佳骑行季节:</strong> 春季(3-5月)和秋季(9-11月)，避开雨季</li>
-              <li><strong>最佳骑行时段:</strong> 上午8-11点，下午气温过高不适宜</li>
-              <li><strong>必备装备:</strong> 山地车、头盔、护膝、手套、维修工具包</li>
-              <li><strong>补给建议:</strong> 充足的水和高能量食物，建议携带2-3升水</li>
-              <li><strong>安全提醒:</strong> 结伴骑行，告知家人行程，携带通讯设备</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      
-      <div class="info-sidebar">
-        <!-- 周边设施板块 -->
-        <div class="sidebar-section">
-          <h3><i class="fas fa-utensils"></i> 周边设施</h3>
-          
-          <div class="facilities-cards">
-            <!-- 餐饮设施 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-coffee"></i>
-              </div>
-              <div class="facility-content">
-                <h4>山腰茶屋</h4>
-                <p>位于路线15公里处，提供热饮和简餐</p>
-              </div>
-            </div>
-            
-            <!-- 维修点 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-tools"></i>
-              </div>
-              <div class="facility-content">
-                <h4>森林维修站</h4>
-                <p>位于起点，提供专业山地车维修服务</p>
-              </div>
-            </div>
-            
-            <!-- 厕所 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-restroom"></i>
-              </div>
-              <div class="facility-content">
-                <h4>公共厕所</h4>
-                <p>起点和山腰休息站各有1处</p>
-              </div>
-            </div>
-            
-            <!-- 停车场 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-parking"></i>
-              </div>
-              <div class="facility-content">
-                <h4>停车场</h4>
-                <p>森林公园入口有收费停车场</p>
-              </div>
-            </div>
-            
-            <!-- 急救站 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-first-aid"></i>
-              </div>
-              <div class="facility-content">
-                <h4>急救站</h4>
-                <p>山腰休息站设有医疗急救点</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 天气信息 -->
-        <div class="sidebar-section">
-          <h3><i class="fas fa-cloud-sun"></i> 今日天气</h3>
-          <p>多云，18°C-25°C，西南风2-3级</p>
-          <p>空气质量: 良 (AQI: 68)</p>
-          <p>骑行指数: <strong style="color: #f39c12;">适宜</strong></p>
-        </div>
-      </div>
-    </section>
-    
-    <section class="gallery-section">
-      <h2><i class="fas fa-image"></i> 沿途景点</h2>
-      
-      <div class="gallery-container">
-        <!-- 景点图片1 -->
-        <div class="gallery-item">
-          <img src="/source/森林山地线.jpg" alt="竹林小径">
-          <div class="gallery-caption">竹林小径 - 路线5公里处</div>
-        </div>
-        
-        <!-- 景点图片2 -->
-        <div class="gallery-item">
-          <img src="/source/森林山地线.jpg" alt="瀑布观景点">
-          <div class="gallery-caption">瀑布观景点 - 路线12公里处</div>
-        </div>
-        
-        <!-- 景点图片3 -->
-        <div class="gallery-item">
-          <img src="/source/森林山地线.jpg" alt="古树群">
-          <div class="gallery-caption">千年古树群 - 路线18公里处</div>
-        </div>
-        
-        <!-- 景点图片4 -->
-        <div class="gallery-item">
-          <img src="/source/森林山地线.jpg" alt="山顶观景台">
-          <div class="gallery-caption">山顶观景台 - 路线终点</div>
-        </div>
-      </div>
-    </section>
-    
-    <!-- 用户交互区域 -->
-    <section class="user-actions">
-      <div class="action-card">
-        <h3><i class="fas fa-star"></i> 路线评价</h3>
-        <div class="rating-stars">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-        </div>
-        <p>基于89位骑行者的评价</p>
-        <button class="btn">写评价</button>
-      </div>
-      
-      <div class="action-card">
-        <h3><i class="fas fa-share-alt"></i> 分享路线</h3>
-        <p>与好友分享这条挑战路线</p>
-        <div class="share-buttons">
-          <a href="#" class="share-btn wechat"><i class="fab fa-weixin"></i></a>
-          <a href="#" class="share-btn weibo"><i class="fab fa-weibo"></i></a>
-          <a href="#" class="share-btn qq"><i class="fab fa-qq"></i></a>
-        </div>
-      </div>
-    </section>
-   </main>
+  <!-- 特色功能探索 -->
+  <section class="features-explore">
+    <div class="container">
+      <h2 class="section-title">特色功能探索</h2>
+      <p class="section-subtitle">不止于路线，我们为你提供全方位的骑行体验</p>
 
-  <!-- 高级路线详情页 - 海岸风景道 -->
-  <main id="route-detail-advanced" class="route-detail-container container">
-    
-    <section class="route-info-section">
-      <div class="info-main">
-        <div class="route-header">
-          <div class="header-top">
-            <span class="difficulty challenging">高级</span>
-            <h1>海岸风景道</h1>
+      <div class="features-grid">
+        <router-link to="/intangible-heritage-map" class="feature-card">
+          <div class="feature-icon heritage">
+            <i class="fas fa-landmark"></i>
           </div>
-          
-          <div class="route-stats">
-            <div class="stat-item">
-              <i class="fas fa-route"></i>
-              <h4>距离</h4>
-              <p>40 公里</p>
-            </div>
-            <div class="stat-item">
-              <i class="far fa-clock"></i>
-              <h4>时间</h4>
-              <p>5-6 小时</p>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-mountain"></i>
-              <h4>海拔</h4>
-              <p>580m</p>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-road"></i>
-              <h4>路面</h4>
-              <p>混合路面</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="route-description">
-          <p>海岸风景道是最具挑战性的高级骑行路线，沿着壮丽的海岸线蜿蜒前行。这条路线结合了海景、山景和技术挑战，为经验丰富的骑行者提供了终极的骑行体验。沿途可以欣赏到无敌海景、悬崖峭壁和原始海岸风光。</p>
-        </div>
-        
-        <!-- 折叠面板 - 路线概览 -->
-        <div class="collapsible-panel">
-          <div class="panel-header">
-            <h3><i class="fas fa-info-circle"></i> 路线概览</h3>
-            <span>+</span>
-          </div>
-          <div class="panel-content">
-            <p>海岸风景道全长约40公里，是一条环形的高难度骑行路线。起点位于海滨大道，沿海岸线向北，经过多个观景点后返回起点。</p>
-            
-            <ul>
-              <li><strong>起点:</strong> 海滨大道游客中心</li>
-              <li><strong>途经:</strong> 灯塔观景台、悬崖栈道、海蚀洞、渔村古镇</li>
-              <li><strong>终点:</strong> 海滨大道游客中心</li>
-              <li><strong>推荐骑行方向:</strong> 顺时针</li>
-            </ul>
-          </div>
-        </div>
-        
-        <!-- 折叠面板 - 海拔剖面 -->
-        <div class="collapsible-panel">
-          <div class="panel-header">
-            <h3><i class="fas fa-chart-area"></i> 海拔剖面</h3>
-            <span>+</span>
-          </div>
-          <div class="panel-content">
-            <div class="elevation-profile">
-              海拔剖面图将在此显示
-            </div>
-            <p>这条路线海拔变化剧烈，总爬升580米，包含多个陡峭的爬坡和下坡路段，对骑行技术和体力都是极大考验。</p>
-            <ul>
-              <li>最低点: 海平面(0m)</li>
-              <li>最高点: 悬崖观景台(580m)</li>
-              <li>平均坡度: 8%</li>
-              <li>最大坡度: 18%</li>
-            </ul>
-          </div>
-        </div>
-        
-        <!-- 折叠面板 - 路况详情 -->
-        <div class="collapsible-panel">
-          <div class="panel-header">
-            <h3><i class="fas fa-road"></i> 路况详情</h3>
-            <span>+</span>
-          </div>
-          <div class="panel-content">
-            <p>路面条件复杂多变，包含柏油路、碎石路、沙滩路段等，部分路段路况较差，需要高超的骑行技术。</p>
-            <ul>
-              <li><strong>第1-12公里:</strong> 海滨柏油路，路况良好，但有强烈海风</li>
-              <li><strong>第13-28公里:</strong> 山地碎石路，坡度陡峭，技术要求极高</li>
-              <li><strong>第29-40公里:</strong> 混合路面，包含沙滩和栈道，需要适应性强</li>
-            </ul>
-            <p><strong>注意事项:</strong> 海风强劲，注意防风。潮汐时间影响部分路段通行。必须携带专业装备和通讯设备。</p>
-          </div>
-        </div>
-        
-        <!-- 折叠面板 - 骑行小贴士 -->
-        <div class="collapsible-panel">
-          <div class="panel-header">
-            <h3><i class="fas fa-lightbulb"></i> 骑行小贴士</h3>
-            <span>+</span>
-          </div>
-          <div class="panel-content">
-            <p>海岸风景道是极具挑战性的路线，仅适合经验丰富的高级骑行者：</p>
-            <ul>
-              <li><strong>最佳骑行季节:</strong> 夏季(6-8月)和初秋(9月)，避开台风季节</li>
-              <li><strong>最佳骑行时段:</strong> 清晨5-8点，避开强烈海风和高温</li>
-              <li><strong>专业装备:</strong> 公路车或山地车、专业头盔、防风衣、GPS设备</li>
-              <li><strong>安全要求:</strong> 必须结伴骑行，携带急救包和通讯设备</li>
-              <li><strong>体能要求:</strong> 建议有2年以上骑行经验，完成过中级路线</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      
-      <div class="info-sidebar">
-        <!-- 周边设施板块 -->
-        <div class="sidebar-section">
-          <h3><i class="fas fa-utensils"></i> 周边设施</h3>
-          
-          <div class="facilities-cards">
-            <!-- 餐饮设施 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-coffee"></i>
-              </div>
-              <div class="facility-content">
-                <h4>海景餐厅</h4>
-                <p>位于路线20公里处，提供海鲜和补给</p>
-              </div>
-            </div>
-            
-            <!-- 维修点 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-tools"></i>
-              </div>
-              <div class="facility-content">
-                <h4>专业维修站</h4>
-                <p>起点设有专业自行车维修中心</p>
-              </div>
-            </div>
-            
-            <!-- 厕所 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-restroom"></i>
-              </div>
-              <div class="facility-content">
-                <h4>公共厕所</h4>
-                <p>沿途3处，主要集中在观景点</p>
-              </div>
-            </div>
-            
-            <!-- 停车场 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-parking"></i>
-              </div>
-              <div class="facility-content">
-                <h4>停车场</h4>
-                <p>游客中心有大型停车场</p>
-              </div>
-            </div>
-            
-            <!-- 救援站 -->
-            <div class="facility-card">
-              <div class="facility-icon">
-                <i class="fas fa-ambulance"></i>
-              </div>
-              <div class="facility-content">
-                <h4>海上救援站</h4>
-                <p>24小时海上救援服务</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 天气信息 -->
-        <div class="sidebar-section">
-          <h3><i class="fas fa-cloud-sun"></i> 今日天气</h3>
-          <p>晴朗，20°C-26°C，东南风4-5级</p>
-          <p>空气质量: 优 (AQI: 35)</p>
-          <p>骑行指数: <strong style="color: #e74c3c;">谨慎骑行</strong></p>
-          <p style="color: #e74c3c;">⚠️ 海风较强，注意安全</p>
-        </div>
-      </div>
-    </section>
-    
-    <section class="gallery-section">
-      <h2><i class="fas fa-image"></i> 沿途景点</h2>
-      
-      <div class="gallery-container">
-        <!-- 景点图片1 -->
-        <div class="gallery-item">
-          <img src="/source/海岸风景道.jpg" alt="灯塔观景台">
-          <div class="gallery-caption">灯塔观景台 - 路线8公里处</div>
-        </div>
-        
-        <!-- 景点图片2 -->
-        <div class="gallery-item">
-          <img src="/source/海岸风景道.jpg" alt="悬崖栈道">
-          <div class="gallery-caption">悬崖栈道 - 路线15公里处</div>
-        </div>
-        
-        <!-- 景点图片3 -->
-        <div class="gallery-item">
-          <img src="/source/海岸风景道.jpg" alt="海蚀洞">
-          <div class="gallery-caption">神秘海蚀洞 - 路线25公里处</div>
-        </div>
-        
-        <!-- 景点图片4 -->
-        <div class="gallery-item">
-          <img src="/source/海岸风景道.jpg" alt="渔村古镇">
-          <div class="gallery-caption">渔村古镇 - 路线32公里处</div>
-        </div>
-        
-        <!-- 景点图片5 -->
-        <div class="gallery-item">
-          <img src="/source/海岸风景道.jpg" alt="日出海景">
-          <div class="gallery-caption">日出海景 - 路线终点</div>
-        </div>
-      </div>
-    </section>
-    
-    <!-- 用户交互区域 -->
-    <section class="user-actions">
-      <div class="action-card">
-        <h3><i class="fas fa-star"></i> 路线评价</h3>
-        <div class="rating-stars">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-        </div>
-        <p>基于45位专业骑行者的评价</p>
-        <button class="btn">写评价</button>
-      </div>
-      
-      <div class="action-card">
-        <h3><i class="fas fa-share-alt"></i> 分享路线</h3>
-        <p>与专业骑友分享这条极限路线</p>
-        <div class="share-buttons">
-          <a href="#" class="share-btn wechat"><i class="fab fa-weixin"></i></a>
-          <a href="#" class="share-btn weibo"><i class="fab fa-weibo"></i></a>
-          <a href="#" class="share-btn qq"><i class="fab fa-qq"></i></a>
-        </div>
-      </div>
-    </section>
-   </main>
+          <h3>非遗骑行地图</h3>
+          <p>穿越千年文脉，用车轮丈量非遗之美。精选10个非遗乡村骑行线路。</p>
+          <span class="feature-link">探索非遗路线 <i class="fas fa-arrow-right"></i></span>
+        </router-link>
 
+        <router-link to="/vr" class="feature-card">
+          <div class="feature-icon vr">
+            <i class="fas fa-vr-cardboard"></i>
+          </div>
+          <h3>VR灵境</h3>
+          <p>足不出户，身临其境。360°沉浸式预览沿途风景，提前规划你的骑行。</p>
+          <span class="feature-link">进入VR体验 <i class="fas fa-arrow-right"></i></span>
+        </router-link>
 
+        <router-link to="/equipment" class="feature-card">
+          <div class="feature-icon equipment">
+            <i class="fas fa-bicycle"></i>
+          </div>
+          <h3>装备推荐</h3>
+          <p>基于大数据分析的骑行装备选购指南，从入门到专业，一站配齐。</p>
+          <span class="feature-link">查看装备 <i class="fas fa-arrow-right"></i></span>
+        </router-link>
+
+        <router-link to="/route-planning" class="feature-card">
+          <div class="feature-icon planning">
+            <i class="fas fa-route"></i>
+          </div>
+          <h3>智能路线规划</h3>
+          <p>基于高德地图API，输入起点终点，自动生成最优骑行路线。</p>
+          <span class="feature-link">开始规划 <i class="fas fa-arrow-right"></i></span>
+        </router-link>
+      </div>
+    </div>
+  </section>
+
+  <!-- 为什么选择我们 -->
+  <section class="why-choose-us">
+    <div class="container">
+      <div class="value-content">
+        <div class="value-text">
+          <h2 class="section-title left">为什么选择我们</h2>
+          <p class="value-desc">我们不仅提供路线，更致力于打造完整的骑行生态系统</p>
+
+          <div class="value-list">
+            <div class="value-item">
+              <div class="value-icon"><i class="fas fa-check-circle"></i></div>
+              <div>
+                <h4>精选实测路线</h4>
+                <p>每条路线均经过实地骑行验证，附详细路况、海拔、设施信息</p>
+              </div>
+            </div>
+            <div class="value-item">
+              <div class="value-icon"><i class="fas fa-check-circle"></i></div>
+              <div>
+                <h4>智能路线规划</h4>
+                <p>接入高德地图API，支持任意两点间的骑行路线规划与导航</p>
+              </div>
+            </div>
+            <div class="value-item">
+              <div class="value-icon"><i class="fas fa-check-circle"></i></div>
+              <div>
+                <h4>文化+骑行融合</h4>
+                <p>独创非遗骑行地图，让骑行不仅是运动，更是一场文化之旅</p>
+              </div>
+            </div>
+            <div class="value-item">
+              <div class="value-icon"><i class="fas fa-check-circle"></i></div>
+              <div>
+                <h4>装备数据支持</h4>
+                <p>基于后端数据分析的装备推荐与价格趋势，让选购更明智</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="value-visual">
+          <img src="/source/森林山地线.jpg" alt="骑行体验">
+          <div class="value-badge">
+            <i class="fas fa-award"></i>
+            <span>最佳骑行平台</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 底部 CTA -->
+  <section class="bottom-cta">
+    <div class="container">
+      <h2>准备好出发了吗？</h2>
+      <p>加入我们的骑行社区，发现更多精彩路线与志同道合的骑友</p>
+      <div class="cta-actions">
+        <router-link to="/register" class="cta-button">免费注册</router-link>
+        <router-link to="/route-planning" class="cta-button-outline">
+          <i class="fas fa-route"></i> 先试规划
+        </router-link>
+      </div>
+    </div>
+  </section>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
+import { ref } from 'vue'
 
 const imageLoaded = (event) => {
   event.target.parentElement.classList.add('loaded');
 };
 
-const map = ref(null)
-const startPoint = ref('')
-const endPoint = ref('')
-const routePlanning = ref(null)
-
-// 动态加载高德地图API脚本
-const loadAMapScript = () => {
-  return new Promise((resolve, reject) => {
-    if (window.AMap) {
-      resolve(window.AMap)
-      return
-    }
-    
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.async = true
-    script.src = 'https://webapi.amap.com/maps?v=1.4.15&key=cc888f3fbd2b5c82cb3b842d8277c241&plugin=AMap.Riding,AMap.Geocoder,AMap.ToolBar,AMap.Scale&jscode=045a4882fc3282b9bf01d689b11a06d7'
-    script.onload = () => {
-      if (window.AMap) {
-        resolve(window.AMap)
-      } else {
-        reject(new Error('高德地图API加载失败'))
-      }
-    }
-    script.onerror = () => reject(new Error('高德地图API脚本加载失败'))
-    document.head.appendChild(script)
-  })
-}
-
-// 初始化高德地图
-const initAMap = async () => {
-  try {
-    // 配置高德地图安全密钥（必须在加载API之前设置）
-    window._AMapSecurityConfig = {
-      securityJSCode: '045a4882fc3282b9bf01d689b11a06d7'
-    }
-    
-    // 动态加载高德地图API
-    await loadAMapScript()
-    
-    // 等待DOM更新
-    await nextTick()
-    
-    // 检查容器是否存在
-    const container = document.getElementById('container')
-    if (!container) {
-      console.error('地图容器不存在')
-      return
-    }
-    
-    // 创建地图实例
-    map.value = new AMap.Map('container', {
-      zoom: 12,
-      center: [114.31667, 30.51667], // 石家庄坐标
-      resizeEnable: true,
-      viewMode: '2D',
-      mapStyle: 'amap://styles/normal'
-    })
-    
-    // 监听地图加载完成事件
-    map.value.on('complete', () => {
-      console.log('地图加载完成')
-      // 在地图中心添加一个标记
-      const marker = new AMap.Marker({
-        position: [114.31667, 30.51667],
-        title: '石家庄市中心'
-      })
-      map.value.add(marker)
-    })
-    
-    // 添加地图控件
-    AMap.plugin(['AMap.ToolBar', 'AMap.Scale'], function() {
-      // 工具条控件
-      map.value.addControl(new AMap.ToolBar({
-        position: 'RB'
-      }))
-      
-      // 比例尺控件
-      map.value.addControl(new AMap.Scale())
-    })
-    
-    // 初始化骑行路线规划服务
-    AMap.plugin('AMap.Riding', function() {
-      routePlanning.value = new AMap.Riding({
-        map: map.value,
-        panel: null,
-        policy: AMap.RidingPolicy.LEAST_TIME // 骑行策略参数
-      })
-    })
-    
-    console.log('高德地图初始化成功')
-  } catch (error) {
-    console.error('高德地图初始化失败:', error)
-  }
-}
-
-// 使用POI搜索API进行地址解析
-const geocodeAddress = async (address) => {
-  try {
-    // 安全密钥
-    const securityJsCode = '045a4882fc3282b9bf01d689b11a06d7'
-    
-    // 首先尝试POI搜索API，这对地标和模糊地址更友好
-    const poiUrl = `https://restapi.amap.com/v3/place/text?key=4b19117847fdee44a92d547edb7ab8c1&keywords=${encodeURIComponent(address)}&city=北京&offset=1&jscode=${securityJsCode}`
-    console.log('尝试POI搜索:', address)
-    console.log('POI搜索URL:', poiUrl)
-    
-    const poiResponse = await fetch(poiUrl)
-    const poiData = await poiResponse.json()
-    
-    console.log('POI搜索响应:', poiData)
-    
-    // 如果POI搜索成功
-    if (poiData.status === '1' && poiData.pois && poiData.pois.length > 0) {
-      const poi = poiData.pois[0]
-      const location = poi.location.split(',')
-      console.log(`POI搜索成功，找到: ${poi.name}，地址: ${poi.address}`)
-      return new AMap.LngLat(parseFloat(location[0]), parseFloat(location[1]))
-    }
-    
-    console.log('POI搜索未找到结果，尝试地理编码API')
-    
-    // 如果POI搜索失败，回退到地理编码API
-    const geoUrl = `https://restapi.amap.com/v3/geocode/geo?key=4b19117847fdee44a92d547edb7ab8c1&address=${encodeURIComponent(address)}&jscode=${securityJsCode}`
-    console.log('地理编码URL:', geoUrl)
-    
-    const geoResponse = await fetch(geoUrl)
-    const geoData = await geoResponse.json()
-    
-    console.log('地理编码响应:', geoData)
-    
-    if (geoData.status === '1' && geoData.geocodes && geoData.geocodes.length > 0) {
-      const location = geoData.geocodes[0].location.split(',')
-      console.log(`地理编码成功，地址: ${geoData.geocodes[0].formatted_address}`)
-      return new AMap.LngLat(parseFloat(location[0]), parseFloat(location[1]))
-    }
-    
-    // 两种方法都失败
-    const errorMsg = poiData.info || geoData.info || '未知错误'
-    throw new Error(`地址解析失败: ${errorMsg}`)
-    
-  } catch (error) {
-    console.error('地址解析异常:', error)
-    if (error.message.includes('地址解析失败:')) {
-      throw error
-    }
-    throw new Error('地址解析请求失败: ' + error.message)
-  }
-}
-
-// 使用Web服务API进行骑行路线规划
-const planBicyclingRoute = async (origin, destination) => {
-  try {
-    const securityJsCode = '045a4882fc3282b9bf01d689b11a06d7'
-    const apiKey = '4b19117847fdee44a92d547edb7ab8c1'
-    
-    // 使用高德地图Web服务API的骑行路线规划
-    const routeUrl = `https://restapi.amap.com/v4/direction/bicycling?key=${apiKey}&origin=${origin}&destination=${destination}&jscode=${securityJsCode}`
-    
-    console.log('骑行路线规划URL:', routeUrl)
-    
-    const response = await fetch(routeUrl)
-    const data = await response.json()
-    
-    console.log('骑行路线规划响应:', data)
-    
-    // 检查API响应格式：{data: {...}, errcode: 0, errmsg: 'OK'}
-    if (data.errcode === 0 && data.data && data.data.paths && data.data.paths.length > 0) {
-      const path = data.data.paths[0]
-      console.log('路线规划成功:', {
-        distance: path.distance + '米',
-        duration: Math.round(path.duration / 60) + '分钟',
-        steps: path.steps.length + '个步骤'
-      })
-      
-      // 在地图上绘制路线
-      drawRouteOnMap(path)
-      
-      alert(`路线规划成功！\n距离: ${(path.distance / 1000).toFixed(1)}公里\n预计时间: ${Math.round(path.duration / 60)}分钟`)
-      return data
-    } else {
-      throw new Error(data.errmsg || '路线规划失败')
-    }
-  } catch (error) {
-    console.error('骑行路线规划失败:', error)
-    throw error
-  }
-}
-
-// 在地图上绘制路线
-const drawRouteOnMap = (path) => {
-  if (!map.value) return
-  
-  try {
-    // 清除之前的路线
-    map.value.clearMap()
-    
-    // 解析路径坐标
-    const pathCoords = []
-    if (path.steps && path.steps.length > 0) {
-      path.steps.forEach(step => {
-        if (step.polyline) {
-          const coords = step.polyline.split(';')
-          coords.forEach(coord => {
-            const [lng, lat] = coord.split(',')
-            if (lng && lat) {
-              pathCoords.push([parseFloat(lng), parseFloat(lat)])
-            }
-          })
-        }
-      })
-    }
-    
-    if (pathCoords.length > 0) {
-      // 创建路线折线
-      const polyline = new AMap.Polyline({
-        path: pathCoords,
-        strokeColor: '#3366FF',
-        strokeWeight: 6,
-        strokeOpacity: 0.8
-      })
-      
-      map.value.add(polyline)
-      
-      // 添加起点和终点标记
-      const startMarker = new AMap.Marker({
-        position: pathCoords[0],
-        title: '起点',
-        icon: new AMap.Icon({
-          size: new AMap.Size(25, 34),
-          image: 'https://webapi.amap.com/theme/v1.3/markers/n/start.png'
-        })
-      })
-      
-      const endMarker = new AMap.Marker({
-        position: pathCoords[pathCoords.length - 1],
-        title: '终点',
-        icon: new AMap.Icon({
-          size: new AMap.Size(25, 34),
-          image: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png'
-        })
-      })
-      
-      map.value.add([startMarker, endMarker])
-      
-      // 调整地图视野以显示完整路线
-      map.value.setFitView([polyline])
-    }
-  } catch (error) {
-    console.error('绘制路线失败:', error)
-  }
-}
-
-// 规划路线
-const calculateRoute = async () => {
-  if (!startPoint.value || !endPoint.value) {
-    alert('请输入起点和终点')
-    return
-  }
-  
-  try {
-    console.log('开始解析起点地址:', startPoint.value)
-    const startLngLat = await geocodeAddress(startPoint.value)
-    console.log('起点坐标:', startLngLat.toString())
-    
-    console.log('开始解析终点地址:', endPoint.value)
-    const endLngLat = await geocodeAddress(endPoint.value)
-    console.log('终点坐标:', endLngLat.toString())
-    
-    // 使用Web服务API进行骑行路线规划
-    const origin = `${startLngLat.lng},${startLngLat.lat}`
-    const destination = `${endLngLat.lng},${endLngLat.lat}`
-    
-    await planBicyclingRoute(origin, destination)
-    
-  } catch (error) {
-    console.error('路线规划失败:', error)
-    alert('路线规划失败: ' + error.message)
-  }
-}
-
-// 组件挂载时初始化地图
-onMounted(async () => {
-  // 等待DOM渲染完成后再初始化地图
-  await nextTick()
-  initAMap()
-  
-  // 绑定按钮事件
-  setTimeout(() => {
-    const calculateBtn = document.getElementById('calculateRoute')
-    if (calculateBtn) {
-      calculateBtn.addEventListener('click', calculateRoute)
-    }
-    
-    // 绑定输入框
-    const startInput = document.getElementById('startPoint')
-    const endInput = document.getElementById('endPoint')
-    
-    if (startInput) {
-      startInput.addEventListener('input', (e) => {
-        startPoint.value = e.target.value
-      })
-    }
-    
-    if (endInput) {
-      endInput.addEventListener('input', (e) => {
-        endPoint.value = e.target.value
-      })
-    }
-  }, 100)
-})
-
-// 组件卸载时销毁地图
-onUnmounted(() => {
-  if (map.value) {
-    map.value.destroy()
-  }
-})
-
-// 跳转到装备推荐页面
-const goToEquipment = () => {
-  router.push('/equipment')
-}
+const statsData = ref([
+  { icon: 'fa-road', number: '86', unit: '万公里', label: '累计骑行里程' },
+  { icon: 'fa-map-marked-alt', number: '28', unit: '条', label: '精选骑行路线' },
+  { icon: 'fa-users', number: '12,000', unit: '+', label: '活跃骑行用户' },
+  { icon: 'fa-mountain', number: '158', unit: '万米', label: '累计爬升海拔' }
+])
 </script>
 
 <style scoped>
-/* 首页特定样式 */
+/* Hero 区域 */
 .hero {
-  background: linear-gradient(135deg, rgba(255, 193, 7, 0.9), rgba(230, 81, 0, 0.7)), 
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.9), rgba(230, 81, 0, 0.7)),
               url('/source/湖滨休闲道.jpg') center/cover fixed;
   color: #FFFFFF;
   padding: 120px 20px 80px;
@@ -1292,25 +279,25 @@ const goToEquipment = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, 
-      rgba(255, 152, 0, 0.8), 
-      rgba(230, 81, 0, 0.6), 
+  background: linear-gradient(135deg,
+      rgba(255, 152, 0, 0.8),
+      rgba(230, 81, 0, 0.6),
       rgba(255, 193, 7, 0.7));
   animation: gradientShift 20s ease infinite;
   z-index: 0;
 }
 
 @keyframes gradientShift {
-  0%, 100% { 
-    background: linear-gradient(135deg, 
-        rgba(255, 152, 0, 0.8), 
-        rgba(230, 81, 0, 0.6), 
+  0%, 100% {
+    background: linear-gradient(135deg,
+        rgba(255, 152, 0, 0.8),
+        rgba(230, 81, 0, 0.6),
         rgba(255, 193, 7, 0.7));
   }
-  50% { 
-    background: linear-gradient(135deg, 
-        rgba(255, 193, 7, 0.8), 
-        rgba(255, 152, 0, 0.7), 
+  50% {
+    background: linear-gradient(135deg,
+        rgba(255, 193, 7, 0.8),
+        rgba(255, 152, 0, 0.7),
         rgba(230, 81, 0, 0.6));
   }
 }
@@ -1328,7 +315,7 @@ const goToEquipment = () => {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.hero h2 {
+.hero h1 {
   font-size: clamp(2.2rem, 5vw, 3.5rem);
   margin-bottom: 24px;
   font-weight: 700;
@@ -1344,6 +331,14 @@ const goToEquipment = () => {
   opacity: 0.95;
 }
 
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
 .cta-button {
   display: inline-block;
   padding: 16px 40px;
@@ -1357,6 +352,8 @@ const goToEquipment = () => {
   box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
   text-transform: uppercase;
   letter-spacing: 1px;
+  border: none;
+  cursor: pointer;
 }
 
 .cta-button:hover {
@@ -1365,9 +362,53 @@ const goToEquipment = () => {
   background: linear-gradient(135deg, #FF8A65, #FFB74D);
 }
 
+.cta-button-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 40px;
+  background: transparent;
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+}
+
+.cta-button-outline:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: white;
+  transform: translateY(-3px);
+}
+
+.hero-stats-mini {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.hero-stats-mini span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-stats-mini strong {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
 /* 主要内容区域 */
 .container {
   padding: 60px 20px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .section-title {
@@ -1391,18 +432,23 @@ const goToEquipment = () => {
   border-radius: 2px;
 }
 
-/* 路线卡片容器 */
+.section-title.left {
+  text-align: left;
+}
+
+.section-title.left::after {
+  left: 0;
+  transform: none;
+}
+
+/* 路线卡片 */
 .route-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 40px;
   margin-top: 60px;
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
-/* 路线卡片样式优化 */
 .route-card {
   background: white;
   border-radius: 20px;
@@ -1535,7 +581,6 @@ const goToEquipment = () => {
   box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
 }
 
-/* 难度标签优化 */
 .difficulty {
   display: inline-block;
   padding: 8px 16px;
@@ -1565,50 +610,357 @@ const goToEquipment = () => {
   box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
 }
 
-/* 路线详情页样式 */
-.route-detail-container {
-  margin-top: 50px;
+/* 数据统计区域 */
+.stats-showcase {
+  background: linear-gradient(135deg, #FFF8F0 0%, #FFF3E0 100%);
+  padding: 80px 20px;
 }
 
-.map-container {
-  height: 500px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.map-controls {
+.stat-card {
   background: white;
-  padding: 25px;
+  border-radius: 20px;
+  padding: 35px 25px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 152, 0, 0.1);
+}
+
+.stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card .stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF9800, #F57C00);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 1.5rem;
+}
+
+.stat-card .stat-number {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #2C3E50;
+  line-height: 1.2;
+}
+
+.stat-card .stat-unit {
+  font-size: 1rem;
+  color: #FF9800;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stat-card .stat-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* 特色功能探索 */
+.features-explore {
+  padding: 80px 20px;
+  background: white;
+}
+
+.features-explore .section-subtitle {
+  text-align: center;
+  color: #666;
+  font-size: 1.1rem;
+  margin-top: -30px;
+  margin-bottom: 50px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 20px;
+  padding: 35px 30px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s ease;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  border-color: rgba(255, 152, 0, 0.2);
+}
+
+.feature-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.feature-icon.heritage {
+  background: linear-gradient(135deg, #E65100, #FF9800);
+}
+
+.feature-icon.vr {
+  background: linear-gradient(135deg, #7B1FA2, #AB47BC);
+}
+
+.feature-icon.equipment {
+  background: linear-gradient(135deg, #FF6F00, #FFA726);
+}
+
+.feature-icon.planning {
+  background: linear-gradient(135deg, #2E7D32, #66BB6A);
+}
+
+.feature-card h3 {
+  font-size: 1.3rem;
+  color: #2C3E50;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.feature-card p {
+  color: #666;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.feature-link {
+  color: #FF9800;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-link {
+  gap: 10px;
+}
+
+.feature-link i {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-link i {
+  transform: translateX(4px);
+}
+
+/* 为什么选择我们 */
+.why-choose-us {
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.value-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.value-desc {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.value-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.value-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.value-item .value-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF9800, #F57C00);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.value-item h4 {
+  color: #2C3E50;
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.value-item p {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.value-visual {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.value-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.value-badge {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #FF9800, #F57C00);
+  color: white;
+  padding: 12px 20px;
   border-radius: 12px;
-  margin-top: 25px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+}
+
+/* 底部 CTA */
+.bottom-cta {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.9), rgba(230, 81, 0, 0.8));
+  padding: 80px 20px;
+  text-align: center;
+  color: white;
+}
+
+.bottom-cta h2 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  margin-bottom: 16px;
+  font-weight: 700;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.bottom-cta p {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin-bottom: 32px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.cta-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 /* 响应式设计 */
+@media (max-width: 1024px) {
+  .value-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .value-visual {
+    order: -1;
+    max-height: 350px;
+  }
+}
+
 @media (max-width: 768px) {
   .hero {
     padding: 80px 15px 60px;
     min-height: 60vh;
   }
-  
+
   .hero-content {
     padding: 30px 15px;
   }
-  
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cta-button,
+  .cta-button-outline {
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+  }
+
+  .hero-stats-mini {
+    gap: 20px;
+  }
+
   .route-container {
     grid-template-columns: 1fr;
     gap: 30px;
     margin-top: 40px;
   }
-  
+
   .route-stats {
     grid-template-columns: 1fr;
     gap: 10px;
   }
-  
+
   .container {
     padding: 40px 15px;
+  }
+
+  .stats-showcase,
+  .features-explore,
+  .why-choose-us,
+  .bottom-cta {
+    padding: 50px 15px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1617,11 +969,11 @@ const goToEquipment = () => {
     min-height: 50vh;
     padding: 60px 10px 40px;
   }
-  
+
   .route-content {
     padding: 20px;
   }
-  
+
   .route-image {
     height: 200px;
   }
@@ -1630,33 +982,5 @@ const goToEquipment = () => {
 @keyframes spin {
   0% { transform: translate(-50%, -50%) rotate(0deg); }
   100% { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-/* 装备推荐卡片样式 */
-.equipment-preview {
-  display: flex;
-  justify-content: space-around;
-  margin: 20px 0;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-.equipment-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.equipment-item i {
-  font-size: 1.5rem;
-  color: #FF9800;
-}
-
-.action-card:hover {
-  cursor: pointer;
 }
 </style>

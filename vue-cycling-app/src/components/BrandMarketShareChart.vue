@@ -141,7 +141,7 @@ export default {
 
     onMounted(loadMarketData)
     watch(selectedCategory, loadMarketData)
-    watch(() => props.categoryId, (val) => { selectedCategory.value = val || 'all'; loadMarketData() })
+    watch(() => props.categoryId, (val) => { selectedCategory.value = val || 'all' })
 
     return { selectedCategory, chartKey, chartData, chartOptions, brandStats, loading, updateChart, loadMarketData }
   }

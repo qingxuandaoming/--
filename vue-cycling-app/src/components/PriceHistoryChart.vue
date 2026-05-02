@@ -92,7 +92,7 @@ export default {
         labels,
         datasets: Object.entries(dsMap).map(([name, data]) => ({
           label: name,
-          data: data.map(v => v !== null && v !== undefined ? Math.round(v) : null),
+          data: Array.isArray(data) ? data.map(v => v !== null && v !== undefined ? Math.round(v) : null) : [],
           borderColor: getColor(name).border,
           backgroundColor: getColor(name).bg,
           tension: 0.4, fill: false, pointRadius: 3, pointHoverRadius: 6, spanGaps: true
