@@ -29,20 +29,47 @@ if not defined JAVA_CMD (
     )
 )
 
-:: 3. Check common install paths
+:: 3. Check Windows Registry (works for any JDK version installed via official installer)
+if not defined JAVA_CMD (
+    for /f "tokens=2*" %%a in ('reg query HKLM\SOFTWARE\JavaSoft\JDK /v JavaHome 2^>nul') do (
+        set "REG_JAVA_HOME=%%b"
+    )
+    if not defined REG_JAVA_HOME (
+        :: Try to read from sub-key (CurrentVersion -> JavaHome)
+        for /f "tokens=2*" %%a in ('reg query HKLM\SOFTWARE\JavaSoft\JDK 2^>nul ^| findstr /i "CurrentVersion"') do (
+            set "REG_VER=%%b"
+        )
+        if defined REG_VER (
+            for /f "tokens=2*" %%a in ('reg query "HKLM\SOFTWARE\JavaSoft\JDK\!REG_VER!" /v JavaHome 2^>nul') do (
+                set "REG_JAVA_HOME=%%b"
+            )
+        )
+    )
+    if defined REG_JAVA_HOME (
+        if exist "!REG_JAVA_HOME!\bin\java.exe" (
+            set "JAVA_CMD=!REG_JAVA_HOME!\bin\java.exe"
+            echo [OK] Found Java via Registry: !REG_JAVA_HOME!
+        )
+    )
+)
+
+:: 4. Check common install paths (jdk-17 through jdk-26)
 if not defined JAVA_CMD (
     for %%p in (
+        "C:\Program Files\Java\jdk-26"
+        "C:\Program Files\Java\jdk-25"
         "C:\Program Files\Java\jdk-24"
         "C:\Program Files\Java\jdk-23"
         "C:\Program Files\Java\jdk-21"
         "C:\Program Files\Java\jdk-17"
+        "C:\Program Files\Eclipse Adoptium\jdk-26*"
         "C:\Program Files\Eclipse Adoptium\jdk-24*"
         "C:\Program Files\Eclipse Adoptium\jdk-23*"
         "C:\Program Files\Eclipse Adoptium\jdk-21*"
         "C:\Program Files\Eclipse Adoptium\jdk-17*"
-        "C:\PROGRA~1\Java\jdk-23"
+        "C:\PROGRA~1\Java\jdk-26"
         "C:\PROGRA~1\Java\jdk-24"
-        "E:\application\java-1.8.0-openjdk-1.8.0.492.b09-1.win.jdk.x86_64"
+        "C:\PROGRA~1\Java\jdk-23"
     ) do (
         for /d %%d in ("%%~p") do (
             if exist "%%d\bin\java.exe" (
@@ -65,9 +92,19 @@ if not defined JAVA_CMD (
 )
 :java_found
 if not defined JAVA_CMD (
-    echo [ERROR] Java not found!
+    echo [ERROR] Java not found! No working JDK detected.
     echo.
-    echo Please install JDK 17+ or set JAVA_HOME environment variable.
+    if defined REG_JAVA_HOME (
+        echo [HINT] Registry shows JDK at: !REG_JAVA_HOME!
+        echo        But java.exe was NOT found there - JDK may be corrupted.
+        echo        Please reinstall it.
+    )
+    echo.
+    echo Download JDK 17+ from:
+    echo   https://www.oracle.com/java/technologies/downloads/
+    echo   or: https://adoptium.net/
+    echo.
+    echo After installing, re-run this script.
     echo.
     pause
     exit /b 1
@@ -113,14 +150,14 @@ echo [INFO] Checking backend ports...
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8080 " ^| findstr "LISTENING"') do (
     echo [WARN] Port 8080 is in use by PID %%a. Stopping it...
     taskkill /F /PID %%a >nul 2>&1
-    timeout /t 1 /nobreak >nul
+    ping 127.0.0.1 -n 2 >nul
 )
 
 :: Free Python port 5000
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":5000 " ^| findstr "LISTENING"') do (
     echo [WARN] Port 5000 is in use by PID %%a. Stopping it...
     taskkill /F /PID %%a >nul 2>&1
-    timeout /t 1 /nobreak >nul
+    ping 127.0.0.1 -n 2 >nul
 )
 
 :: ============================================================
@@ -129,21 +166,22 @@ for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":5000 " ^| findstr "LISTENIN
 
 set "FRONTEND_PORT="
 for %%p in (5500 5510 5520) do (
-    netstat -ano | findstr "LISTENING" | findstr ":%%p " >nul 2>&1
-    if errorlevel 1 (
-        set "FRONTEND_PORT=%%p"
-        echo [OK] Frontend port %%p is available.
-        goto :port_found
-    ) else (
-        echo [WARN] Port %%p is in use, trying next...
+    if not defined FRONTEND_PORT (
+        netstat -ano | findstr "LISTENING" | findstr ":%%p " >nul 2>&1
+        if errorlevel 1 (
+            set "FRONTEND_PORT=%%p"
+        ) else (
+            echo [WARN] Port %%p is in use, trying next...
+        )
     )
 )
 
-echo [ERROR] All ports (5500, 5510, 5520) are in use! Please free one and retry.
-pause
-exit /b 1
-
-:port_found
+if not defined FRONTEND_PORT (
+    echo [ERROR] All ports ^(5500, 5510, 5520^) are in use! Please free one and retry.
+    pause
+    exit /b 1
+)
+echo [OK] Frontend port %FRONTEND_PORT% is available.
 echo.
 
 :: ============================================================
@@ -156,7 +194,7 @@ start /MIN "Java Backend" cmd /c ""%~dp0java-backend\start.bat" "%JAVA_CMD%""
 :: Wait and verify
 set /a RETRY=0
 :java_wait
- timeout /t 1 /nobreak >nul
+ ping 127.0.0.1 -n 2 >nul
  netstat -ano | findstr "LISTENING" | findstr ":8080 " >nul 2>&1
  if not errorlevel 1 goto :java_ok
  set /a RETRY+=1
@@ -178,7 +216,7 @@ start /MIN "Python Backend" cmd /c ""%~dp0python-backend\start.bat""
 :: Wait and verify
 set /a RETRY=0
 :python_wait
- timeout /t 1 /nobreak >nul
+ ping 127.0.0.1 -n 2 >nul
  netstat -ano | findstr "LISTENING" | findstr ":5000 " >nul 2>&1
  if not errorlevel 1 goto :python_ok
  set /a RETRY+=1

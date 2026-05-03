@@ -30,14 +30,17 @@ if %ERRORLEVEL% neq 0 (
 )
 
 :: 检查必需的初始化 SQL 文件是否存在
-if not exist "database\complete_init.sql" (
-    echo [WARN] 未找到 database\complete_init.sql
+if not exist "%~dp0database\complete_init.sql" (
+    echo [WARN] 未找到 %~dp0database\complete_init.sql
     echo   Docker 首次启动时可能无法自动初始化数据库。
+    echo   请确认 database/complete_init.sql 文件存在后重试。
+    pause
+    exit /b 1
 )
 
 echo [INFO] Building and starting all services...
 echo [INFO] This may take several minutes on first run...
-%COMPOSE_CMD% -p cycling_system up -d --build
+%COMPOSE_CMD% -p cycling_system up -d --build --remove-orphans
 
 if %ERRORLEVEL% neq 0 (
     echo.
@@ -46,9 +49,46 @@ if %ERRORLEVEL% neq 0 (
     echo   1. 端口 3307/8080/5000/80 被占用
     echo   2. database\complete_init.sql 缺失
     echo   3. Docker 守护进程未正常运行
+    echo.
+    echo 查看详细日志: %COMPOSE_CMD% -p cycling_system logs
     pause
     exit /b 1
 )
+
+:: 等待后端服务健康就绪
+echo.
+echo [INFO] Waiting for services to become healthy...
+set /a WAIT=0
+
+:health_loop
+ping 127.0.0.1 -n 4 >nul
+set /a WAIT+=3
+
+:: 检查 Java 后端
+curl -sf http://localhost:8080/api/route/health >nul 2>&1
+set JAVA_OK=%ERRORLEVEL%
+
+:: 检查 Python 后端
+curl -sf http://localhost:5000/api/health >nul 2>&1
+set PYTHON_OK=%ERRORLEVEL%
+
+if %JAVA_OK% equ 0 (
+    if %PYTHON_OK% equ 0 (
+        echo [OK] All backends are healthy after %WAIT%s.
+        goto :all_ready
+    )
+)
+
+if %WAIT% lss 120 (
+    echo [INFO] Still waiting... (%WAIT%s elapsed, Java=%JAVA_OK% Python=%PYTHON_OK%)
+    goto :health_loop
+)
+
+echo [WARN] Backends did not respond within 120s. Check logs:
+echo   %COMPOSE_CMD% -p cycling_system logs java-backend
+echo   %COMPOSE_CMD% -p cycling_system logs python-backend
+
+:all_ready
 
 echo.
 echo =======================================================
