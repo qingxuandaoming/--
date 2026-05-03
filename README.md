@@ -279,7 +279,7 @@ npm run dev
 | 🏗️ 架构设计 | 系统架构和设计模式 | [ARCHITECTURE](./docs/ARCHITECTURE.md) |
 | 🔄 部署指南 | 生产环境部署文档 | [DEPLOYMENT](./docs/DEPLOYMENT.md) |
 | 🧪 测试指南 | 测试策略和用例 | [TESTING](./docs/TESTING.md) |
-| 🤝 贡献指南 | 代码贡献规范 | [CONTRIBUTING](./docs/CONTRIBUTING.md) |
+| 🤝 贡献指南 | 代码贡献规范与 CLA | [CONTRIBUTING](./CONTRIBUTING.md) |
 
 ## 🌐 服务端口
 
@@ -378,7 +378,14 @@ test(unit): 添加用户服务单元测试
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+本项目采用 **双重许可模式（Dual Licensing）** 发布：
+
+- **非商业用途**：适用 **GNU AGPL-3.0** 开源许可，免费使用，但衍生作品必须开源
+- **商业用途**：须签署书面商业授权协议并支付许可费用
+
+详见 [LICENSE](LICENSE) 文件。如需商业授权，请参阅 [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) 模板或联系 925342921@qq.com。
+
+提交贡献前，请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 中的贡献者许可协议（CLA）条款。
 
 ## 📞 联系我们
 
@@ -394,7 +401,7 @@ test(unit): 添加用户服务单元测试
 
 欢迎提交 Issue 和 Pull Request！
 
-[报告Bug](https://github.com/your-repo/issues) • [功能建议](https://github.com/your-repo/issues) • [贡献代码](./docs/CONTRIBUTING.md)
+[报告Bug](https://github.com/your-repo/issues) • [功能建议](https://github.com/your-repo/issues) • [贡献代码](./CONTRIBUTING.md)
 
 ---
 
