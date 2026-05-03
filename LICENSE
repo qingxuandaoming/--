@@ -1,0 +1,161 @@
+灵境行者 (Spirit Journey Rider) — 双重许可声明
+Intangible Cultural Heritage Cycling Tour — Dual License Notice
+
+================================================================================
+版权所有 (C) 2026 河北经贸大学 灵境行者团队
+Copyright (C) 2026 Hebei University of Economics and Business, Spirit Journey Rider Team
+著作权人 / Copyright Holder: 陈冠衡 (Chen Guanheng)
+联系邮箱 / Contact: 925342921@qq.com
+
+项目地址 / Repository: https://github.com/qingxuandaoming/Intangible_Cultural_Heritage_Cycling_Tour
+================================================================================
+
+本项目采用「双重许可模式（Dual Licensing）」发布，任何使用、复制、修改、分发本
+项目代码及衍生作品的行为，均须遵守以下条款：
+
+This project is released under a "Dual Licensing" model. Any use, copying,
+modification, or distribution of this project's code and derivative works is
+subject to the following terms:
+
+================================================================================
+第一条 许可选择 / License Choice
+================================================================================
+
+您必须根据您的使用场景，选择适用以下 A 条款或 B 条款之一，二者不可同时适用：
+
+You must choose to apply either Section A or Section B below, based on your
+usage scenario. The two sections may not apply simultaneously.
+
+--------------------------------------------------------------------------------
+A. 开源许可条款 — GNU AFFERO GENERAL PUBLIC LICENSE Version 3
+   Open Source License Terms — GNU AGPL v3
+--------------------------------------------------------------------------------
+
+若您的使用属于「非商业用途」（定义见下文），您可以在遵守 GNU Affero General
+Public License Version 3（以下简称"AGPL-3.0"）的前提下，免费使用本项目。
+
+AGPL-3.0 完整文本见：
+https://www.gnu.org/licenses/agpl-3.0.html
+https://www.gnu.org/licenses/agpl-3.0.zh-cn.html（非官方中文参考译文）
+
+适用 AGPL-3.0 的核心义务包括但不限于：
+(a) 若您在本项目基础上进行修改并发布，修改后的源代码必须以 AGPL-3.0 向公众开源；
+(b) 若您通过网络提供基于本项目的服务（SaaS/PaaS 等），您必须向服务用户提供完整
+    的服务端源代码；
+(c) 所有衍生作品必须保留本版权声明及 AGPL-3.0 许可声明；
+(d) 不提供任何担保，责任自负。
+
+If your use qualifies as "Non-Commercial Use" (as defined below), you may use
+this project free of charge under the GNU Affero General Public License
+Version 3 ("AGPL-3.0").
+
+The full text of AGPL-3.0 is available at:
+https://www.gnu.org/licenses/agpl-3.0.html
+
+--------------------------------------------------------------------------------
+B. 商业授权条款 / Commercial License Terms
+--------------------------------------------------------------------------------
+
+若您的使用属于「商业用途」（定义见下文），您不得适用 AGPL-3.0 进行免费使用，而
+必须与著作权人签署书面商业授权协议，并支付相应的许可费用。
+
+商业授权协议模板见本仓库根目录下的 COMMERCIAL_LICENSE.md 文件。该模板中的
+"________" 填空处须在正式签署前补全。双方各执一份签字盖章后的原件。
+
+正式签署前，建议双方各自咨询知识产权律师审核条款。
+
+If your use qualifies as "Commercial Use" (as defined below), you may NOT rely
+on AGPL-3.0 for free use. You must enter into a written commercial license
+agreement with the copyright holder and pay the applicable license fees.
+
+The commercial license agreement template is located at COMMERCIAL_LICENSE.md
+in the root of this repository. All "________" placeholders must be completed
+before formal execution. Each party shall retain one original signed copy.
+
+Both parties are advised to consult intellectual property attorneys before
+formal execution.
+
+================================================================================
+第二条 定义 / Definitions
+================================================================================
+
+2.1 「非商业用途 / Non-Commercial Use」
+指不以营利为目的，且不具有商业推广性质的使用，包括但不限于：
+(a) 个人学习、研究或兴趣爱好；
+(b) 学校教学、学术研究、课程设计、毕业论文（须注明来源）；
+(c) 非营利组织的内部使用（不得对外收费提供服务）；
+(d) 参与本项目的开源贡献（须遵守 CONTRIBUTING.md 中的 CLA 条款）。
+
+2.2 「商业用途 / Commercial Use」
+指以营利为目的或具有商业推广性质的使用，包括但不限于：
+(a) 将本软件或其衍生代码集成到收费产品、服务或解决方案中；
+(b) 以 SaaS、PaaS、IaaS 等形式对外提供基于本软件的服务，无论是否直接收费；
+(c) 将本软件用于商业外包项目、政府招投标项目或企业内部运营系统；
+(d) 使用本软件的输出数据、爬虫结果进行商业销售或数据交易；
+(e) 其他任何直接或间接产生经济收益的使用方式。
+
+注：在非营利组织内部使用，但若该组织以本项目为基础向第三方提供收费服务，
+    仍视为商业用途。
+
+================================================================================
+第三条 权利保留 / Rights Reserved
+================================================================================
+
+3.1 本项目的一切知识产权（包括但不限于著作权、专利权、商标权、商业秘密）
+    均归著作权人所有。无论您选择适用 A 条款或 B 条款，本许可的授予均不导致
+    任何知识产权的转让。
+
+3.2 未在本文件中明确授予的所有权利，均由著作权人保留。任何超出本许可范围
+    的使用，均须事先获得著作权人的书面授权。
+
+3.3 本项目的名称"灵境行者"、"Spirit Journey Rider"、"非遗骑行导览系统"
+    及相关标识、Logo 的商标权归著作权人所有。未经授权，任何第三方不得将其
+    注册为商标或用于可能产生混淆的产品/服务名称。
+
+================================================================================
+第四条 贡献者条款 / Contributor Terms
+================================================================================
+
+4.1 任何个人或实体向本项目提交贡献（包括但不限于代码、文档、设计、翻译），
+    即视为已阅读、理解并同意 CONTRIBUTING.md 中的《贡献者许可协议》(CLA)。
+
+4.2 根据 CLA，贡献者将其贡献的全部著作权无偿、永久、不可撤销地转让给著作权人，
+    以确保本项目能够统一行使开源许可与商业授权。著作权人承诺通过 Git 提交记录
+    保留贡献者的署名权。
+
+================================================================================
+第五条 免责声明 / Disclaimer of Warranty
+================================================================================
+
+本项目按"原样（AS IS）"提供，著作权人不对本项目的适销性、特定用途适用性、
+无侵权性、不间断运行等作出任何明示或暗示的担保。使用本项目的全部风险由您
+自行承担。
+
+在任何情况下，著作权人均不对因使用或无法使用本项目而产生的任何直接、间接、
+附带、特殊或后果性损害承担责任，即使已被告知该等损害的可能性。
+
+================================================================================
+第六条 协议冲突与解释 / Conflict and Interpretation
+================================================================================
+
+6.1 本文件（LICENSE）与 COMMERCIAL_LICENSE.md、CONTRIBUTING.md 共同构成完整的
+    知识产权许可体系。若条款之间存在冲突：
+    (a) 商业授权场景：以双方正式签署的商业授权协议为准；
+    (b) 开源使用场景：以 AGPL-3.0 及本文件为准；
+    (c) 贡献者权利义务：以 CONTRIBUTING.md 中的 CLA 为准。
+
+6.2 本文件以中文和英文书写，两种文本具有同等效力。如发生歧义，以中文文本为准。
+
+6.3 本文件的解释及因本文件产生的争议，适用中华人民共和国法律（不含冲突法规则）。
+
+================================================================================
+
+如您对许可条款有任何疑问，或希望洽谈商业授权，请联系：
+If you have any questions about the license terms, or wish to discuss commercial
+licensing, please contact:
+
+    邮箱 / Email: 925342921@qq.com
+    主题 / Subject: 许可咨询 / License Inquiry
+
+================================================================================
+*本文件最后更新 / Last Updated: 2026年5月*
