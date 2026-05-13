@@ -16,7 +16,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/ljxz?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
-    password: YOUR_DB_PASSWORD_HERE
+    password: ${DB_PASSWORD:YOUR_DB_PASSWORD_HERE}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 20
@@ -60,11 +60,11 @@ spring:
 # 高德地图API配置
 amap:
   # Web服务API Key
-  web-api-key: YOUR_AMAP_WEB_API_KEY_HERE
+  web-api-key: ${AMAP_WEB_API_KEY:YOUR_AMAP_WEB_API_KEY_HERE}
   # Web端JS API Key
-  js-api-key: YOUR_AMAP_JS_API_KEY_HERE
+  js-api-key: ${AMAP_JS_API_KEY:YOUR_AMAP_JS_API_KEY_HERE}
   # 安全密钥
-  security-key: YOUR_AMAP_SECURITY_KEY_HERE
+  security-key: ${AMAP_SECURITY_KEY:YOUR_AMAP_SECURITY_KEY_HERE}
   # API基础URL
   base-url: https://restapi.amap.com/v3
   # 请求超时时间(毫秒)
@@ -74,7 +74,7 @@ amap:
 
 # JWT配置
 jwt:
-  secret: YOUR_JWT_SECRET_HERE
+  secret: ${JWT_SECRET:YOUR_JWT_SECRET_HERE}
   expiration: 86400000  # 24小时(毫秒)
   refresh-expiration: 604800000  # 7天(毫秒)
 

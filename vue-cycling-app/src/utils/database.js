@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 // API基础URL配置
-const API_BASE_URL = 'http://localhost:8080/api'; // Java后端
+// 开发模式使用 /api 走 Vite 代理，生产模式使用绝对 URL
+const isDev = import.meta.env.DEV;
+const API_BASE_URL = isDev ? '/api' : 'http://localhost:8080/api'; // Java后端
 const PYTHON_API_BASE_URL = 'http://localhost:5000/api'; // Python后端
 
 // 创建axios实例

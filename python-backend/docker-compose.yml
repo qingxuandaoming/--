@@ -7,10 +7,10 @@ services:
     container_name: ljxz_mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ljxz
       MYSQL_USER: ljxz_user
-      MYSQL_PASSWORD: ljxz_pass
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
@@ -45,12 +45,12 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: ljxz_user
-      DB_PASSWORD: ljxz_pass
+      DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ljxz
       
       # Flask配置
       FLASK_DEBUG: false
-      SECRET_KEY: your-secret-key-here
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-here}
       
       # Redis配置（可选）
       REDIS_HOST: redis

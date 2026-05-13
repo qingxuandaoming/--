@@ -6,7 +6,7 @@ services:
     container_name: cycling_mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: YOUR_DB_PASSWORD_HERE
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ljxz
       TZ: Asia/Shanghai
     ports:
@@ -16,7 +16,7 @@ services:
       # 将初始化脚本挂载到 docker-entrypoint-initdb.d 目录下，容器首次启动会自动执行
       - ./database/complete_init.sql:/docker-entrypoint-initdb.d/complete_init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pYOUR_DB_PASSWORD_HERE"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -39,7 +39,7 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ljxz?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=YOUR_DB_PASSWORD_HERE
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - TZ=Asia/Shanghai
     depends_on:
       mysql:
@@ -65,11 +65,11 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - DATABASE_URL=mysql+pymysql://root:YOUR_DB_PASSWORD_HERE@mysql:3306/ljxz
+      - DATABASE_URL=mysql+pymysql://root:${DB_PASSWORD}@mysql:3306/ljxz
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_USER=root
-      - DB_PASSWORD=YOUR_DB_PASSWORD_HERE
+      - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=ljxz
       - TZ=Asia/Shanghai
       - CHROME_BINARY_PATH=/usr/bin/google-chrome

@@ -6,6 +6,15 @@ echo Starting Spirit Journey Rider Locally
 echo ==========================================
 echo.
 
+:: 加载 .env 环境变量（如果存在）
+if exist "%~dp0.env" (
+    echo [INFO] Loading environment variables from .env
+    for /f "delims=" %%i in ('powershell -NoProfile -Command "Get-Content '%~dp0.env' ^| Where-Object { $_ -match '^\s*([^#][^=]*)\s*=\s*(.*)$' } ^| ForEach-Object { $matches[1].Trim() + '=' + $matches[2].Trim() }"') do (
+        set "%%i"
+    )
+)
+echo.
+
 :: Auto-detect Java (multi-source)
 set "JAVA_CMD="
 
@@ -161,11 +170,11 @@ for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":5000 " ^| findstr "LISTENIN
 )
 
 :: ============================================================
-:: Detect frontend port (5500 -> 5510 -> 5520)
+:: Detect frontend port (5700 -> 5710 -> 5720)
 :: ============================================================
 
 set "FRONTEND_PORT="
-for %%p in (5500 5510 5520) do (
+for %%p in (5700 5710 5720) do (
     if not defined FRONTEND_PORT (
         netstat -ano | findstr "LISTENING" | findstr ":%%p " >nul 2>&1
         if errorlevel 1 (
@@ -177,7 +186,7 @@ for %%p in (5500 5510 5520) do (
 )
 
 if not defined FRONTEND_PORT (
-    echo [ERROR] All ports ^(5500, 5510, 5520^) are in use! Please free one and retry.
+    echo [ERROR] All ports ^(5700, 5710, 5720^) are in use! Please free one and retry.
     pause
     exit /b 1
 )

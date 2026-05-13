@@ -23,7 +23,7 @@ export default defineConfig({
   },
   server: {
     host: '127.0.0.1',
-    port: 5500,
+    port: 5700,
     strictPort: false,
     proxy: {
       // Python后端 - 装备和爬虫相关API
@@ -41,7 +41,14 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            // 移除 Origin 头，避免 Spring Security CORS 过滤器拒绝请求
+            // 开发模式下前端与代理同源，无需携带 Origin
+            proxyReq.removeHeader('origin');
+          });
+        }
       }
     }
   }

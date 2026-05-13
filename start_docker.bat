@@ -99,7 +99,7 @@ echo Frontend: http://localhost
 echo Java Backend: http://localhost:8080/api/route/health
 echo Python Backend: http://localhost:5000/api/health
 echo.
-echo Default Admin: root / YOUR_DB_PASSWORD_HERE
+echo [INFO] 请确保 .env 文件已配置数据库密码
 echo.
 echo Logs: %COMPOSE_CMD% -p cycling_system logs -f
 echo Stop: %COMPOSE_CMD% -p cycling_system down

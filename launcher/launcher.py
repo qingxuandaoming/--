@@ -56,7 +56,21 @@ PY_PORT   = 5000
 WEB_PORT  = 5000  # Python 同时 serve 前端静态文件
 
 DB_USER = "root"
-DB_PASS = "YOUR_DB_PASSWORD_HERE"
+DB_PASS = os.environ.get("DB_PASSWORD", "")
+if not DB_PASS:
+    # 尝试从项目根目录的 .env 文件读取
+    _env_file = os.path.join(os.path.dirname(BASE_DIR), ".env")
+    if os.path.exists(_env_file):
+        with open(_env_file, "r", encoding="utf-8") as f:
+            for _line in f:
+                _line = _line.strip()
+                if _line and not _line.startswith("#") and "=" in _line:
+                    _k, _v = _line.split("=", 1)
+                    if _k.strip() == "DB_PASSWORD":
+                        DB_PASS = _v.strip()
+                        break
+    if not DB_PASS:
+        DB_PASS = "YOUR_DB_PASSWORD_HERE"
 DB_NAME = "ljxz"
 
 # 系统 MySQL/MariaDB 常见端口（探测顺序）

@@ -16,7 +16,7 @@
   - 非遗文化地图展示
 
 - **项目架构**：前后端分离的微服务架构
-  - `vue-cycling-app/` — Vue 3 前端应用（端口 5173 或 5500+）
+  - `vue-cycling-app/` — Vue 3 前端应用（端口 5173 或 5700+）
   - `java-backend/` — Java 主后端服务（Spring Boot，端口 8080）
   - `python-backend/` — Python 爬虫与数据分析服务（Flask，端口 5000）
   - `database/` — 数据库初始化脚本
@@ -111,7 +111,7 @@
 - 服务端口：`8080`，上下文路径：`/api`
 - 数据库：`jdbc:mysql://localhost:3306/ljxz`
 - 高德地图 API Key：配置在 `amap.web-api-key` / `js-api-key` / `security-key`
-- JWT 密钥：`ljxz-cycling-route-secret-key-2024`，有效期 24 小时，Refresh Token 7 天
+- JWT 密钥：通过环境变量 `JWT_SECRET` 配置（或 `application-local.yml`），有效期 24 小时，Refresh Token 7 天
 - 免认证路径：`/auth/**`, `/health`, `/route/health`, `/public/**` 等
 - MyBatis 配置当前被注释掉，项目实际使用 Spring Data JPA
 
@@ -131,7 +131,7 @@
 
 ```bash
 npm install
-npm run dev          # 开发模式，默认端口 5500（vite.config.js 中配置）
+npm run dev          # 开发模式，默认端口 5700（vite.config.js 中配置）
 npm run build        # 生产构建，输出到 dist/
 npm run preview      # 预览生产构建
 ```
@@ -189,7 +189,7 @@ double-click start_local.bat
 该脚本会自动：
 1. 检测并启动 Java 后端（端口 8080）
 2. 启动 Python 后端（端口 5000，含调度器）
-3. 启动 Vue 前端（Vite，端口 5500/5510/5520 自动探测）
+3. 启动 Vue 前端（Vite，端口 5700/5710/5720 自动探测）
 4. 前端退出时自动关闭两个后端
 
 ---
@@ -285,13 +285,15 @@ double-click start_local.bat
 
 ### 9.1 敏感信息
 
-以下文件中**包含硬编码密钥**，生产部署前必须修改：
+以下敏感配置已通过环境变量外部化，请勿在代码中硬编码真实值：
 - `java-backend/src/main/resources/application.yml`：
-  - `amap.web-api-key` / `js-api-key` / `security-key`（高德地图 API Key）
-  - `jwt.secret`（JWT 签名密钥）
-  - `spring.datasource.password`（数据库密码）
+  - `amap.web-api-key` / `js-api-key` / `security-key`（高德地图 API Key）→ 环境变量 `AMAP_WEB_API_KEY` / `AMAP_JS_API_KEY` / `AMAP_SECURITY_KEY`
+  - `jwt.secret`（JWT 签名密钥）→ 环境变量 `JWT_SECRET`
+  - `spring.datasource.password`（数据库密码）→ 环境变量 `DB_PASSWORD`
 - `python-backend/.env`（若存在）：数据库密码、邮件密码
-- `launcher/launcher.py`：`DB_PASS = "Cycling2024!"`
+- `launcher/launcher.py`：`DB_PASS` → 环境变量 `DB_PASSWORD` 或项目根目录 `.env`
+
+本地开发时，复制 `.env.example` 为 `.env` 并填入真实值；各服务启动时会自动读取。
 
 ### 9.2 认证与授权
 
