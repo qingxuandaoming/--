@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="petalGradient" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#ffdcdc;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ffa7a6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f25477;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#fff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec275f;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Cherry blossom petals -->
+  <g transform="translate(100,100)">
+    <!-- Petal 1 -->
+    <ellipse cx="0" cy="-25" rx="8" ry="20" fill="url(#petalGradient)" transform="rotate(0)" />
+    <!-- Petal 2 -->
+    <ellipse cx="0" cy="-25" rx="8" ry="20" fill="url(#petalGradient)" transform="rotate(72)" />
+    <!-- Petal 3 -->
+    <ellipse cx="0" cy="-25" rx="8" ry="20" fill="url(#petalGradient)" transform="rotate(144)" />
+    <!-- Petal 4 -->
+    <ellipse cx="0" cy="-25" rx="8" ry="20" fill="url(#petalGradient)" transform="rotate(216)" />
+    <!-- Petal 5 -->
+    <ellipse cx="0" cy="-25" rx="8" ry="20" fill="url(#petalGradient)" transform="rotate(288)" />
+    
+    <!-- Center -->
+    <circle cx="0" cy="0" r="6" fill="url(#centerGradient)" />
+  </g>
+</svg>

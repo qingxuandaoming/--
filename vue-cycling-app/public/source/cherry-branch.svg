@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="300" height="150">
+  <defs>
+    <radialGradient id="blossomGradient" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#ffdcdc;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ffa7a6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f25477;stop-opacity:1" />
+    </radialGradient>
+    <linearGradient id="branchGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A0522D;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Branch -->
+  <path d="M20 120 Q80 100 150 90 Q200 85 280 80" stroke="url(#branchGradient)" stroke-width="4" fill="none" stroke-linecap="round" />
+  
+  <!-- Small branches -->
+  <path d="M60 105 Q70 95 80 85" stroke="url(#branchGradient)" stroke-width="2" fill="none" stroke-linecap="round" />
+  <path d="M120 95 Q130 85 140 75" stroke="url(#branchGradient)" stroke-width="2" fill="none" stroke-linecap="round" />
+  <path d="M180 88 Q190 78 200 68" stroke="url(#branchGradient)" stroke-width="2" fill="none" stroke-linecap="round" />
+  <path d="M240 83 Q250 73 260 63" stroke="url(#branchGradient)" stroke-width="2" fill="none" stroke-linecap="round" />
+  
+  <!-- Cherry blossoms -->
+  <g>
+    <!-- Blossom 1 -->
+    <g transform="translate(75,85)">
+      <ellipse cx="0" cy="-8" rx="3" ry="6" fill="url(#blossomGradient)" transform="rotate(0)" />
+      <ellipse cx="0" cy="-8" rx="3" ry="6" fill="url(#blossomGradient)" transform="rotate(72)" />
+      <ellipse cx="0" cy="-8" rx="3" ry="6" fill="url(#blossomGradient)" transform="rotate(144)" />
+      <ellipse cx="0" cy="-8" rx="3" ry="6" fill="url(#blossomGradient)" transform="rotate(216)" />
+      <ellipse cx="0" cy="-8" rx="3" ry="6" fill="url(#blossomGradient)" transform="rotate(288)" />
+      <circle cx="0" cy="0" r="2" fill="#fff" />
+    </g>
+    
+    <!-- Blossom 2 -->
+    <g transform="translate(135,75)">
+      <ellipse cx="0" cy="-7" rx="2.5" ry="5" fill="url(#blossomGradient)" transform="rotate(0)" />
+      <ellipse cx="0" cy="-7" rx="2.5" ry="5" fill="url(#blossomGradient)" transform="rotate(72)" />
+      <ellipse cx="0" cy="-7" rx="2.5" ry="5" fill="url(#blossomGradient)" transform="rotate(144)" />
+      <ellipse cx="0" cy="-7" rx="2.5" ry="5" fill="url(#blossomGradient)" transform="rotate(216)" />
+      <ellipse cx="0" cy="-7" rx="2.5" ry="5" fill="url(#blossomGradient)" transform="rotate(288)" />
+      <circle cx="0" cy="0" r="1.5" fill="#fff" />
+    </g>
+    
+    <!-- Blossom 3 -->
+    <g transform="translate(195,68)">
+      <ellipse cx="0" cy="-9" rx="3.5" ry="7" fill="url(#blossomGradient)" transform="rotate(0)" />
+      <ellipse cx="0" cy="-9" rx="3.5" ry="7" fill="url(#blossomGradient)" transform="rotate(72)" />
+      <ellipse cx="0" cy="-9" rx="3.5" ry="7" fill="url(#blossomGradient)" transform="rotate(144)" />
+      <ellipse cx="0" cy="-9" rx="3.5" ry="7" fill="url(#blossomGradient)" transform="rotate(216)" />
+      <ellipse cx="0" cy="-9" rx="3.5" ry="7" fill="url(#blossomGradient)" transform="rotate(288)" />
+      <circle cx="0" cy="0" r="2.5" fill="#fff" />
+    </g>
+    
+    <!-- Blossom 4 -->
+    <g transform="translate(255,63)">
+      <ellipse cx="0" cy="-6" rx="2" ry="4" fill="url(#blossomGradient)" transform="rotate(0)" />
+      <ellipse cx="0" cy="-6" rx="2" ry="4" fill="url(#blossomGradient)" transform="rotate(72)" />
+      <ellipse cx="0" cy="-6" rx="2" ry="4" fill="url(#blossomGradient)" transform="rotate(144)" />
+      <ellipse cx="0" cy="-6" rx="2" ry="4" fill="url(#blossomGradient)" transform="rotate(216)" />
+      <ellipse cx="0" cy="-6" rx="2" ry="4" fill="url(#blossomGradient)" transform="rotate(288)" />
+      <circle cx="0" cy="0" r="1" fill="#fff" />
+    </g>
+    
+    <!-- Small buds -->
+    <circle cx="90" cy="95" r="2" fill="#ffa7a6" />
+    <circle cx="160" cy="85" r="1.5" fill="#f25477" />
+    <circle cx="220" cy="78" r="2.5" fill="#ffdcdc" />
+  </g>
+</svg>

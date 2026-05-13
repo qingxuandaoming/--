@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
+  <defs>
+    <!-- 樱花花瓣渐变 -->
+    <radialGradient id="petal1" cx="30%" cy="20%" r="80%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.9" />
+      <stop offset="40%" style="stop-color:#ffdcdc;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#f25477;stop-opacity:0.6" />
+    </radialGradient>
+    <radialGradient id="petal2" cx="30%" cy="20%" r="80%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.8" />
+      <stop offset="40%" style="stop-color:#ffa7a6;stop-opacity:0.7" />
+      <stop offset="100%" style="stop-color:#ec275f;stop-opacity:0.5" />
+    </radialGradient>
+    <radialGradient id="petal3" cx="30%" cy="20%" r="80%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.9" />
+      <stop offset="40%" style="stop-color:#ffb6c1;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#d63384;stop-opacity:0.6" />
+    </radialGradient>
+    
+    <!-- 真实樱花花瓣形状 -->
+    <path id="sakuraPetal" d="M0,0 Q-3,-8 0,-12 Q3,-8 0,0 Q2,3 0,8 Q-2,3 0,0 Z" />
+  </defs>
+  
+  <!-- 飘落的樱花花瓣 -->
+  <g>
+    <!-- 第一层花瓣 -->
+    <use href="#sakuraPetal" x="50" y="-10" fill="url(#petal1)" opacity="0.8">
+      <animateTransform attributeName="transform" type="translate" 
+        values="0,0; 15,80; -8,160; 20,240; -5,320; 12,400" 
+        dur="15s" repeatCount="indefinite" />
+      <animateTransform attributeName="transform" type="rotate" 
+        values="0; 45; 90; 135; 180; 225; 270; 315; 360" 
+        dur="15s" repeatCount="indefinite" additive="sum" />
+      <animate attributeName="opacity" values="0.8; 0.9; 0.6; 0.8; 0.5; 0.7" dur="15s" repeatCount="indefinite" />
+    </use>
+    
+    <use href="#sakuraPetal" x="120" y="-20" fill="url(#petal2)" opacity="0.7">
+      <animateTransform attributeName="transform" type="translate" 
+        values="0,0; -12,70; 18,140; -10,210; 25,280; -8,350" 
+        dur="18s" repeatCount="indefinite" />
+      <animateTransform attributeName="transform" type="rotate" 
+        values="30; 75; 120; 165; 210; 255; 300; 345; 390" 
+        dur="18s" repeatCount="indefinite" additive="sum" />
+      <animate attributeName="opacity" values="0.7; 0.8; 0.5; 0.9; 0.4; 0.6" dur="18s" repeatCount="indefinite" />
+    </use>
+    
+    <use href="#sakuraPetal" x="200" y="-5" fill="url(#petal3)" opacity="0.6">
+      <animateTransform attributeName="transform" type="translate" 
+        values="0,0; 22,90; -15,180; 30,270; -12,360; 18,450" 
+        dur="20s" repeatCount="indefinite" />
+      <animateTransform attributeName="transform" type="rotate" 
+        values="60; 105; 150; 195; 240; 285; 330; 375; 420" 
+        dur="20s" repeatCount="indefinite" additive="sum" />
+      <animate attributeName="opacity" values="0.6; 0.8; 0.4; 0.7; 0.3; 0.5" dur="20s" repeatCount="indefinite" />
+    </use>
+    
+    <use href="#sakuraPetal" x="280" y="-15" fill="url(#petal1)" opacity="0.8">
+      <animateTransform attributeName="transform" type="translate" 
+        values="0,0; -18,85; 25,170; -20,255; 35,340; -15,425" 
+        dur="16s" repeatCount="indefinite" />
+      <animateTransform attributeName="transform" type="rotate" 
+        values="90; 135; 180; 225; 270; 315; 360; 405; 450" 
+        dur="16s" repeatCount="indefinite" additive="sum" />
+      <animate attributeName="opacity" values="0.8; 0.9; 0.5; 0.8; 0.4; 0.7" dur="16s" repeatCount="indefinite" />
+    </use>
+    
+    <use href="#sakuraPetal" x="350" y="-8" fill="url(#petal2)" opacity="0.7">
+      <animateTransform attributeName="transform" type="translate" 
+        values="0,0; 20,75; -22,150; 28,225; -18,300; 32,375" 
+        dur="17s" repeatCount="indefinite" />
+      <animateTransform attributeName="transform" type="rotate" 
+        values="120; 165; 210; 255; 300; 345; 390; 435; 480" 
+        dur="17s" repeatCount="indefinite" additive="sum" />
+      <animate attributeName="opacity" values="0.7; 0.8; 0.4; 0.9; 0.3; 0.6" dur="17s" repeatCount="indefinite" />
+    </use>
+    
+    <!-- 第二层花瓣（更小更远） -->
+    <use href="#sakuraPetal" x="80" y="-25" fill="url(#petal3)" opacity="0.5" transform="scale(0.7)">
+      <animateTransform attributeName="transform" type="translate" 
+        values="0,0; 12,100; -8,200; 18,300; -5,400; 15,500" 
+        dur="22s" repeatCount="indefinite" />
+      <animateTransform attributeName="transform" type="rotate" 
+        values="150; 195; 240; 285; 330; 375; 420; 465; 510" 
+        dur="22s" repeatCount="indefinite" additive="sum" />
+      <animate attributeName="opacity" values="0.5; 0.7; 0.3; 0.6; 0.2; 0.4" dur="22s" repeatCount="indefinite" />
+    </use>
+    
+    <use href="#sakuraPetal" x="180" y="-30" fill="url(#petal1)" opacity="0.4" transform="scale(0.6)">
+      <animateTransform attributeName="transform" type="translate" 
+        values="0,0; -15,95; 20,190; -12,285; 28,380; -10,475" 
+        dur="25s" repeatCount="indefinite" />
+      <animateTransform attributeName="transform" type="rotate" 
+        values="180; 225; 270; 315; 360; 405; 450; 495; 540" 
+        dur="25s" repeatCount="indefinite" additive="sum" />
+      <animate attributeName="opacity" values="0.4; 0.6; 0.2; 0.5; 0.1; 0.3" dur="25s" repeatCount="indefinite" />
+    </use>
+    
+    <use href="#sakuraPetal" x="320" y="-18" fill="url(#petal2)" opacity="0.6" transform="scale(0.8)">
+      <animateTransform attributeName="transform" type="translate" 
+        values="0,0; 25,88; -20,176; 30,264; -15,352; 35,440" 
+        dur="19s" repeatCount="indefinite" />
+      <animateTransform attributeName="transform" type="rotate" 
+        values="210; 255; 300; 345; 390; 435; 480; 525; 570" 
+        dur="19s" repeatCount="indefinite" additive="sum" />
+      <animate attributeName="opacity" values="0.6; 0.8; 0.3; 0.7; 0.2; 0.5" dur="19s" repeatCount="indefinite" />
+    </use>
+  </g>
+</svg>
