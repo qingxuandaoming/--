@@ -272,7 +272,7 @@ const loadAMapScript = () => {
     const script = document.createElement('script')
     script.type = 'text/javascript'
     script.async = true
-    script.src = 'https://webapi.amap.com/maps?v=1.4.15&key=YOUR_AMAP_JS_API_KEY_HERE&plugin=AMap.Riding,AMap.Geocoder,AMap.ToolBar,AMap.Scale&jscode=YOUR_AMAP_SECURITY_KEY_HERE'
+    script.src = 'https://webapi.amap.com/maps?v=1.4.15&key=cc888f3fbd2b5c82cb3b842d8277c241&plugin=AMap.Riding,AMap.Geocoder,AMap.ToolBar,AMap.Scale&jscode=045a4882fc3282b9bf01d689b11a06d7'
     script.onload = () => {
       if (window.AMap) {
         resolve(window.AMap)
@@ -290,7 +290,7 @@ const initAMap = async () => {
   try {
     // 配置高德地图安全密钥（必须在加载API之前设置）
     window._AMapSecurityConfig = {
-      securityJSCode: 'YOUR_AMAP_SECURITY_KEY_HERE'
+      securityJSCode: '045a4882fc3282b9bf01d689b11a06d7'
     }
     
     // 动态加载高德地图API
@@ -356,10 +356,10 @@ const initAMap = async () => {
 const geocodeAddress = async (address) => {
   try {
     // 安全密钥
-    const securityJsCode = 'YOUR_AMAP_SECURITY_KEY_HERE'
+    const securityJsCode = '045a4882fc3282b9bf01d689b11a06d7'
     
     // 首先尝试POI搜索API，这对地标和模糊地址更友好
-    const poiUrl = `https://restapi.amap.com/v3/place/text?key=YOUR_AMAP_WEB_API_KEY_HERE&keywords=${encodeURIComponent(address)}&city=石家庄&offset=1&jscode=${securityJsCode}`
+    const poiUrl = `https://restapi.amap.com/v3/place/text?key=4b19117847fdee44a92d547edb7ab8c1&keywords=${encodeURIComponent(address)}&city=石家庄&offset=1&jscode=${securityJsCode}`
     console.log('尝试POI搜索:', address)
     console.log('POI搜索URL:', poiUrl)
     
@@ -379,7 +379,7 @@ const geocodeAddress = async (address) => {
     console.log('POI搜索未找到结果，尝试地理编码API')
     
     // 如果POI搜索失败，回退到地理编码API
-    const geoUrl = `https://restapi.amap.com/v3/geocode/geo?key=YOUR_AMAP_WEB_API_KEY_HERE&address=${encodeURIComponent(address)}&jscode=${securityJsCode}`
+    const geoUrl = `https://restapi.amap.com/v3/geocode/geo?key=4b19117847fdee44a92d547edb7ab8c1&address=${encodeURIComponent(address)}&jscode=${securityJsCode}`
     console.log('地理编码URL:', geoUrl)
     
     const geoResponse = await fetch(geoUrl)
@@ -409,8 +409,8 @@ const geocodeAddress = async (address) => {
 // 使用Web服务API进行骑行路线规划
 const planBicyclingRoute = async (origin, destination) => {
   try {
-    const securityJsCode = 'YOUR_AMAP_SECURITY_KEY_HERE'
-    const apiKey = 'YOUR_AMAP_WEB_API_KEY_HERE'
+    const securityJsCode = '045a4882fc3282b9bf01d689b11a06d7'
+    const apiKey = '4b19117847fdee44a92d547edb7ab8c1'
     
     // 使用高德地图Web服务API的骑行路线规划
     const routeUrl = `https://restapi.amap.com/v4/direction/bicycling?key=${apiKey}&origin=${origin}&destination=${destination}&jscode=${securityJsCode}`

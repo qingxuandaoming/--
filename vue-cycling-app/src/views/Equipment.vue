@@ -245,9 +245,9 @@
                 <p>{{ equipment.description || '暂无描述' }}</p>
               </div>
               
-              <div class="equipment-price" v-if="equipment.latest_price">
-                <div class="current-price">¥{{ equipment.latest_price.price }}</div>
-                <div class="platform">{{ equipment.latest_price.platform }}</div>
+              <div class="equipment-price" v-if="equipment.latest_price || equipment.price">
+                <div class="current-price">¥{{ equipment.latest_price ? equipment.latest_price.price : equipment.price }}</div>
+                <div class="platform" v-if="equipment.latest_price">{{ equipment.latest_price.platform }}</div>
               </div>
               
               <div class="equipment-tags" v-if="equipment.tags && equipment.tags.length > 0">
@@ -401,11 +401,11 @@
                 <p>{{ selectedEquipment.description }}</p>
               </div>
               
-              <div class="price-info" v-if="selectedEquipment.latest_price">
+              <div class="price-info" v-if="selectedEquipment.latest_price || selectedEquipment.price">
                 <h3>价格信息</h3>
                 <div class="price-display">
-                  <span class="price">¥{{ selectedEquipment.latest_price.price }}</span>
-                  <span class="platform">{{ selectedEquipment.latest_price.platform }}</span>
+                  <span class="price">¥{{ selectedEquipment.latest_price ? selectedEquipment.latest_price.price : selectedEquipment.price }}</span>
+                  <span class="platform" v-if="selectedEquipment.latest_price">{{ selectedEquipment.latest_price.platform }}</span>
                 </div>
                 <a 
                   v-if="selectedEquipment.latest_price.url" 

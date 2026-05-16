@@ -60,11 +60,11 @@ spring:
 # 高德地图API配置
 amap:
   # Web服务API Key
-  web-api-key: ${AMAP_WEB_API_KEY:YOUR_AMAP_WEB_API_KEY_HERE}
+  web-api-key: ${AMAP_WEB_API_KEY:4b19117847fdee44a92d547edb7ab8c1}
   # Web端JS API Key
-  js-api-key: ${AMAP_JS_API_KEY:YOUR_AMAP_JS_API_KEY_HERE}
+  js-api-key: ${AMAP_JS_API_KEY:cc888f3fbd2b5c82cb3b842d8277c241}
   # 安全密钥
-  security-key: ${AMAP_SECURITY_KEY:YOUR_AMAP_SECURITY_KEY_HERE}
+  security-key: ${AMAP_SECURITY_KEY:045a4882fc3282b9bf01d689b11a06d7}
   # API基础URL
   base-url: https://restapi.amap.com/v3
   # 请求超时时间(毫秒)
