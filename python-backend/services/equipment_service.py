@@ -426,7 +426,7 @@ class EquipmentService:
     def get_equipment_detail(self, equipment_id):
         """获取装备详情"""
         try:
-            equipment = Equipment.query.get(equipment_id)
+            equipment = self.Equipment.query.get(equipment_id)
             if not equipment:
                 raise ValueError(f"装备 {equipment_id} 不存在")
             
