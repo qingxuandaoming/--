@@ -2,7 +2,7 @@
   <header class="navbar">
     <div class="container navbar-container">
       <div class="logo">
-        <router-link to="/">灵境骑行</router-link>
+        <router-link to="/">驭见东方骑行</router-link>
       </div>
       <nav class="nav-links">
         <router-link to="/" exact-active-class="active">首页</router-link>
@@ -12,7 +12,7 @@
         <router-link to="/register" active-class="active">注册</router-link>
         <router-link to="/feedback" active-class="active">建议</router-link>
         <router-link to="/help" active-class="active">帮助</router-link>
-        <router-link to="/vr" active-class="active">VR灵境</router-link>
+        <router-link to="/vr" active-class="active">VR体验</router-link>
       </nav>
     </div>
   </header>

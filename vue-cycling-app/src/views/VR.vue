@@ -2,7 +2,7 @@
   <main class="container">
     <div class="vr-container">
       <div class="vr-header">
-        <h1>VR灵境体验</h1>
+        <h1>VR体验</h1>
         <p>通过虚拟现实技术，提前体验精选骑行路线的美景与挑战，让您足不出户就能感受骑行乐趣</p>
         <a href="#vr-routes" class="cta-button">探索VR路线</a>
       </div>

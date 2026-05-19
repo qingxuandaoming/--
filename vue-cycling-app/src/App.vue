@@ -7,7 +7,7 @@ import './assets/styles/base.css';
 
 onMounted(() => {
   // 在组件挂载后执行的逻辑
-  document.title = '灵境骑行 - 探索城市周边最美骑行路线';
+  document.title = '驭见东方骑行 - 探索城市周边最美骑行路线';
 });
 </script>
 

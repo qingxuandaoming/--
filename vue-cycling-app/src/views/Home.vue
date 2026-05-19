@@ -179,7 +179,7 @@
           <div class="feature-icon vr">
             <i class="fas fa-vr-cardboard"></i>
           </div>
-          <h3>VR灵境</h3>
+          <h3>VR体验</h3>
           <p>足不出户，身临其境。360°沉浸式预览沿途风景，提前规划你的骑行。</p>
           <span class="feature-link">进入VR体验 <i class="fas fa-arrow-right"></i></span>
         </router-link>

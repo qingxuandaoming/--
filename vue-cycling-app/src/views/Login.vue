@@ -3,7 +3,7 @@
     <div class="auth-container">
       <div class="auth-header">
         <h1>欢迎回来</h1>
-        <p>登录您的灵境骑行账户，探索更多精彩</p>
+        <p>登录您的驭见东方账户，探索更多精彩</p>
       </div>
       
       <form @submit.prevent="handleSubmit">
